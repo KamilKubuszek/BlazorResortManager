@@ -23,6 +23,7 @@ namespace BlazorResortManager1.Components.ResortManagement
                 using var database = contextFactory.CreateDbContext();
                 await database.statusSheets.AddAsync(statusSheet);
                 await database.SaveChangesAsync();
+                //komentarz
             });
 
             return accountGroup;
