@@ -1,0 +1,17 @@
+﻿
+@inherits LayoutComponentBase
+
+<AuthorizeView>
+    <Authorized>
+        <BlazorResortManager1.Components.Pages.Navbar />
+    </Authorized>
+</AuthorizeView>
+@Body
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<RadzenDialog @rendermode="@RenderMode.InteractiveServer" />
+

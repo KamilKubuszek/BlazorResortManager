@@ -1,0 +1,181 @@
+﻿@* @inject HttpContext httpContext *@
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+
+@page "/statuses/update/{currentResortIdParameter?}"
+
+<h3>UpdateStatus</h3>
+
+@if (loading)
+{
+    <div>loading...</div>
+}
+else
+{
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/" Text="Home" />
+        <RadzenBreadCrumbItem Path="/statuses" Text="Statuses" />
+        <RadzenBreadCrumbItem Icon="add" Text="Update" />
+    </RadzenBreadCrumb>
+
+    @if (resorts != null && currentResortIdParameter == null)
+    {
+        <RadzenDropDown Change="@setStatusForm" Data=@resorts TValue="string" TextProperty="name" ValueProperty="id"
+                        AllowFiltering="true" Name="DropDownResorts">
+        </RadzenDropDown>
+    }
+    @if (currentStatusSheet != null)
+    {
+        <RadzenTemplateForm Submit="@(async (StatusSheet args) => {await postStatusSheet(args); })" Method="post" TItem="StatusSheet" Data="currentStatusSheet">
+            <RadzenFieldset Text="Resort">
+                <p>
+                    <RadzenCheckBox @bind-Value=@currentStatusSheet.resortStatus.opened Name="CheckboxS_opened" />
+                    <RadzenLabel Text="opened" Component="CheckboxS_opened" />
+                </p>
+            </RadzenFieldset>
+
+            <RadzenFieldset Text="Tracks">
+                @foreach (TrackStatus trackStatus in currentStatusSheet.trackStatuses)
+                {
+                    <p>
+                        <RadzenCheckBox @bind-Value=@trackStatus.opened Name="Checkbox_opened" />
+                        <RadzenLabel Text="opened" Component="CheckboxT_opened" />
+                    </p>
+
+                    <p>
+                        <RadzenCheckBox @bind-Value=@trackStatus.illuminated Name="Checkbox_illuminated" />
+                        <RadzenLabel Text="illuminated" Component="CheckboxT_illuminated" />
+                    </p>
+
+                    <p>
+                        <RadzenCheckBox @bind-Value=@trackStatus.snowGroomed Name="Checkbox_snowGroomed" />
+                        <RadzenLabel Text="snow groomed" Component="CheckboxT_snowGroomed" />
+                    </p>
+                }
+            </RadzenFieldset>
+
+            <RadzenFieldset Text="Lifts">
+                @foreach (LiftStatus liftStatus in currentStatusSheet.liftStatuses)
+                {
+                    <p>
+                        <RadzenCheckBox @bind-Value=@liftStatus.opened Name="CheckboxL_opened" />
+                        <RadzenLabel Text="opened" Component="CheckboxL_opened" />
+                    </p>
+                }
+            </RadzenFieldset>
+
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </RadzenTemplateForm>
+    }
+
+}
+
+
+@code {
+    [Parameter]
+    public string? currentResortIdParameter { get; set; }
+
+    public Resort[]? resorts { get; set; }
+    public Dictionary<Guid, StatusSheet> statusesByResortId = new Dictionary<Guid, StatusSheet>();
+    public StatusSheet? currentStatusSheet { get; set; }
+    public bool loading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        await Task.Run(loadResortData);
+        loading = false;
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            Console.WriteLine("//FIRST RENDER//");
+        else
+            Console.WriteLine("//SECOND RENDER//");
+    }
+
+    protected async Task setStatusForm(object value)
+    {
+        var selectedResortId = (Guid)value;
+        Console.WriteLine($"Value changed to {value}");
+
+        currentStatusSheet = statusesByResortId[selectedResortId];
+        // Console.Write(JsonSerializer.Serialize(currentStatusSheet, new JsonSerializerOptions()
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        // }));
+
+    }
+
+    protected async Task loadResortData()
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            resorts = await database.resorts.AsNoTracking().ToArrayAsync();
+
+            statusesByResortId = new Dictionary<Guid, StatusSheet>();
+            foreach (Resort resort in resorts)
+            {
+                var StatusSheet = await database.statusSheets
+                    .Where(e => e.resortId == resort.id && e.productionVersion == true)
+                    .OrderByDescending(e => e.dateTime)
+                    .Include(e => e.resortStatus)
+                    .Include(e => e.liftStatuses)
+                    .Include(e => e.trackStatuses)
+                    .IgnoreAutoIncludes()
+                    .FirstOrDefaultAsync();
+
+                statusesByResortId.Add(resort.id, StatusSheet);
+            }
+        }
+        if(currentResortIdParameter != null && statusesByResortId.Count() > 0)
+        {
+            currentStatusSheet = statusesByResortId[new Guid(currentResortIdParameter)];
+        }
+    }
+
+    protected async Task postStatusSheet(StatusSheet statusSheet)
+    {
+        Console.WriteLine("updating... ");
+
+        loading = true;
+
+        statusSheet.id = Guid.NewGuid();
+        statusSheet.dateTime = DateTime.Now;
+        statusSheet.resort = null;
+
+        statusSheet.resortStatus.id = Guid.NewGuid();
+
+        foreach(TrackStatus trackStatus in statusSheet.trackStatuses)
+        {
+            trackStatus.id = Guid.NewGuid();
+        }
+
+        foreach (LiftStatus liftStatus in statusSheet.liftStatuses)
+        {
+            liftStatus.id = Guid.NewGuid();
+        }
+
+        using (var database = contextFactory.CreateDbContext())
+        {
+            await database.statusSheets.AddAsync(statusSheet);
+            await database.SaveChangesAsync();
+        }
+        Console.WriteLine("Status updated: ");
+        Console.Write(JsonSerializer.Serialize(statusSheet, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        }));
+
+        loading = false;
+    }
+
+}
+    
+
+

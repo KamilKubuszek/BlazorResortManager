@@ -1,0 +1,86 @@
+﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
+
+<RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" Method="post" TItem="Track" Data="trackDto">
+    <RadzenFormField Text="Name" Variant="Variant.Flat">
+        <RadzenTextBox @bind-Value="trackDto.name" Name="trackName" />
+    </RadzenFormField>
+    <RadzenRequiredValidator Component="trackName" Text="This field is required" />
+    <br />
+
+    @{ int nameIndexer = 0; }
+    @foreach(var parameter in trackDto.parameters)
+    {
+        nameIndexer++;
+        var counter = nameIndexer;
+        <RadzenFormField Text="Name" Variant="Variant.Flat">
+            <RadzenTextBox @bind-Value="parameter.name" Name="@("Namef"+counter)" />
+        </RadzenFormField>
+        <RadzenRequiredValidator Component="@("Namef"+counter)" Text="This field is required" />
+        
+        <RadzenFormField Text="Value" Variant="Variant.Flat">
+            <RadzenTextBox @bind-Value="parameter.value" Name="@("valuef"+counter)" />
+        </RadzenFormField>
+        <RadzenRequiredValidator Component="@("valuef"+counter)" Text="This field is required" />
+        
+
+        <RadzenButton Icon="highlight_off" Click="@( () => deleteParamterField(parameter))" />
+    }
+    
+    <RadzenButton ButtonType="ButtonType.Button" Text="add parameter" Click="addParameterField"/>
+    <RadzenButton ButtonType="ButtonType.Submit" Text="save"/>
+</RadzenTemplateForm>
+
+
+@code {
+    [Parameter]
+    public Guid ResortId { get; set; }
+    protected Track trackDto { get; set; } = new Track
+    {
+        parameters = new List<TrackParameter>()
+    };
+
+    protected override void OnInitialized()
+    {
+
+    }
+
+    protected async Task PostTrack(Track trackSubmission)
+    {
+        trackSubmission.id = Guid.NewGuid();
+        trackSubmission.resortId = ResortId;
+        foreach (var parameter in trackSubmission.parameters)
+        {
+            parameter.id = Guid.NewGuid();
+            parameter.trackId = trackSubmission.id;
+        }
+
+        using (var database = contextFactory.CreateDbContext())
+        {
+            await database.tracks.AddAsync(trackSubmission);
+            await database.SaveChangesAsync();
+        }
+
+        Console.Write(JsonSerializer.Serialize(trackSubmission, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        }));
+
+
+        DialogService.Close();
+
+    }
+
+    private void deleteParamterField(TrackParameter parameter)
+    {
+        trackDto.parameters.Remove(parameter);
+        StateHasChanged();
+    }
+
+    private void addParameterField()
+    {
+        trackDto.parameters.Add(new TrackParameter());
+        StateHasChanged();
+    }
+}

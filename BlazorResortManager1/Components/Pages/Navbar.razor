@@ -1,0 +1,40 @@
+﻿@inject NavigationManager NavigationManager
+
+<RadzenMenu>
+    <RadzenMenuItem Path="Resorts" Text="Resorts" />
+    <RadzenMenuItem Path="Statuses" Text="Statuses" />
+    <RadzenMenuItem Path="Statuses/update" Text="Update status" />
+</RadzenMenu>
+<div class="nav-item px-3">
+    <form action="Account/Logout" method="post">
+        <AntiforgeryToken />
+        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+        <button type="submit" class="nav-link">
+            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+        </button>
+        
+    </form>
+</div>
+
+@code {
+
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+    
+}
