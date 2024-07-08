@@ -16,15 +16,16 @@ namespace BlazorResortManager1.Components.ResortManagement
 
             var accountGroup = endpoints.MapGroup("/Resort");
 
-            accountGroup.Map("/Status/Update", async (
-                IDbContextFactory<ApplicationDbContext> contextFactory,
-                [FromBody] StatusSheet statusSheet) =>
-            {
-                using var database = contextFactory.CreateDbContext();
-                await database.statusSheets.AddAsync(statusSheet);
-                await database.SaveChangesAsync();
-                //komentarz
-            });
+            //accountGroup.Map("/Status/Update", async (
+            //    IDbContextFactory<ApplicationDbContext> contextFactory,
+            //    [FromBody] StatusSheet statusSheet) =>
+            //{
+            //    using var database = contextFactory.CreateDbContext();
+            //    await database.statusSheets.AddAsync(statusSheet);
+            //    await database.SaveChangesAsync();
+            //    //komentarz
+            //    return TypedResults.LocalRedirect($"~/{"Status"}");
+            //});
 
             return accountGroup;
         }

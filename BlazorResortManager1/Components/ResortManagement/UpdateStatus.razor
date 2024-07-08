@@ -76,6 +76,9 @@ else
     [Parameter]
     public string? currentResortIdParameter { get; set; }
 
+    [CascadingParameter]
+    private HttpClient httpClient { get; set; } = default!;
+
     public Resort[]? resorts { get; set; }
     public Dictionary<Guid, StatusSheet> statusesByResortId = new Dictionary<Guid, StatusSheet>();
     public StatusSheet? currentStatusSheet { get; set; }
@@ -166,11 +169,11 @@ else
             await database.SaveChangesAsync();
         }
         Console.WriteLine("Status updated: ");
-        Console.Write(JsonSerializer.Serialize(statusSheet, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        }));
+        // Console.Write(JsonSerializer.Serialize(statusSheet, new JsonSerializerOptions()
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        // }));
 
         loading = false;
     }

@@ -123,11 +123,11 @@ else
 
         loading = false;
 
-        Console.Write(JsonSerializer.Serialize(selectedResort, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        }));
+        // Console.Write(JsonSerializer.Serialize(selectedResort, new JsonSerializerOptions()
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        // }));
     }
 
     public async Task openDialog()

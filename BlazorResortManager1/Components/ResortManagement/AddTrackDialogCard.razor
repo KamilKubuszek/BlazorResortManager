@@ -61,11 +61,11 @@
             await database.SaveChangesAsync();
         }
 
-        Console.Write(JsonSerializer.Serialize(trackSubmission, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        }));
+        // Console.Write(JsonSerializer.Serialize(trackSubmission, new JsonSerializerOptions()
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        // }));
 
 
         DialogService.Close();

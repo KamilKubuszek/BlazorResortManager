@@ -9,7 +9,7 @@ Welcome to your new app.
 @userId
  <AuthorizeView>
      <Authorized>
-         welcome @context.User.Identity?.Name!
+         welcome @context.User.FindFirst(e => e.Type == ClaimTypes.Name)?.Value
      </Authorized>
      <Authorizing>
          authorizing...
