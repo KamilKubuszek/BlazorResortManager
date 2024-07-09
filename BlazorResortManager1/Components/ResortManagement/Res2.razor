@@ -1,9 +1,173 @@
-﻿<h3>Res2</h3>
+﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 @page "/res"
 @attribute [Authorize]
+<AuthorizeView>
+    <Authorized>
+        welcome @context.User.FindFirst(e => e.Type == ClaimTypes.Name)?.Value
+    </Authorized>
+    <Authorizing>
+        authorizing...
+    </Authorizing>
+    <NotAuthorized>
+        not authorized
+    </NotAuthorized>
+</AuthorizeView>
 
-hi there
+
+<h3>Resorts</h3>
+
+@if (loading)
+{
+    <div>loading... </div>
+}
+
+else
+{
+    @if (resorts != null)
+    {
+        <RadzenDropDown Change="@setResort" Data=@resorts TValue="string" TextProperty="name" ValueProperty="id"
+                        AllowFiltering="true" Name="DropDownResorts">
+        </RadzenDropDown>
+    }
+    if (selectedResort != null)
+    {
+        <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true"
+                        Data="@selectedResort.tracks" TItem="Track">
+            <Template Context="track">
+                <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@track.parameters">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(TrackParameter.name)" Title="Name" />
+                        <RadzenDataGridColumn Property="@nameof(TrackParameter.value)" Title="Value" />
+                        <RadzenDataGridColumn Property="@nameof(TrackParameter.value)" Title="Unit value">
+                            <Template Context="parameter">
+                                @(parameter.value + " some unit of parameter")
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </Template>
+            <Columns>
+                <RadzenDataGridColumn Property="name" Title="Name" />
+            </Columns>
+        </RadzenDataGrid>
+
+
+        <RadzenDataGrid @ref="grid2" AllowFiltering="true" AllowSorting="true"
+                        Data="@selectedResort.lifts" TItem="Lift">
+            <Template Context="lift">
+                <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@lift.parameters">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(LiftParameter.name)" Title="Name" />
+                        <RadzenDataGridColumn Property="@nameof(LiftParameter.value)" Title="Value" />
+                        <RadzenDataGridColumn Property="@nameof(LiftParameter.value)" Title="Unit value">
+                            <Template Context="parameter">
+                                @(parameter.value + " some unit of parameter")
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </Template>
+            <Columns>
+                <RadzenDataGridColumn Property="name" Title="Name" />
+            </Columns>
+        </RadzenDataGrid>
+    }
+    <RadzenButton Text="add another track" Click=@openDialog />
+
+}
 
 @code {
+    // [CascadingParameter]
+    // private Task<AuthenticationState> authenticationState { get; set; }
 
+    RadzenDataGrid<Track> grid;
+    RadzenDataGrid<Lift> grid2;
+    private Resort[]? resorts { get; set; }
+    private Resort? selectedResort { get; set; }
+
+    private Guid? selectedResortId { get; set; }
+    private bool loading { get; set; } = false;
+    //private Guid? userId = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+
+        // var authState = await authenticationState;
+        // var user = authState.User;
+
+        // if (user.Identity.IsAuthenticated)
+        // {
+        //     userId = new Guid(user.FindFirst(
+        //         c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        // }
+
+        await Task.Run(loadResortData);
+
+        loading = false;
+    }
+
+    protected async Task loadResortData()
+    {
+
+        using (var database = contextFactory.CreateDbContext())
+        {
+            // var slopeIdsByPermit = database.permits
+            //     .Where(e => e.userId == userId)
+            //     .Select(e => e.resortId)
+            //     .ToArray();
+
+
+            resorts = await database.resorts
+            //.Where(e => slopeIdsByPermit.Contains(e.id))
+            //.Select(e => new Resort{ id = e.id })
+            //.AsNoTracking()
+            .ToArrayAsync();
+        }
+        Console.WriteLine("dataloaded");
+    }
+
+    protected async Task setResort(object value)
+    {
+        loading = true;
+
+        selectedResortId = (Guid)value;
+        Console.WriteLine($"Resort changed to {value}");
+
+        using (var database = contextFactory.CreateDbContext())
+        {
+            selectedResort = await database.resorts
+                .Where(e => e.id == selectedResortId)
+                .Include(e => e.tracks)
+                    .ThenInclude(e => e.parameters)
+                .Include(e => e.lifts)
+                    .ThenInclude(e => e.parameters)
+                .Include(e => e.resortParameters)
+                .AsNoTracking()
+                .AsSplitQuery()
+                .FirstOrDefaultAsync();
+
+        }
+
+        loading = false;
+
+        // Console.Write(JsonSerializer.Serialize(selectedResort, new JsonSerializerOptions()
+        // {
+        //     WriteIndented = true,
+        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        // }));
+    }
+
+    public async Task openDialog()
+    {
+        Console.WriteLine("Opening dialog... ");
+        await DialogService.OpenAsync<AddTrackDialogCard>("Add new track",
+               new Dictionary<string, object>() { { "ResortId", selectedResortId } },
+               new DialogOptions() { Width = "700px", Height = "512px" });
+        Console.WriteLine("opened!");
+    }
 }

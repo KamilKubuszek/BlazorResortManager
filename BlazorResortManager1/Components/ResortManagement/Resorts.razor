@@ -4,37 +4,30 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @page "/resorts"
-@attribute [Authorize]
-<AuthorizeView>
-    <Authorized>
-        welcome @context.User.FindFirst(e => e.Type == ClaimTypes.Name)?.Value
-    </Authorized>
-    <Authorizing>
-        authorizing...
-    </Authorizing>
-    <NotAuthorized>
-        not authorized
-    </NotAuthorized>
-</AuthorizeView>
 
 
 <h3>Resorts</h3>
-
+@dropdownResortId
 @if (loading)
 {
     <div>loading... </div>
 }
-
 else
 {
     @if (resorts != null)
     {
-        <RadzenDropDown Change="@setResort" Data=@resorts TValue="string" TextProperty="name" ValueProperty="id"
-                        AllowFiltering="true" Name="DropDownResorts">
+        <RadzenDropDown 
+            Change="@setResort" 
+            @bind-Value=@dropdownResortId
+            Data=@resorts 
+            TValue="Guid" 
+            TextProperty="name" 
+            ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
         </RadzenDropDown>
     }
     if(selectedResort != null)
     {
+        <RadzenButton Text="add another track" Click=@openAddTrackDialog />
         <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" 
                 Data="@selectedResort.tracks" TItem="Track">
             <Template Context="track">
@@ -76,35 +69,37 @@ else
             </Columns>
         </RadzenDataGrid>
     }
-    <RadzenButton Text="add another track" Click=@openDialog />
+    
    
 }
 
 @code {
-    // [CascadingParameter]
-    // private Task<AuthenticationState> authenticationState { get; set; }
-
     RadzenDataGrid<Track> grid;
     RadzenDataGrid<Lift> grid2;
+    private Guid dropdownResortId { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     private Resort[]? resorts { get; set; }
     private Resort? selectedResort { get; set; }
 
     private Guid? selectedResortId { get; set; }
     private bool loading { get; set; } = false;
-    //private Guid? userId = null;
+    private Guid? userId = null;
 
     protected override async Task OnInitializedAsync()
     {
         loading = true;
         
-        // var authState = await authenticationState;
-        // var user = authState.User;
+        var authState = await authenticationState;
+        var user = authState.User;
 
-        // if (user.Identity.IsAuthenticated)
-        // {
-        //     userId = new Guid(user.FindFirst(
-        //         c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-        // }
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = new Guid(user.FindFirst(
+                c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        }
 
         await Task.Run(loadResortData);
 
@@ -116,14 +111,14 @@ else
 
         using (var database = contextFactory.CreateDbContext())
         {
-            // var slopeIdsByPermit = database.permits
-            //     .Where(e => e.userId == userId)
-            //     .Select(e => e.resortId)
-            //     .ToArray();
+            var slopeIdsByPermit = database.permits
+                .Where(e => e.userId == userId)
+                .Select(e => e.resortId)
+                .ToArray();
 
 
             resorts = await database.resorts
-                //.Where(e => slopeIdsByPermit.Contains(e.id))
+                .Where(e => slopeIdsByPermit.Contains(e.id))
             //.Select(e => new Resort{ id = e.id })
             //.AsNoTracking()
             .ToArrayAsync();
@@ -135,13 +130,13 @@ else
     {
         loading = true;
 
-        selectedResortId = (Guid)value;
+        //selectedResortId = (Guid)value;
         Console.WriteLine($"Resort changed to {value}");
 
         using (var database = contextFactory.CreateDbContext())
         {
             selectedResort = await database.resorts
-                .Where(e => e.id == selectedResortId)    
+                .Where(e => e.id == dropdownResortId)    
                 .Include(e => e.tracks)
                     .ThenInclude(e => e.parameters)
                 .Include(e => e.lifts)
@@ -150,7 +145,6 @@ else
                 .AsNoTracking()
                 .AsSplitQuery()
                 .FirstOrDefaultAsync();
-
         }
 
         loading = false;
@@ -162,7 +156,7 @@ else
         // }));
     }
 
-    public async Task openDialog()
+    public async Task openAddTrackDialog()
     {
         Console.WriteLine("Opening dialog... ");
         await DialogService.OpenAsync<AddTrackDialogCard>("Add new track",
@@ -170,4 +164,4 @@ else
                new DialogOptions() { Width = "700px", Height = "512px" });
         Console.WriteLine("opened!");
     }
-}
+} 
