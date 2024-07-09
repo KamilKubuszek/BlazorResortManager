@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using BlazorResortManager1.status;
 
-namespace BlazorResortManager1.main
+namespace BlazorResortManager1.Data.Models.main
 {
     [Table("lift")]
     public class Lift

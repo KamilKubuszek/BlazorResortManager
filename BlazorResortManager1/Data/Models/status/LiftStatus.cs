@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using BlazorResortManager1.main;
+using BlazorResortManager1.Data.Models.main;
 
-namespace BlazorResortManager1.status
+namespace BlazorResortManager1.Data.Models.status
 {
     [Table("liftStatus")]
     public class LiftStatus

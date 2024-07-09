@@ -5,7 +5,17 @@
 
 @page "/resorts"
 @attribute [Authorize]
-
+<AuthorizeView>
+    <Authorized>
+        welcome @context.User.FindFirst(e => e.Type == ClaimTypes.Name)?.Value
+    </Authorized>
+    <Authorizing>
+        authorizing...
+    </Authorizing>
+    <NotAuthorized>
+        not authorized
+    </NotAuthorized>
+</AuthorizeView>
 
 
 <h3>Resorts</h3>
@@ -71,8 +81,8 @@ else
 }
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
+    // [CascadingParameter]
+    // private Task<AuthenticationState> authenticationState { get; set; }
 
     RadzenDataGrid<Track> grid;
     RadzenDataGrid<Lift> grid2;

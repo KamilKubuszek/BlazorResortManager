@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using BlazorResortManager1.status;
 using BlazorResortManager1.user;
 
-namespace BlazorResortManager1.main
+namespace BlazorResortManager1.Data.Models.main
 {
     [Table("resort")]
     public class Resort

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BlazorResortManager1.main
+namespace BlazorResortManager1.Data.Models.main
 {
     [Table("liftParameter")]
     public class LiftParameter
