@@ -14,9 +14,11 @@ namespace BlazorResortManager1.user
         [Key]
         public Guid id { get; set; }
 
-        //[Required]
-        //[ForeignKey("ApplicationUser")]
-        public Guid userId { get; set; }
+        //prop has to be string instead of guid in order
+        //to bind this key with identity users id
+        [Required]
+        [ForeignKey("ApplicationUser")]
+        public string userId { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; } = null!;
 
         [Required]

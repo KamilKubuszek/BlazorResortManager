@@ -7,7 +7,7 @@
 
 
 <h3>Resorts</h3>
-@dropdownResortId
+
 @if (loading)
 {
     <div>loading... </div>
@@ -18,7 +18,7 @@ else
     {
         <RadzenDropDown 
             Change="@setResort" 
-            @bind-Value=@dropdownResortId
+            @bind-Value=@dropdownSelectedResortId
             Data=@resorts 
             TValue="Guid" 
             TextProperty="name" 
@@ -69,24 +69,21 @@ else
             </Columns>
         </RadzenDataGrid>
     }
-    
-   
 }
 
 @code {
     RadzenDataGrid<Track> grid;
     RadzenDataGrid<Lift> grid2;
-    private Guid dropdownResortId { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    private Resort[]? resorts { get; set; }
-    private Resort? selectedResort { get; set; }
-
-    private Guid? selectedResortId { get; set; }
-    private bool loading { get; set; } = false;
     private Guid? userId = null;
+    private bool loading = false;
+
+    private Resort[]? resorts { get; set; }
+    private Guid dropdownSelectedResortId { get; set; }
+    private Resort? selectedResort { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,7 +109,7 @@ else
         using (var database = contextFactory.CreateDbContext())
         {
             var slopeIdsByPermit = database.permits
-                .Where(e => e.userId == userId)
+                .Where(e => e.userId == userId.ToString())
                 .Select(e => e.resortId)
                 .ToArray();
 
@@ -126,17 +123,14 @@ else
         Console.WriteLine("dataloaded");
     }
 
-    protected async Task setResort(object value)
+    protected async Task setResort()
     {
         loading = true;
-
-        //selectedResortId = (Guid)value;
-        Console.WriteLine($"Resort changed to {value}");
 
         using (var database = contextFactory.CreateDbContext())
         {
             selectedResort = await database.resorts
-                .Where(e => e.id == dropdownResortId)    
+                .Where(e => e.id == dropdownSelectedResortId)    
                 .Include(e => e.tracks)
                     .ThenInclude(e => e.parameters)
                 .Include(e => e.lifts)
@@ -149,18 +143,13 @@ else
 
         loading = false;
 
-        // Console.Write(JsonSerializer.Serialize(selectedResort, new JsonSerializerOptions()
-        // {
-        //     WriteIndented = true,
-        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        // }));
     }
 
     public async Task openAddTrackDialog()
     {
         Console.WriteLine("Opening dialog... ");
         await DialogService.OpenAsync<AddTrackDialogCard>("Add new track",
-               new Dictionary<string, object>() { { "ResortId", selectedResortId } },
+               new Dictionary<string, object>() { { "ResortId", dropdownSelectedResortId } },
                new DialogOptions() { Width = "700px", Height = "512px" });
         Console.WriteLine("opened!");
     }
