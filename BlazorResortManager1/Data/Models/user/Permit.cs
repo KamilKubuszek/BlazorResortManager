@@ -16,7 +16,7 @@ namespace BlazorResortManager1.user
 
         //[Required]
         //[ForeignKey("ApplicationUser")]
-        public string userId { get; set; }
+        public Guid userId { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; } = null!;
 
         [Required]

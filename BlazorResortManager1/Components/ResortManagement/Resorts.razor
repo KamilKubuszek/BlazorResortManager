@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @page "/resorts"
+@attribute [Authorize]
 
 
 
@@ -66,22 +67,35 @@ else
         </RadzenDataGrid>
     }
     <RadzenButton Text="add another track" Click=@openDialog />
-
-    
+   
 }
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
     RadzenDataGrid<Track> grid;
     RadzenDataGrid<Lift> grid2;
-    public Resort[]? resorts { get; set; }
-    public Resort? selectedResort { get; set; }
+    private Resort[]? resorts { get; set; }
+    private Resort? selectedResort { get; set; }
 
-    public Guid? selectedResortId { get; set; }
-    public bool loading { get; set; } = false;
+    private Guid? selectedResortId { get; set; }
+    private bool loading { get; set; } = false;
+    //private Guid? userId = null;
 
     protected override async Task OnInitializedAsync()
     {
         loading = true;
+        
+        // var authState = await authenticationState;
+        // var user = authState.User;
+
+        // if (user.Identity.IsAuthenticated)
+        // {
+        //     userId = new Guid(user.FindFirst(
+        //         c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        // }
+
         await Task.Run(loadResortData);
 
         loading = false;
@@ -89,9 +103,17 @@ else
 
     protected async Task loadResortData()
     {
+
         using (var database = contextFactory.CreateDbContext())
         {
+            // var slopeIdsByPermit = database.permits
+            //     .Where(e => e.userId == userId)
+            //     .Select(e => e.resortId)
+            //     .ToArray();
+
+
             resorts = await database.resorts
+                //.Where(e => slopeIdsByPermit.Contains(e.id))
             //.Select(e => new Resort{ id = e.id })
             //.AsNoTracking()
             .ToArrayAsync();
