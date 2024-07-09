@@ -1,5 +1,5 @@
 ﻿using BlazorResortManager1.Data;
-using BlazorResortManager1.main;
+using BlazorResortManager1.Data.Models.main;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

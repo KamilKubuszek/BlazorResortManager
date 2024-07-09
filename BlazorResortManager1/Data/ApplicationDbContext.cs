@@ -1,5 +1,5 @@
-using BlazorResortManager1.main;
-using BlazorResortManager1.status;
+using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Data.Models.status;
 using BlazorResortManager1.user;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
