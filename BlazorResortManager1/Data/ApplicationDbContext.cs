@@ -26,7 +26,7 @@ namespace BlazorResortManager1.Data
         public DbSet<LiftParameter> liftParameters { get; set; } 
         public DbSet<TrackParameter> trackParameters { get; set; } 
 
-        public DbSet<yrNoCityCode> cityCodes { get; set; }
+        public DbSet<YrNoCityCode> cityCodes { get; set; }
 
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,6 +51,10 @@ namespace BlazorResortManager1.Data
                 .HasForeignKey<ResortStatus>(l => l.statusSheetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //modelBuilder.Entity<Resort>()
+            //    .HasOne(e => e.cityCode)
+            //    .WithMany(e => e.resorts)
+            //    .HasForeignKey(e => e.cityCodeId);
         }
         //(DbContextOptions<ApplicationDbContext> options) (options)
     }

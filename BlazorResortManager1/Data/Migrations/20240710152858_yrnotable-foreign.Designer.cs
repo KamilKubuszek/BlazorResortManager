@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240710125741_yrnotable")]
-    partial class yrnotable
+    [Migration("20240710152858_yrnotable-foreign")]
+    partial class yrnotableforeign
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,7 +90,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.yrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -170,7 +170,7 @@ namespace BlazorResortManager1.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<Guid>("cityCodeId")
+                    b.Property<Guid?>("cityCodeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("description")
@@ -197,6 +197,9 @@ namespace BlazorResortManager1.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("yrNoCityCodeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("id");
 
@@ -554,13 +557,11 @@ namespace BlazorResortManager1.Migrations
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.yrNoCityCode", "cityCode")
-                        .WithMany("resort")
-                        .HasForeignKey("cityCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", "yrNoCityCode")
+                        .WithMany("resorts")
+                        .HasForeignKey("cityCodeId");
 
-                    b.Navigation("cityCode");
+                    b.Navigation("yrNoCityCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.ResortParameter", b =>
@@ -739,9 +740,9 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("permits");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.yrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
                 {
-                    b.Navigation("resort");
+                    b.Navigation("resorts");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>

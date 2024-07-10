@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace BlazorResortManager1.Data.Models.forecast
 {
     [Table("yrNoCityCode")]
-    public class yrNoCityCode
+    public class YrNoCityCode
     {
         [Key]
         public Guid id {  get; set; }
@@ -21,7 +21,8 @@ namespace BlazorResortManager1.Data.Models.forecast
 
         public string country { get; set; }
 
-        [JsonIgnore]
-        public ICollection<Resort> resort { get; set; } = new List<Resort>();   
+        [ForeignKey("cityCodeId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ICollection<Resort> resorts { get; set; } = new List<Resort>();   
     }
 }

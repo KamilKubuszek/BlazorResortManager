@@ -39,9 +39,10 @@ namespace BlazorResortManager1.Data.Models.main
         [MaxLength(128, ErrorMessage = "'webpage' może mieć maksymalnie 128 znaków")]
         public string webpage { get; set; }
 
-        [ForeignKey("cityCode")]
-        public Guid cityCodeId { get; set; }
-        public yrNoCityCode cityCode { get; set; }
+        //[ForeignKey("cityCode")]
+        public Guid yrNoCityCodeId { get; set; }
+        public YrNoCityCode? yrNoCityCode { get; set; }
+
         //public ICollection<Permission> permissions { get; set; } = new List<Permission>();
         // public ICollection<User> permissionOwners { get; set; } = new List<User>();
         [JsonIgnore]
