@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using BlazorResortManager1.Data.Models.forecast;
 using BlazorResortManager1.Data.Models.main;
 using BlazorResortManager1.Data.Models.status;
 
@@ -37,6 +38,10 @@ namespace BlazorResortManager1.Data.Models.main
         [Required(ErrorMessage = "'webpage' jest wymagane")]
         [MaxLength(128, ErrorMessage = "'webpage' może mieć maksymalnie 128 znaków")]
         public string webpage { get; set; }
+
+        [ForeignKey("cityCode")]
+        public Guid cityCodeId { get; set; }
+        public yrNoCityCode cityCode { get; set; }
         //public ICollection<Permission> permissions { get; set; } = new List<Permission>();
         // public ICollection<User> permissionOwners { get; set; } = new List<User>();
         [JsonIgnore]

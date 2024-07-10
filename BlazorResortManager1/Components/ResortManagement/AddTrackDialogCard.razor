@@ -1,5 +1,6 @@
 ﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
+@attribute [Authorize]
 
 <RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" Method="post" TItem="Track" Data="trackDto">
     <RadzenFormField Text="Name" Variant="Variant.Flat">
@@ -38,6 +39,7 @@
 @code {
     [Parameter]
     public Guid ResortId { get; set; }
+
     protected Track trackDto { get; set; } = new Track
     {
         parameters = new List<TrackParameter>()
@@ -45,7 +47,7 @@
 
     protected override void OnInitialized()
     {
-
+        
     }
 
     protected async Task PostTrack(Track trackSubmission)

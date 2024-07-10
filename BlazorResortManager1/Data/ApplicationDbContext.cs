@@ -1,3 +1,4 @@
+using BlazorResortManager1.Data.Models.forecast;
 using BlazorResortManager1.Data.Models.main;
 using BlazorResortManager1.Data.Models.status;
 using BlazorResortManager1.user;
@@ -24,6 +25,8 @@ namespace BlazorResortManager1.Data
         public DbSet<ResortParameter> resortParameters { get; set; } 
         public DbSet<LiftParameter> liftParameters { get; set; } 
         public DbSet<TrackParameter> trackParameters { get; set; } 
+
+        public DbSet<yrNoCityCode> cityCodes { get; set; }
 
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
