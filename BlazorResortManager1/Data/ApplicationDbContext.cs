@@ -12,27 +12,27 @@ namespace BlazorResortManager1.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Permit> permits { get; set; } 
+        public DbSet<Permit> permits { get; set; }
         public DbSet<TrackStatus> trackStatuses { get; set; }
         public DbSet<ResortStatus> resortStatuses { get; set; }
         public DbSet<LiftStatus> liftStatuses { get; set; }
         public DbSet<StatusSheet> statusSheets { get; set; }
 
         public DbSet<Resort> resorts { get; set; }
-        public DbSet<Track> tracks { get; set; } 
-        public DbSet<Lift> lifts { get; set; } 
+        public DbSet<Track> tracks { get; set; }
+        public DbSet<Lift> lifts { get; set; }
 
-        public DbSet<ResortParameter> resortParameters { get; set; } 
-        public DbSet<LiftParameter> liftParameters { get; set; } 
-        public DbSet<TrackParameter> trackParameters { get; set; } 
+        public DbSet<ResortParameter> resortParameters { get; set; }
+        public DbSet<LiftParameter> liftParameters { get; set; }
+        public DbSet<TrackParameter> trackParameters { get; set; }
 
         public DbSet<YrNoCityCode> cityCodes { get; set; }
 
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<LiftStatus>()
                 .HasOne(l => l.statusSheet)
                 .WithMany(s => s.liftStatuses)
@@ -52,9 +52,15 @@ namespace BlazorResortManager1.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             //modelBuilder.Entity<Resort>()
-            //    .HasOne(e => e.cityCode)
+            //    .HasOne(e => e.yrNoCityCode)
             //    .WithMany(e => e.resorts)
-            //    .HasForeignKey(e => e.cityCodeId);
+            //    .HasForeignKey(e => e.yrNoCityCodeId);
+
+            //modelBuilder.Entity<YrNoCityCode>()
+            //    .HasMany(e => e.resorts)
+            //    .WithOne(e => e.yrNoCityCode)
+            //    .HasForeignKey(e => e.yrNoCityCodeId)
+            //    .HasPrincipalKey(e => e.id);
         }
         //(DbContextOptions<ApplicationDbContext> options) (options)
     }
