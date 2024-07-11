@@ -1,6 +1,8 @@
 ﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
 
+@using Radzen.Blazor.Rendering
+
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @page "/resorts"
@@ -27,7 +29,34 @@ else
     }
     if(selectedResort != null)
     {
-        <RadzenButton Text="add another track" Click=@openAddTrackDialog />
+        //utility buttons
+        <RadzenButton Text="add another track" Click=@openAddTrackDialog @ref="locationPopupButton"/>
+        <RadzenButton Text="Change Resort Location" Click="(args) => locationPopup.ToggleAsync(locationPopupButton.Element)" />
+        <Popup @ref="locationPopup" Open="@loadLocations">
+            <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes">
+                <Template Context="cityCode">
+                    <RadzenCard Style="width: 100%" @onclick="async () => setLocation(cityCode)">
+                        @cityCode.cityName
+                        <hr />
+                        <RadzenRow>
+                            <RadzenColumn>
+                                Country @cityCode.country
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                Code: @cityCode.code
+                            </RadzenColumn>
+                        </RadzenRow>
+                        
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+        </Popup>
+        <p>
+            Current Location:
+            @(selectedResort.yrNoCityCode != null 
+                ? selectedResort.yrNoCityCode.country + ", " + selectedResort.yrNoCityCode.cityName 
+                : "not set" )
+        </p>
         <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" 
                 Data="@selectedResort.tracks" TItem="Track">
             <Template Context="track">
@@ -68,6 +97,7 @@ else
                 <RadzenDataGridColumn Property="name" Title="Name" />
             </Columns>
         </RadzenDataGrid>
+
     }
 }
 
@@ -75,20 +105,25 @@ else
     RadzenDataGrid<Track> grid;
     RadzenDataGrid<Lift> grid2;
 
+    RadzenButton locationPopupButton;
+    Popup locationPopup;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
     private Guid? userId = null;
     private bool loading = false;
 
-    private Resort[]? resorts { get; set; }
-    private Guid dropdownSelectedResortId { get; set; }
-    private Resort? selectedResort { get; set; }
+    private Resort[]? resorts;
+    private Guid dropdownSelectedResortId;
+    private Resort? selectedResort;
+    private YrNoCityCode[]? CityCodes;
+
 
     protected override async Task OnInitializedAsync()
     {
         loading = true;
-        
+
         var authState = await authenticationState;
         var user = authState.User;
 
@@ -145,12 +180,38 @@ else
 
     }
 
-    public async Task openAddTrackDialog()
+    private async Task openAddTrackDialog()
     {
         Console.WriteLine("Opening dialog... ");
         await DialogService.OpenAsync<AddTrackDialogCard>("Add new track",
                new Dictionary<string, object>() { { "ResortId", dropdownSelectedResortId } },
                new DialogOptions() { Width = "700px", Height = "512px" });
         Console.WriteLine("opened!");
+    }
+
+    private async Task loadLocations()
+    {
+        using(var database = contextFactory.CreateDbContext())
+        {
+            CityCodes = database.cityCodes.ToArray();
+        }
+    }
+    private async Task setLocation(YrNoCityCode cityCode)
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            var Resort = database.resorts.FirstOrDefault(e => e.id == dropdownSelectedResortId);
+            Resort.yrNoCityCodeId = cityCode.id;
+
+            await database.SaveChangesAsync();
+        }
+
+        if(selectedResort != null)
+        {
+            selectedResort.yrNoCityCodeId = cityCode.id;
+            selectedResort.yrNoCityCode = cityCode;
+        }
+        
+        await locationPopup.CloseAsync();
     }
 } 
