@@ -18,13 +18,18 @@ namespace BlazorResortManager1.Components.ResortManagement
 
             var accountGroup = endpoints.MapGroup("/Resort");
 
-            accountGroup.Map("/Status/Update", async (
+            accountGroup.Map("/Track/Add", async (
                 IDbContextFactory<ApplicationDbContext> contextFactory,
                 [FromBody] Track track) =>
             {
                 //using var database = contextFactory.CreateDbContext();
                 //await database.tracks.AddAsync(track);
                 //await database.SaveChangesAsync();
+                Console.Write(JsonSerializer.Serialize(track, new JsonSerializerOptions()
+                {
+                    WriteIndented = true,
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+                }));
 
                 Console.Write(JsonSerializer.Serialize(trackSubmission, new JsonSerializerOptions()
         // {
