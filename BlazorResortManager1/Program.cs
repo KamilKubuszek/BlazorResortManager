@@ -1,5 +1,6 @@
 using BlazorResortManager1.Components;
 using BlazorResortManager1.Components.Account;
+using BlazorResortManager1.Components.ResortManagement;
 using BlazorResortManager1.Data;
 using BlazorResortManager1.Data.Models.main;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -78,5 +79,7 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+app.MapResortManagementEndpoints();
 
 app.Run();

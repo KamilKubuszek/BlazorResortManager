@@ -10,17 +10,17 @@ using System.Text.Json;
 
 namespace BlazorResortManager1.Components.ResortManagement
 {
-    internal static class ResortManagementRouteBuilderExtensions
+    internal static class ResortManagementEndpoints
     {
-        public static IEndpointConventionBuilder MapResortManagementEndpoints(this IEndpointRouteBuilder endpoints)
+        public static void MapResortManagementEndpoints(this WebApplication app)
         {
-            ArgumentNullException.ThrowIfNull(endpoints);
+            
 
-            var accountGroup = endpoints.MapGroup("/Resort");
+            var ResortGroup = app.MapGroup("/Resort");
 
-            accountGroup.Map("/Track/Add", async (
+            ResortGroup.Map("/Track/Add", async (
                 IDbContextFactory<ApplicationDbContext> contextFactory,
-                [FromBody] Track track) =>
+                [FromForm] Track track) =>
             {
                 //using var database = contextFactory.CreateDbContext();
                 //await database.tracks.AddAsync(track);
@@ -31,16 +31,9 @@ namespace BlazorResortManager1.Components.ResortManagement
                     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
                 }));
 
-                Console.Write(JsonSerializer.Serialize(trackSubmission, new JsonSerializerOptions()
-        // {
-        //     WriteIndented = true,
-        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        // }));
-        //komentarz
                 return TypedResults.LocalRedirect($"~/{"Status"}");
             });
 
-            return accountGroup;
         }
     }
 }

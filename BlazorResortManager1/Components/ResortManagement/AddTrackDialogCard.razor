@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 @attribute [Authorize]
 
-<RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" Method="post" TItem="Track" Data="trackDto">
+<RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" TItem="Track" Data="trackDto">
     <RadzenFormField Text="Name" Variant="Variant.Flat">
         <RadzenTextBox @bind-Value="trackDto.name" Name="trackName" />
     </RadzenFormField>
