@@ -31,9 +31,10 @@ else
     {
         //utility buttons
         <RadzenButton Text="add another track" Click=@openAddTrackDialog @ref="locationPopupButton"/>
-        <RadzenButton Text="Change Resort Location" Click="(args) => locationPopup.ToggleAsync(locationPopupButton.Element)" />
-        <Popup @ref="locationPopup" Open="@loadLocations">
-            <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes">
+        <RadzenButton Text="Change Resort Location" Click="@(args => locationPopup.ToggleAsync(locationPopupButton.Element))" />
+        <Popup @ref="locationPopup" Open="@loadLocations"
+               Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
+            <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes" AllowVirtualization=true Style="height:100%;overflow:auto;">
                 <Template Context="cityCode">
                     <RadzenCard Style="width: 100%" @onclick="async () => setLocation(cityCode)">
                         @cityCode.cityName
@@ -134,6 +135,7 @@ else
         }
 
         await Task.Run(loadResortData);
+        await Task.Run(loadLocations);
 
         loading = false;
     }
