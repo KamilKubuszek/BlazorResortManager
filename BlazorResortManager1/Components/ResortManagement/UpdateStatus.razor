@@ -21,8 +21,9 @@ else
 
     @if (resorts != null && currentResortIdParameter == null)
     {
-        <RadzenDropDown Change="@setStatusForm" Data=@resorts TValue="string" TextProperty="name" ValueProperty="id"
-                        AllowFiltering="true" Name="DropDownResorts">
+        <RadzenDropDown 
+            Change="@setStatusForm" Data=@resorts TValue="Guid" TextProperty="name" ValueProperty="id"
+            @bind-Value="dropdownSelectedResortId" AllowFiltering="true" Name="DropDownResorts">
         </RadzenDropDown>
     }
     @if (currentStatusSheet != null)
@@ -38,30 +39,34 @@ else
             <RadzenFieldset Text="Tracks">
                 @foreach (TrackStatus trackStatus in currentStatusSheet.trackStatuses)
                 {
-                    <p>
-                        <RadzenCheckBox @bind-Value=@trackStatus.opened Name="Checkbox_opened" />
-                        <RadzenLabel Text="opened" Component="CheckboxT_opened" />
-                    </p>
+                    @* <RadzenFieldset Text="@trackStatus.parentTrack.name"> *@
+                        <p>
+                            <RadzenCheckBox @bind-Value=@trackStatus.opened Name="Checkbox_opened" />
+                            <RadzenLabel Text="opened" Component="CheckboxT_opened" />
+                        </p>
 
-                    <p>
-                        <RadzenCheckBox @bind-Value=@trackStatus.illuminated Name="Checkbox_illuminated" />
-                        <RadzenLabel Text="illuminated" Component="CheckboxT_illuminated" />
-                    </p>
+                        <p>
+                            <RadzenCheckBox @bind-Value=@trackStatus.illuminated Name="Checkbox_illuminated" />
+                            <RadzenLabel Text="illuminated" Component="CheckboxT_illuminated" />
+                        </p>
 
-                    <p>
-                        <RadzenCheckBox @bind-Value=@trackStatus.snowGroomed Name="Checkbox_snowGroomed" />
-                        <RadzenLabel Text="snow groomed" Component="CheckboxT_snowGroomed" />
-                    </p>
+                        <p>
+                            <RadzenCheckBox @bind-Value=@trackStatus.snowGroomed Name="Checkbox_snowGroomed" />
+                            <RadzenLabel Text="snow groomed" Component="CheckboxT_snowGroomed" />
+                        </p>
+                    @* </RadzenFieldset> *@
                 }
             </RadzenFieldset>
 
             <RadzenFieldset Text="Lifts">
                 @foreach (LiftStatus liftStatus in currentStatusSheet.liftStatuses)
                 {
-                    <p>
-                        <RadzenCheckBox @bind-Value=@liftStatus.opened Name="CheckboxL_opened" />
-                        <RadzenLabel Text="opened" Component="CheckboxL_opened" />
-                    </p>
+                    @* <RadzenFieldset Text="@liftStatus.parentLift.name"> *@
+                        <p>
+                            <RadzenCheckBox @bind-Value=@liftStatus.opened Name="CheckboxL_opened" />
+                            <RadzenLabel Text="opened" Component="CheckboxL_opened" />
+                        </p>
+                    @* </RadzenFieldset> *@
                 }
             </RadzenFieldset>
 
@@ -76,12 +81,15 @@ else
     [Parameter]
     public string? currentResortIdParameter { get; set; }
 
-    [CascadingParameter]
-    private HttpClient httpClient { get; set; } = default!;
+    // [CascadingParameter]
+    // private HttpClient httpClient { get; set; } = default!;
 
-    public Resort[]? resorts { get; set; }
-    public Dictionary<Guid, StatusSheet> statusesByResortId = new Dictionary<Guid, StatusSheet>();
-    public StatusSheet? currentStatusSheet { get; set; }
+    public Resort[]? resorts;
+    private Guid dropdownSelectedResortId;
+    private Resort? selectedResort;
+    private StatusSheet? currentStatusSheet;
+    //public Dictionary<Guid, StatusSheet> statusesByResortId = new Dictionary<Guid, StatusSheet>();
+
     public bool loading { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -92,25 +100,49 @@ else
 
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-            Console.WriteLine("//FIRST RENDER//");
-        else
-            Console.WriteLine("//SECOND RENDER//");
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //         Console.WriteLine("//FIRST RENDER//");
+    //     else
+    //         Console.WriteLine("//SECOND RENDER//");
+    // }
 
-    protected async Task setStatusForm(object value)
+    protected async Task setStatusForm()
     {
-        var selectedResortId = (Guid)value;
-        Console.WriteLine($"Value changed to {value}");
+        loading = true;
+        selectedResort = resorts.FirstOrDefault(e => e.id == dropdownSelectedResortId);
 
-        currentStatusSheet = statusesByResortId[selectedResortId];
-        // Console.Write(JsonSerializer.Serialize(currentStatusSheet, new JsonSerializerOptions()
-        // {
-        //     WriteIndented = true,
-        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        // }));
+        using (var database = contextFactory.CreateDbContext())
+        {
+            currentStatusSheet = await database.statusSheets
+                .Where(e => e.resortId == dropdownSelectedResortId && e.productionVersion == true)
+                .OrderByDescending(e => e.dateTime)
+                .Include(e => e.resortStatus)
+                .Include(e => e.liftStatuses)
+                // .Select( e => new StatusSheet
+                // {
+                //     liftStatuses = new LiftStatus
+                //     {
+                //         parentLift = new Lift
+                //         {
+                //             name = e.liftStatuses.
+                //         }
+                //     }
+                // })
+                .Include(e => e.trackStatuses)
+                // .Select(e => e.parentTrack.name))
+                .AsSplitQuery()
+                .IgnoreAutoIncludes()
+                .FirstOrDefaultAsync();
+        }
+        loading = false;
+        //currentStatusSheet = statusesByResortId[selectedResortId];
+        Console.Write(System.Text.Json.JsonSerializer.Serialize(currentStatusSheet, new System.Text.Json.JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        }));
 
     }
 
@@ -118,27 +150,12 @@ else
     {
         using (var database = contextFactory.CreateDbContext())
         {
-            resorts = await database.resorts.AsNoTracking().ToArrayAsync();
-
-            statusesByResortId = new Dictionary<Guid, StatusSheet>();
-            foreach (Resort resort in resorts)
-            {
-                var StatusSheet = await database.statusSheets
-                    .Where(e => e.resortId == resort.id && e.productionVersion == true)
-                    .OrderByDescending(e => e.dateTime)
-                    .Include(e => e.resortStatus)
-                    .Include(e => e.liftStatuses)
-                    .Include(e => e.trackStatuses)
-                    .IgnoreAutoIncludes()
-                    .FirstOrDefaultAsync();
-
-                statusesByResortId.Add(resort.id, StatusSheet);
-            }
+            resorts = await database.resorts.AsNoTracking().AsSplitQuery().ToArrayAsync();          
         }
-        if(currentResortIdParameter != null && statusesByResortId.Count() > 0)
-        {
-            currentStatusSheet = statusesByResortId[new Guid(currentResortIdParameter)];
-        }
+        // if(currentResortIdParameter != null && statusesByResortId.Count() > 0)
+        // {
+        //     currentStatusSheet = statusesByResortId[new Guid(currentResortIdParameter)];
+        // }
     }
 
     protected async Task postStatusSheet(StatusSheet statusSheet)

@@ -48,7 +48,7 @@
 
     protected override void OnInitialized()
     {
-        
+
     }
 
     protected async Task PostTrack(Track trackSubmission)
@@ -63,6 +63,21 @@
 
         using (var database = contextFactory.CreateDbContext())
         {
+
+            //prepare blank status page and add to latest production version status sheet
+            Guid statusSheetId = database.statusSheets
+                    .OrderByDescending(e => e.dateTime)
+                    .FirstOrDefault(e => e.resortId == trackSubmission.resortId && e.productionVersion == true)
+                    .id;
+            TrackStatus status = new TrackStatus
+            {
+                opened = false,
+                illuminated = false,
+                snowGroomed = false,
+                statusSheetId = statusSheetId
+            };
+            trackSubmission.statuses.Add(status);
+
             await database.tracks.AddAsync(trackSubmission);
             await database.SaveChangesAsync();
         }

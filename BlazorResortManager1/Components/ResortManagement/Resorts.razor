@@ -7,6 +7,7 @@
 
 @page "/resorts"
 
+<RadzenButton Text="add new resort"/>
 
 <h3>Resorts</h3>
 
@@ -31,17 +32,18 @@ else
     {
         //utility buttons
         <RadzenButton Text="add another track" Click=@openAddTrackDialog @ref="locationPopupButton"/>
+
         <RadzenButton Text="Change Resort Location" Click="@(args => locationPopup.ToggleAsync(locationPopupButton.Element))" />
         <Popup @ref="locationPopup" Open="@loadLocations"
                Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
             <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes" AllowVirtualization=true Style="height:100%;overflow:auto;">
                 <Template Context="cityCode">
-                    <RadzenCard Style="width: 100%" @onclick="async () => setLocation(cityCode)">
+                    <RadzenCard @onclick="async () => setLocation(cityCode)">
                         @cityCode.cityName
                         <hr />
                         <RadzenRow>
                             <RadzenColumn>
-                                Country @cityCode.country
+                                Country: @cityCode.country
                             </RadzenColumn>
                             <RadzenColumn>
                                 Code: @cityCode.code
@@ -52,6 +54,7 @@ else
                 </Template>
             </RadzenDataList>
         </Popup>
+
         <p>
             Current Location:
             @(selectedResort.yrNoCityCode != null 
@@ -99,8 +102,23 @@ else
             </Columns>
         </RadzenDataGrid>
 
+        //weather widget
+        @if (selectedResort.yrNoCityCode != null)
+        {
+            <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+                    src=@("https://www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/card.html")>
+            </iframe>
+
+            @*             <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+                    src=@("https: //www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/table.html")>
+            </iframe> *@
+        }
     }
+
+    
 }
+
+
 
 @code {
     RadzenDataGrid<Track> grid;
@@ -173,6 +191,8 @@ else
                 .Include(e => e.lifts)
                     .ThenInclude(e => e.parameters)
                 .Include(e => e.resortParameters)
+                .Include(e => e.yrNoCityCode)
+                    .ThenInclude(e => e.yrNoLanguageCode)
                 .AsNoTracking()
                 .AsSplitQuery()
                 .FirstOrDefaultAsync();
@@ -198,13 +218,14 @@ else
             CityCodes = database.cityCodes.ToArray();
         }
     }
+
     private async Task setLocation(YrNoCityCode cityCode)
     {
         using (var database = contextFactory.CreateDbContext())
         {
             var Resort = database.resorts.FirstOrDefault(e => e.id == dropdownSelectedResortId);
             Resort.yrNoCityCodeId = cityCode.id;
-
+            Console.WriteLine("new location: " + cityCode.code);
             await database.SaveChangesAsync();
         }
 
@@ -213,7 +234,8 @@ else
             selectedResort.yrNoCityCodeId = cityCode.id;
             selectedResort.yrNoCityCode = cityCode;
         }
-        
+        StateHasChanged();
         await locationPopup.CloseAsync();
+        
     }
 } 
