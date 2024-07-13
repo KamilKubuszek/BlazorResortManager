@@ -2,11 +2,12 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
 
-@page "/statuses/update/{currentResortIdParameter?}"
+@page "/resort/status/update/{currentResortIdParameter?}"
 
 <h3>UpdateStatus</h3>
-
+<_ResortSidebar />
 @if (loading)
 {
     <div>loading...</div>
@@ -81,14 +82,10 @@ else
     [Parameter]
     public string? currentResortIdParameter { get; set; }
 
-    // [CascadingParameter]
-    // private HttpClient httpClient { get; set; } = default!;
-
     public Resort[]? resorts;
     private Guid dropdownSelectedResortId;
     private Resort? selectedResort;
     private StatusSheet? currentStatusSheet;
-    //public Dictionary<Guid, StatusSheet> statusesByResortId = new Dictionary<Guid, StatusSheet>();
 
     public bool loading { get; set; }
 
@@ -99,14 +96,6 @@ else
         loading = false;
 
     }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //         Console.WriteLine("//FIRST RENDER//");
-    //     else
-    //         Console.WriteLine("//SECOND RENDER//");
-    // }
 
     protected async Task setStatusForm()
     {
@@ -160,39 +149,53 @@ else
 
     protected async Task postStatusSheet(StatusSheet statusSheet)
     {
-        Console.WriteLine("updating... ");
-
-        loading = true;
-
-        statusSheet.id = Guid.NewGuid();
-        statusSheet.dateTime = DateTime.Now;
-        statusSheet.resort = null;
-
-        statusSheet.resortStatus.id = Guid.NewGuid();
-
-        foreach(TrackStatus trackStatus in statusSheet.trackStatuses)
+        var postStatus = async () =>
         {
-            trackStatus.id = Guid.NewGuid();
-        }
+            Console.WriteLine("updating... ");
 
-        foreach (LiftStatus liftStatus in statusSheet.liftStatuses)
+            //loading = true;
+
+            statusSheet.id = Guid.NewGuid();
+            statusSheet.dateTime = DateTime.Now;
+            statusSheet.resort = null;
+
+            statusSheet.resortStatus.id = Guid.NewGuid();
+
+            foreach (TrackStatus trackStatus in statusSheet.trackStatuses)
+            {
+                trackStatus.id = Guid.NewGuid();
+            }
+
+            foreach (LiftStatus liftStatus in statusSheet.liftStatuses)
+            {
+                liftStatus.id = Guid.NewGuid();
+            }
+
+            using (var database = contextFactory.CreateDbContext())
+            {
+                await database.statusSheets.AddAsync(statusSheet);
+                await database.SaveChangesAsync();
+            }
+            Console.WriteLine("Status updated: ");
+            // Console.Write(JsonSerializer.Serialize(statusSheet, new JsonSerializerOptions()
+            // {
+            //     WriteIndented = true,
+            //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+            // }));
+
+        };
+
+        InvokeAsync(async () =>
         {
-            liftStatus.id = Guid.NewGuid();
-        }
+            await postStatus();
+            await Task.Delay(2000);
+            DialogService.Close();
+        });
+        var dialog = await DialogService.OpenAsync<LoadingTaskDialog>("",
+           new Dictionary<string, object>() { { "displayMessage", "LoAdInG." } },
+           new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
 
-        using (var database = contextFactory.CreateDbContext())
-        {
-            await database.statusSheets.AddAsync(statusSheet);
-            await database.SaveChangesAsync();
-        }
-        Console.WriteLine("Status updated: ");
-        // Console.Write(JsonSerializer.Serialize(statusSheet, new JsonSerializerOptions()
-        // {
-        //     WriteIndented = true,
-        //     ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
-        // }));
-
-        loading = false;
+       // loading = false;
     }
 
 }

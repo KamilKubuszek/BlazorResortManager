@@ -1,14 +1,15 @@
 ﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
+@attribute [Authorize]
 
 @using Radzen.Blazor.Rendering
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-@page "/resorts"
+@page "/resort"
 
 <RadzenButton Text="add new resort"/>
-
+<_ResortSidebar/>
 <h3>Resorts</h3>
 
 @if (loading)
@@ -155,6 +156,13 @@ else
         await Task.Run(loadResortData);
         await Task.Run(loadLocations);
 
+        //make first resort autoselected
+        if (resorts != null && resorts.Count() > 0)
+        {
+            dropdownSelectedResortId = resorts[0].id;
+            await setResort();
+        }
+
         loading = false;
     }
 
@@ -175,6 +183,7 @@ else
             //.AsNoTracking()
             .ToArrayAsync();
         }
+        
         Console.WriteLine("dataloaded");
     }
 
