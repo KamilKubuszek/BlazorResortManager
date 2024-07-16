@@ -191,7 +191,7 @@ else
             await Task.Delay(2000);
             DialogService.Close();
         });
-        var dialog = await DialogService.OpenAsync<LoadingTaskDialog>("",
+        var dialog = await DialogService.OpenAsync<_LoadingTaskDialog>("",
            new Dictionary<string, object>() { { "displayMessage", "LoAdInG." } },
            new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
 

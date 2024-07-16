@@ -1,15 +1,13 @@
 ﻿@inject NavigationManager NavigationManager
 
-<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Style="height: fit-content;">
+<RadzenPanelMenu Style="width:300px" Multiple="false">
     @foreach(var page in pages)
     {
-        <RadzenButton ButtonStyle="ButtonStyle.Light" Shade="Shade.Lighter" Style="width: 100%;"
-                      Variant="@(pageUrl == page.url ? Variant.Outlined : Variant.Flat )" 
-                      Click=@(() => changePage("/"+page.url))
-                      Text=@(page.title) 
-                      Disabled="@(pageUrl == page.url ? true : false)"/>
+        <RadzenPanelMenuItem Text="@(page.title)" Path="@(pageUrl == page.url ? "" : page.url )" 
+        class="rz-border-radius-6" Style="text-align: center" />
     }
-</RadzenStack>
+</RadzenPanelMenu>
+    
 
 @code {
     private string pageUrl = string.Empty;
@@ -19,7 +17,7 @@
         new pageInfo{ url = "resort/lift/add", title="Add new lift"},
         new pageInfo{ url = "resort/status", title="Statuses"},
         new pageInfo{ url = "resort/status/update", title="Update resort status"},
-        new pageInfo{ url = "/resort/edit", title="Edit resort info"}      
+        new pageInfo{ url = "resort/edit", title="Edit resort info"}      
     };
 
     protected override void OnInitialized() => pageUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
