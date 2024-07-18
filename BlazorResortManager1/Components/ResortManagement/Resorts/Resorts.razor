@@ -9,48 +9,7 @@
 @page "/resort"
 
 <h3>Resorts</h3>
-<RadzenStack>
-    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" >
-        <RadzenColumn Size="4">
-            
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn Size="2">
-            <_ResortSidebar />
-        </RadzenColumn>
-        <RadzenColumn>
 
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn Size="2">
-            
-            @if (selectedResort != null)
-            {
-                <p>
-                    Current Location:
-                    @(selectedResort.yrNoCityCode != null
-                        ? selectedResort.yrNoCityCode.country + ", " + selectedResort.yrNoCityCode.cityName
-                        : "not set")
-                </p>
-
-                <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
-                        src=@("https://www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/card.html")>
-                </iframe>
-
-                @*             <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
-            src=@("https: //www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/table.html")>
-            </iframe> *@
-            }
-        </RadzenColumn>
-        <RadzenColumn>
-           
-
-
-        </RadzenColumn> 
-    </RadzenRow>
-</RadzenStack>
 @if (loading)
 {
     <div>loading... </div>
@@ -142,6 +101,23 @@ else
                     TextProperty="name"
                     ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
     </RadzenDropDown>
+}
+@if (selectedResort != null)
+{
+    <p>
+        Current Location:
+        @(selectedResort.yrNoCityCode != null
+            ? selectedResort.yrNoCityCode.country + ", " + selectedResort.yrNoCityCode.cityName
+            : "not set")
+    </p>
+
+    <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+            src=@("https://www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/card.html")>
+    </iframe>
+
+    @*             <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+            src=@("https: //www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/table.html")>
+            </iframe> *@
 }
 
 

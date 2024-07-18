@@ -1,17 +1,43 @@
 ﻿
 @inherits LayoutComponentBase
 
-<AuthorizeView>
-    <Authorized>
-        <BlazorResortManager1.Components.Pages.Navbar />
-    </Authorized>
-</AuthorizeView>
-@Body
+<RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Vertical">
+    <AuthorizeView>
+        <Authorized>
+            <_Navbar />
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="2">
+                    <_ResortDropdown />
+                    <_ResortSidebar />
+                </RadzenColumn>
+
+                <RadzenColumn Size="12" SizeMD="10">
+                    @Body
+                </RadzenColumn>
+            </RadzenRow>
+                    
+
+        </Authorized>
+
+        <NotAuthorized>
+            @Body
+        </NotAuthorized>
+    </AuthorizeView>
+</RadzenStack>
+
+
+
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
 <RadzenDialog @rendermode="@RenderMode.InteractiveServer" />
 
+@code{
+   // private override async Task OnInitializedAsync(){
+
+   // }
+}
