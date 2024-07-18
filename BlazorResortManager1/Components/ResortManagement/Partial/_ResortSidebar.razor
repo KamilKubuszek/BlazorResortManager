@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 
-<RadzenPanelMenu Style="width:300px" Multiple="false">
+<RadzenPanelMenu Style="width: 100%;" Multiple="false">
     @foreach(var page in pages)
     {
         <RadzenPanelMenuItem Text="@(page.title)" Path="@(pageUrl == page.url ? "" : page.url )" 

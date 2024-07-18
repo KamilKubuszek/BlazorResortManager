@@ -8,77 +8,78 @@
 
 @page "/resort"
 
-<RadzenButton Text="add new resort"/>
-<_ResortSidebar/>
 <h3>Resorts</h3>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" >
+        <RadzenColumn Size="4">
+            
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="2">
+            <_ResortSidebar />
+        </RadzenColumn>
+        <RadzenColumn>
 
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="2">
+            
+            @if (selectedResort != null)
+            {
+                <p>
+                    Current Location:
+                    @(selectedResort.yrNoCityCode != null
+                        ? selectedResort.yrNoCityCode.country + ", " + selectedResort.yrNoCityCode.cityName
+                        : "not set")
+                </p>
+
+                <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+                        src=@("https://www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/card.html")>
+                </iframe>
+
+                @*             <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
+            src=@("https: //www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/table.html")>
+            </iframe> *@
+            }
+        </RadzenColumn>
+        <RadzenColumn>
+           
+
+
+        </RadzenColumn> 
+    </RadzenRow>
+</RadzenStack>
 @if (loading)
 {
     <div>loading... </div>
 }
 else
 {
-    @if (resorts != null)
-    {
-        <RadzenDropDown 
-            Change="@setResort" 
-            @bind-Value=@dropdownSelectedResortId
-            Data=@resorts 
-            TValue="Guid" 
-            TextProperty="name" 
-            ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
-        </RadzenDropDown>
-    }
-    if(selectedResort != null)
+
+    if (selectedResort != null)
     {
         //utility buttons
-        <RadzenButton Text="add another track" Click=@openAddTrackDialog @ref="locationPopupButton"/>
 
-        <RadzenButton Text="Change Resort Location" Click="@(args => locationPopup.ToggleAsync(locationPopupButton.Element))" />
-        <Popup @ref="locationPopup" Open="@loadLocations"
-               Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
-            <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes" AllowVirtualization=true Style="height:100%;overflow:auto;">
-                <Template Context="cityCode">
-                    <RadzenCard @onclick="async () => setLocation(cityCode)">
-                        @cityCode.cityName
-                        <hr />
-                        <RadzenRow>
-                            <RadzenColumn>
-                                Country: @cityCode.country
-                            </RadzenColumn>
-                            <RadzenColumn>
-                                Code: @cityCode.code
-                            </RadzenColumn>
-                        </RadzenRow>
-                        
-                    </RadzenCard>
-                </Template>
-            </RadzenDataList>
-        </Popup>
-
-        <p>
-            Current Location:
-            @(selectedResort.yrNoCityCode != null 
-                ? selectedResort.yrNoCityCode.country + ", " + selectedResort.yrNoCityCode.cityName 
-                : "not set" )
-        </p>
-        <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" 
-                Data="@selectedResort.tracks" TItem="Track">
+        <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true"
+                        Data="@selectedResort.tracks" TItem="Track">
             <Template Context="track">
                 <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@track.parameters">
                     <Columns>
                         <RadzenDataGridColumn Property="@nameof(TrackParameter.name)" Title="Name" />
                         <RadzenDataGridColumn Property="@nameof(TrackParameter.value)" Title="Value" />
                         <RadzenDataGridColumn Property="@nameof(TrackParameter.value)" Title="Unit value">
-                                <Template Context="parameter">
-                                    @(parameter.value+" some unit of parameter")
-                                </Template>
+
+                            <Template Context="parameter">
+                                @(parameter.value + " some unit of parameter")
+                            </Template>
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
             </Template>
             <Columns>
-                <RadzenDataGridColumn Property="name" Title="Name"/>
+                <RadzenDataGridColumn Property="name" Title="Name" />
             </Columns>
         </RadzenDataGrid>
 
@@ -103,20 +104,44 @@ else
             </Columns>
         </RadzenDataGrid>
 
-        //weather widget
-        @if (selectedResort.yrNoCityCode != null)
-        {
-            <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
-                    src=@("https://www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/card.html")>
-            </iframe>
+        <RadzenButton Text="add another track" Click=@openAddTrackDialog @ref="locationPopupButton" />
 
-            @*             <iframe style="display: block; float: left; height: 361.9px; width: fit-content;"
-                    src=@("https: //www.yr.no/en/content/"+selectedResort.yrNoCityCode.code+"/table.html")>
-            </iframe> *@
-        }
+        <RadzenButton Text="Change Resort Location" Click="@(args => locationPopup.ToggleAsync(locationPopupButton.Element))" />
+        <Popup @ref="locationPopup" Open="@loadLocations"
+               Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
+            <RadzenDataList TItem="YrNoCityCode" Data="@CityCodes" AllowVirtualization=true Style="height:100%;overflow:auto;">
+                <Template Context="cityCode">
+                    <RadzenCard @onclick="async () => setLocation(cityCode)">
+                        @cityCode.cityName
+                        <hr />
+                        <RadzenRow>
+                            <RadzenColumn>
+                                Country: @cityCode.country
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                Code: @cityCode.code
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                    </RadzenCard>
+                </Template>
+            </RadzenDataList>
+        </Popup>
+
     }
 
-    
+
+}
+@if (resorts != null)
+{
+    <RadzenDropDown Style="width: 100%; text-align: center;"
+                    Change="@setResort"
+                    @bind-Value=@dropdownSelectedResortId
+                    Data=@resorts
+                    TValue="Guid"
+                    TextProperty="name"
+                    ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
+    </RadzenDropDown>
 }
 
 
