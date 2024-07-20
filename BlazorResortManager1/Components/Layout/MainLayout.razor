@@ -46,42 +46,50 @@
         ? true : false;
 
     public Resort[]? resorts = null;
-    private Guid selectedResortId;
     private Resort? selectedResort = null;
 
     protected override async Task OnInitializedAsync(){
         Console.WriteLine("open new tab");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         await fetchData();
     }
 
-    private void resortChanged(Resort resort){
-        Console.WriteLine("res changed: " + resort.name);
-        //selectedResort = resorts.FirstOrDefault(e => e.id == selectedResortId);
+    private void resortChanged(Guid resId){
+        Console.WriteLine("res changed: " + resId);
+        //selectedResortId == 
+        selectedResort = resorts.FirstOrDefault(e => e.id == resId);
     }
 
     private async Task fetchData(){
-        var auth = await authenticationState;
-        if (shouldFetchResortData && auth.User != null)
+        if(resorts == null)
         {
-            Console.WriteLine("fetching resort data...");
-            using (var database = contextFactory.CreateDbContext())
+            var auth = await authenticationState;
+            if (shouldFetchResortData && auth.User != null)
             {
-                var userId = auth.User.FindFirst(
-                    c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                var slopeIdsByPermit = await database.permits
-                                        .Where(e => e.userId == userId)
-                                        .Select(e => e.resortId)
-                                        .ToArrayAsync();
+                Console.WriteLine("fetching resort data...");
+                using (var database = contextFactory.CreateDbContext())
+                {
+                    var userId = auth.User.FindFirst(
+                        c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    var slopeIdsByPermit = await database.permits
+                                            .Where(e => e.userId == userId)
+                                            .Select(e => e.resortId)
+                                            .ToArrayAsync();
 
-                resorts = database.resorts
-                            .Where(e => slopeIdsByPermit
-                            .Contains(e.id))
-                            .ToArray();
-                Console.WriteLine(resorts.Count());
-                StateHasChanged();
+                    resorts = database.resorts
+                                .Where(e => slopeIdsByPermit
+                                .Contains(e.id))
+                                .ToArray();
+                    Console.WriteLine(resorts.Count());
+                    StateHasChanged();
+                }
             }
+            else
+                Console.WriteLine("user is not provided or there is no need to fetch data");
         }
-        else
-            Console.WriteLine("user is not provided or there is no need to fetch data");
+        
     }
 }

@@ -1,14 +1,21 @@
 ﻿@page "/resort/edit"
+@using System.ComponentModel.DataAnnotations
 
 <h3>EditResort</h3>
-@if(resort != null)
+@if(selectedResort != null)
 {
-    @resort.id
-    @resort.name
+    @selectedResort.id
+    @selectedResort.name
 }
-
 
 @code {
     [CascadingParameter]
-    private Resort? resort { get; set; }
+    private Resort? selectedResort { get; set; }
+
+    private async Task editResortData(Resort resortDto)
+    {
+        ValidationContext context = new ValidationContext(resortDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(resortDto, context, results, true);
+    }
 }
