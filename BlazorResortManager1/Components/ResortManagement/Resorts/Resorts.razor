@@ -140,7 +140,6 @@ else
     private Resort? selectedResort;
     private YrNoCityCode[]? CityCodes;
 
-
     protected override async Task OnInitializedAsync()
     {
         loading = true;
@@ -176,7 +175,6 @@ else
                 .Where(e => e.userId == userId.ToString())
                 .Select(e => e.resortId)
                 .ToArray();
-
 
             resorts = await database.resorts
                 .Where(e => slopeIdsByPermit.Contains(e.id))

@@ -1,5 +1,35 @@
-﻿<h3>_ResortDropdown</h3>
+﻿
 
+<RadzenDropDown Style="width: 100%; text-align: center;"
+                Change="setResort"
+                @bind-Value=@selectedResortId
+                Data=@resorts
+                TValue="Guid"
+                TextProperty="name"
+                ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
+</RadzenDropDown>
+@if(resorts != null)
+{
+    <p>dsadsadsad</p>
+}
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
+
+    [CascadingParameter]
+    public Resort[]? resorts { get; set; }
+
+    private Resort selectedResort;
+    private Guid selectedResortId;
+
+    [Parameter] 
+    public EventCallback<Resort> onResortChanged { get; set; }
+
+    protected Task setResort()
+    {
+        Console.WriteLine("changing");
+        selectedResort = resorts.FirstOrDefault(e => e.id == selectedResortId);
+        return onResortChanged.InvokeAsync(selectedResort);
+    }
 
 }

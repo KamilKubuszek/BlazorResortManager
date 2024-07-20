@@ -1,43 +1,87 @@
 ﻿
 @inherits LayoutComponentBase
 
-<RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Vertical">
+
     <AuthorizeView>
         <Authorized>
-            <_Navbar />
-            <RadzenRow>
-                <RadzenColumn Size="12" SizeMD="2">
-                    <_ResortDropdown />
-                    <_ResortSidebar />
-                </RadzenColumn>
+            <CascadingValue Value=@resorts>
+                <_Navbar />
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="2">
+                        <_ResortDropdown onResortChanged="resortChanged" />
+                        <_ResortSidebar />
+                    </RadzenColumn>
 
-                <RadzenColumn Size="12" SizeMD="10">
-                    @Body
-                </RadzenColumn>
-            </RadzenRow>
-                    
-
+                    <RadzenColumn Size="12" SizeMD="10">
+                        <CascadingValue Value="selectedResort">
+                            @Body
+                        </CascadingValue>
+                    </RadzenColumn>
+                </RadzenRow>
+            </CascadingValue>
         </Authorized>
 
         <NotAuthorized>
             @Body
         </NotAuthorized>
     </AuthorizeView>
-</RadzenStack>
-
-
-
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
-
+<RadzenComponents @rendermode=@RenderMode.InteractiveServer />
 <RadzenDialog @rendermode="@RenderMode.InteractiveServer" />
 
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NavigationManager NavigationManager
 @code{
-   // private override async Task OnInitializedAsync(){
 
-   // }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private bool shouldFetchResortData =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("resort") 
+        ? true : false;
+
+    public Resort[]? resorts = null;
+    private Guid selectedResortId;
+    private Resort? selectedResort = null;
+
+    protected override async Task OnInitializedAsync(){
+        Console.WriteLine("open new tab");
+        await fetchData();
+    }
+
+    private void resortChanged(Resort resort){
+        Console.WriteLine("res changed: " + resort.name);
+        //selectedResort = resorts.FirstOrDefault(e => e.id == selectedResortId);
+    }
+
+    private async Task fetchData(){
+        var auth = await authenticationState;
+        if (shouldFetchResortData && auth.User != null)
+        {
+            Console.WriteLine("fetching resort data...");
+            using (var database = contextFactory.CreateDbContext())
+            {
+                var userId = auth.User.FindFirst(
+                    c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var slopeIdsByPermit = await database.permits
+                                        .Where(e => e.userId == userId)
+                                        .Select(e => e.resortId)
+                                        .ToArrayAsync();
+
+                resorts = database.resorts
+                            .Where(e => slopeIdsByPermit
+                            .Contains(e.id))
+                            .ToArray();
+                Console.WriteLine(resorts.Count());
+                StateHasChanged();
+            }
+        }
+        else
+            Console.WriteLine("user is not provided or there is no need to fetch data");
+    }
 }

@@ -18,6 +18,7 @@ builder.Services.AddRazorComponents()
 
 //Radzen
 builder.Services.AddScoped<DialogService>();
+builder.Services.AddRadzenComponents();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();

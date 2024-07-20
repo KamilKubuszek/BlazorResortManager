@@ -1,0 +1,14 @@
+﻿@page "/resort/edit"
+
+<h3>EditResort</h3>
+@if(resort != null)
+{
+    @resort.id
+    @resort.name
+}
+
+
+@code {
+    [CascadingParameter]
+    private Resort? resort { get; set; }
+}
