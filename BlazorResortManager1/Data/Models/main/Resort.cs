@@ -31,8 +31,9 @@ namespace BlazorResortManager1.Data.Models.main
         [MaxLength(16, ErrorMessage = "'phoneNumber' może mieć maksymalnie 16 znaków")]
         public string phoneNumber { get; set; }
 
-        [Required(ErrorMessage = "'email' jest wymagane")]
+        [Required]
         [MaxLength(64, ErrorMessage = "'email' może mieć maksymalnie 64 znaki")]
+        [EmailAddress(ErrorMessage = "this field should follow email template")]
         public string email { get; set; }
 
         [Required(ErrorMessage = "'webpage' jest wymagane")]

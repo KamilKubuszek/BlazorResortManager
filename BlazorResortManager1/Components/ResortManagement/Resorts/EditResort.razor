@@ -1,12 +1,30 @@
 ﻿@page "/resort/edit"
 @using System.ComponentModel.DataAnnotations
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>EditResort</h3>
 @if(selectedResort != null)
 {
-    @selectedResort.id
-    @selectedResort.name
+    <RadzenTemplateForm Data="selectedResort" TItem="Resort" InvalidSubmit="invalidSubmit" Submit="(args => editResortData(args))">
+        <RadzenFormField Text="emial" Variant="Variant.Flat">
+            <RadzenTextBox @bind-Value="selectedResort.email" Name="email" />
+        </RadzenFormField>
+        <RadzenDataAnnotationValidator Component="email" MessageSeparator="/n"/>
+
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"/>
+@*         <RadzenFormField Text="webpage" Variant="Variant.Flat">
+            <RadzenTextBox @bind-Value="selectedResort.webpage" Name="webpage" />
+        </RadzenFormField>
+        <RadzenRequiredValidator Component="webpage" Text="This field is required" />
+
+        <RadzenFormField Text="phoneNumber" Variant="Variant.Flat">
+            <RadzenTextBox @bind-Value="selectedResort.phoneNumber" Name="phoneNumber" />
+        </RadzenFormField>
+        <RadzenRequiredValidator Component="phoneNumber" Text="This field is required" />
+         *@
+    </RadzenTemplateForm>
 }
+
 
 @code {
     [CascadingParameter]
@@ -17,5 +35,10 @@
         ValidationContext context = new ValidationContext(resortDto);
         ICollection<ValidationResult> results = new List<ValidationResult>();
         bool isValid = Validator.TryValidateObject(resortDto, context, results, true);
+    }
+
+    private void invalidSubmit()
+    {
+        
     }
 }
