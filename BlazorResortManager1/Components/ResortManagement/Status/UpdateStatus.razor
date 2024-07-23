@@ -30,18 +30,18 @@ else
     @if (currentStatusSheet != null)
     {
         <RadzenTemplateForm Submit="@(async (StatusSheet args) => {await postStatusSheet(args); })" Method="post" TItem="StatusSheet" Data="currentStatusSheet">
-            <RadzenFieldset Text="Resort">
+@*             <RadzenFieldset Text="Resort">
                 <p>
                     <RadzenCheckBox @bind-Value=@currentStatusSheet.resortStatus.opened Name="CheckboxS_opened" />
                     <RadzenLabel Text="opened" Component="CheckboxS_opened" />
                 </p>
-            </RadzenFieldset>
+            </RadzenFieldset> *@
 
             <RadzenFieldset Text="Tracks">
                 @foreach (TrackStatus trackStatus in currentStatusSheet.trackStatuses)
                 {
                     @* <RadzenFieldset Text="@trackStatus.parentTrack.name"> *@
-                        <p>
+                        @* <p>
                             <RadzenCheckBox @bind-Value=@trackStatus.opened Name="Checkbox_opened" />
                             <RadzenLabel Text="opened" Component="CheckboxT_opened" />
                         </p>
@@ -54,7 +54,7 @@ else
                         <p>
                             <RadzenCheckBox @bind-Value=@trackStatus.snowGroomed Name="Checkbox_snowGroomed" />
                             <RadzenLabel Text="snow groomed" Component="CheckboxT_snowGroomed" />
-                        </p>
+                        </p> *@
                     @* </RadzenFieldset> *@
                 }
             </RadzenFieldset>

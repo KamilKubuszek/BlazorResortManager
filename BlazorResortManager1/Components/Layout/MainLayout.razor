@@ -36,35 +36,35 @@
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NavigationManager NavigationManager
-@code{
+@code {
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
     private bool shouldFetchResortData =>
-        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("resort") 
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("resort")
         ? true : false;
 
     public Resort[]? resorts = null;
     private Resort? selectedResort = null;
 
-    protected override async Task OnInitializedAsync(){
-        Console.WriteLine("open new tab");
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
+        NavigationManager.LocationChanged += fetchDataOnLocationChanged;
         await fetchData();
     }
 
-    private void resortChanged(Guid resId){
+    private void resortChanged(Guid resId)
+    {
         Console.WriteLine("res changed: " + resId);
-        //selectedResortId == 
+        //selectedResortId ==
         selectedResort = resorts.FirstOrDefault(e => e.id == resId);
+        Console.WriteLine("id of this mf" + selectedResort.id);
     }
 
-    private async Task fetchData(){
-        if(resorts == null)
+    private async Task fetchData()
+    {
+        if (resorts == null)
         {
             var auth = await authenticationState;
             if (shouldFetchResortData && auth.User != null)
@@ -90,6 +90,9 @@
             else
                 Console.WriteLine("user is not provided or there is no need to fetch data");
         }
-        
+
     }
+
+    private async void fetchDataOnLocationChanged(object sender, LocationChangedEventArgs args)
+        => await fetchData();
 }
