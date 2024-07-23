@@ -29,7 +29,11 @@
 </html>
 @inject NavigationManager NavigationManager
 @code{
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
     private IComponentRenderMode? RenderModeForPage =>
         NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("resort")
-        ? new InteractiveServerRenderMode(prerender: false) : null;
+        ? null : new InteractiveServerRenderMode(prerender: false);
+
 }

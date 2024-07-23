@@ -34,7 +34,6 @@ namespace BlazorResortManager1.Data.Models.main
 
         [Required(ErrorMessage = "'email' jest wymagane")]
         [MaxLength(64, ErrorMessage = "'email' może mieć maksymalnie 64 znaki")]
-        [EmailAddress(ErrorMessage = "this field should follow email template")]
         public string email { get; set; }
 
         [Required(ErrorMessage = "'webpage' jest wymagane")]

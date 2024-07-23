@@ -8,6 +8,10 @@
                 TextProperty="name"
                 ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
 </RadzenDropDown>
+@if(resorts != null)
+{
+    <p>dsadsadsad</p>
+}
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
@@ -15,14 +19,17 @@
     [CascadingParameter]
     public Resort[]? resorts { get; set; }
 
-    [CascadingParameter]
-    private Guid selectedResortId { get; set; }
-
     private Resort selectedResort;
+    private Guid selectedResortId;
 
     [Parameter] 
     public EventCallback<Guid> onResortChanged { get; set; }
 
-    protected async Task setResort() => await onResortChanged.InvokeAsync(selectedResortId);
+    protected async Task setResort()
+    {
+        Console.WriteLine("changing");
+        //selectedResort = resorts.FirstOrDefault(e => e.id == selectedResortId);
+        await onResortChanged.InvokeAsync(selectedResortId);
+    }
 
 }

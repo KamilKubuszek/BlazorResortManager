@@ -5,7 +5,6 @@
     <AuthorizeView>
         <Authorized>
             <CascadingValue Value=@resorts>
-            <CascadingValue Value=@selectedResort>
                 <_Navbar />
                 <RadzenRow>
                     <RadzenColumn Size="12" SizeMD="2">
@@ -13,11 +12,12 @@
                         <_ResortSidebar />
                     </RadzenColumn>
 
-                    <RadzenColumn Size="12" SizeMD="10">               
+                    <RadzenColumn Size="12" SizeMD="10">
+                        <CascadingValue Value="selectedResort">
                             @Body
+                        </CascadingValue>
                     </RadzenColumn>
                 </RadzenRow>
-            </CascadingValue>
             </CascadingValue>
         </Authorized>
 
@@ -49,20 +49,18 @@
     private Resort? selectedResort = null;
 
     protected override async Task OnInitializedAsync(){
-        NavigationManager.LocationChanged += fetchDataOnLocationChanged;
-        await fetchData();
+        Console.WriteLine("open new tab");
     }
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     await fetchData();
-    // }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await fetchData();
+    }
 
     private void resortChanged(Guid resId){
         Console.WriteLine("res changed: " + resId);
         //selectedResortId == 
         selectedResort = resorts.FirstOrDefault(e => e.id == resId);
-        Console.WriteLine("id of this mf" + selectedResort.id);
     }
 
     private async Task fetchData(){
@@ -92,9 +90,6 @@
             else
                 Console.WriteLine("user is not provided or there is no need to fetch data");
         }
-
+        
     }
-
-    private async void fetchDataOnLocationChanged(object sender, LocationChangedEventArgs args)
-        => await fetchData();
 }
