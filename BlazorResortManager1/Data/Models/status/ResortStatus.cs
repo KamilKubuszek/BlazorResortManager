@@ -11,15 +11,21 @@ namespace BlazorResortManager1.Data.Models.status
         [Key]
         public Guid id { get; set; }
 
-        [Required(ErrorMessage = "'opened' jest wymagane")]
+        [Required]
         public bool opened { get; set; }
 
-        [Required(ErrorMessage = "'parentresortId' jest wymagany")]
+        [Required]
+        public TimeOnly openingTime { get; set; }
+
+        [Required]
+        public TimeOnly closingTime { get; set; }
+
+        [Required]
         public Guid parentResortId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Resort? parentResort { get; set; } //= null!;
 
-        [Required(ErrorMessage = "'statusSheetId' jest wymagany")]
+        [Required]
         public Guid statusSheetId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public StatusSheet? statusSheet { get; set; } = null!;

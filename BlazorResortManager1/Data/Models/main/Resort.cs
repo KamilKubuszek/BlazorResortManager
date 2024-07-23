@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using BlazorResortManager1.Data.Models.camera;
 using BlazorResortManager1.Data.Models.forecast;
 using BlazorResortManager1.Data.Models.main;
 using BlazorResortManager1.Data.Models.status;
@@ -31,7 +32,7 @@ namespace BlazorResortManager1.Data.Models.main
         [MaxLength(16, ErrorMessage = "'phoneNumber' może mieć maksymalnie 16 znaków")]
         public string phoneNumber { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "'email' jest wymagane")]
         [MaxLength(64, ErrorMessage = "'email' może mieć maksymalnie 64 znaki")]
         [EmailAddress(ErrorMessage = "this field should follow email template")]
         public string email { get; set; }
@@ -43,8 +44,6 @@ namespace BlazorResortManager1.Data.Models.main
         public Guid? yrNoCityCodeId { get; set; }
         public YrNoCityCode? yrNoCityCode { get; set; }
 
-        //public ICollection<Permission> permissions { get; set; } = new List<Permission>();
-        // public ICollection<User> permissionOwners { get; set; } = new List<User>();
         [JsonIgnore]
         public ICollection<Permit> permits { get; set; } = new List<Permit>();
 
@@ -60,7 +59,10 @@ namespace BlazorResortManager1.Data.Models.main
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ICollection<Lift> lifts { get; set; } = new List<Lift>();
 
-        public ICollection<ResortParameter> resortParameters { get; set; } = new List<ResortParameter>();    
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ICollection<ResortParameter> resortParameters { get; set; } = new List<ResortParameter>();
+
+        public ICollection<CameraResortBinding> cameras { get; set; } = new List<CameraResortBinding>();
     }
 
 

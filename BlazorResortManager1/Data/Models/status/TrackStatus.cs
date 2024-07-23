@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using BlazorResortManager1.Data.Models.camera;
 using BlazorResortManager1.Data.Models.main;
 
 namespace BlazorResortManager1.Data.Models.status
@@ -14,13 +15,16 @@ namespace BlazorResortManager1.Data.Models.status
         [Required(ErrorMessage = "'opened' jest wymagane")]
         public bool opened { get; set; }
 
-        [Required(ErrorMessage = "'snowGroomed' jest wymagane")]
-        public bool snowGroomed { get; set; }
+        [Required]
+        public TimeOnly openingTime { get; set; }
 
-        [Required(ErrorMessage = "'illuminated' jest wymagane")]
-        public bool illuminated { get; set; }
+        [Required]
+        public TimeOnly closingTime { get; set; }
 
-        [Required(ErrorMessage = "'parentTrackId' jest wymagany")]
+        [Required]
+        public int snowCover {  get; set; }
+
+        [Required]
         public Guid parentTrackId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Track? parentTrack { get; set; } = null!;
@@ -28,7 +32,7 @@ namespace BlazorResortManager1.Data.Models.status
         [Required(ErrorMessage = "'statusSheetId' jest wymagany")]
         public Guid statusSheetId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public StatusSheet? statusSheet { get; set; } = null!;
+        public StatusSheet? statusSheet { get; set; } = null!;     
     }
 
 }

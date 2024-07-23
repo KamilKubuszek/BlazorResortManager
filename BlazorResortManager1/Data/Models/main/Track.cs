@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using BlazorResortManager1.Data.Models.camera;
 using BlazorResortManager1.Data.Models.status;
 
 namespace BlazorResortManager1.Data.Models.main
@@ -11,31 +12,39 @@ namespace BlazorResortManager1.Data.Models.main
         [Key]
         public Guid id { get; set; }
 
-        [Required(ErrorMessage = "'name' jest wymagane")]
+        [Required]
         [MaxLength(32, ErrorMessage = "'name' może mieć maksymalnie 32 znaki")]
         public string name { get; set; }
 
-        //[Required(ErrorMessage = "'totalHeightMeters' jest wymagane")]
-        //public int totalHeightMeters { get; set; }
+        [Required]
+        public int totalHeightMeters { get; set; }
 
-        //[Required(ErrorMessage = "'inclination' jest wymagane")]
-        //public int inclination { get; set; }
+        [Required]
+        public int inclination { get; set; }
 
-        //[Required(ErrorMessage = "'marking' jest wymagane")]
-        //[MaxLength(16, ErrorMessage = "'marking' może mieć maksymalnie 16 znaków")]
-        //public string marking { get; set; }
+        [Required]
+        public bool illuminated { get; set; }
 
-        //[Required(ErrorMessage = "'lengthMeters' jest wymagane")]
-        //public int lengthMeters { get; set; }
+        [Required]
+        public bool snowGroomed {  get; set; }
 
-        //[Required(ErrorMessage = "'difficulty' jest wymagane")]
-        //public string difficulty { get; set; }
+        [Required]
+        [MaxLength(16, ErrorMessage = "'marking' może mieć maksymalnie 16 znaków")]
+        public string marking { get; set; }
+
+        [Required]
+        public int lengthMeters { get; set; }
+
+        [Required]
+        public string difficulty { get; set; }
         public ICollection<TrackParameter> parameters { get; set; } = new List<TrackParameter>();
         public ICollection<TrackStatus> statuses { get; set; } = new List<TrackStatus>();
         [ForeignKey("resort")]
         public Guid resortId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Resort? resort { get; set; }
+
+        public ICollection<CameraTrackBinding> cameras { get; set; } = new List<CameraTrackBinding>();
     }
 
 

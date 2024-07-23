@@ -21,10 +21,6 @@ namespace BlazorResortManager1.Data.Models.forecast
 
         public string country { get; set; }
 
-        [Required]
-        public Guid yrNoLanguageCodeId { get; set; }
-        public YrNoLanguageCode yrNoLanguageCode { get; set; }
-
         //[ForeignKey("yrNoCityCodeId")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<Resort> resorts { get; set; } = new List<Resort>();
