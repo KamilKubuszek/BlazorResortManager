@@ -4,6 +4,7 @@ using BlazorResortManager1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240722105128_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -106,29 +109,9 @@ namespace BlazorResortManager1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("yrNoLanguageCodeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("id");
-
-                    b.HasIndex("yrNoLanguageCodeId");
 
                     b.ToTable("yrNoCityCode");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("yrNoLanguageCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -368,17 +351,17 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("illuminated")
-                        .HasColumnType("bit");
+                    b.Property<TimeOnly>("closingTime")
+                        .HasColumnType("time");
 
                     b.Property<bool>("opened")
                         .HasColumnType("bit");
 
+                    b.Property<TimeOnly>("openingTime")
+                        .HasColumnType("time");
+
                     b.Property<Guid>("parentTrackId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("snowGroomed")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("statusSheetId")
                         .HasColumnType("uniqueidentifier");
@@ -545,17 +528,6 @@ namespace BlazorResortManager1.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
-                {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", "yrNoLanguageCode")
-                        .WithMany("yrNoCityCodes")
-                        .HasForeignKey("yrNoLanguageCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("yrNoLanguageCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -768,11 +740,6 @@ namespace BlazorResortManager1.Migrations
             modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
                 {
                     b.Navigation("resorts");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Navigation("yrNoCityCodes");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>

@@ -4,6 +4,7 @@ using BlazorResortManager1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240708183909_dataTypeFix")]
+    partial class dataTypeFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,51 +90,29 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.StatusSheet", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("cityName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                    b.Property<DateTime>("dateTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("productionVersion")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("yrNoLanguageCodeId")
+                    b.Property<Guid>("resortId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("id");
 
-                    b.HasIndex("yrNoLanguageCodeId");
+                    b.HasIndex("resortId");
 
-                    b.ToTable("yrNoCityCode");
+                    b.ToTable("statusSheet");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("yrNoLanguageCode");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Lift", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -152,7 +133,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("lift");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.LiftParameter", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.LiftParameter", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +157,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("liftParameter");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Resort", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -212,17 +193,12 @@ namespace BlazorResortManager1.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<Guid?>("yrNoCityCodeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("id");
-
-                    b.HasIndex("yrNoCityCodeId");
 
                     b.ToTable("resort");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.ResortParameter", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.ResortParameter", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -246,7 +222,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("resortParameter");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Track", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Track", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -267,7 +243,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("track");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.TrackParameter", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.TrackParameter", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -291,7 +267,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("trackParameter");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.LiftStatus", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.LiftStatus", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -315,7 +291,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("liftStatus");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.ResortStatus", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.ResortStatus", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -340,29 +316,7 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("resortStatus");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.StatusSheet", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("dateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("productionVersion")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("resortId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("resortId");
-
-                    b.ToTable("statusSheet");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.TrackStatus", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.TrackStatus", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
@@ -398,18 +352,20 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<Guid>("resortId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("userId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("id");
 
-                    b.HasIndex("resortId");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("resortId");
 
                     b.ToTable("permit");
                 });
@@ -547,20 +503,20 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.StatusSheet", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", "yrNoLanguageCode")
-                        .WithMany("yrNoCityCodes")
-                        .HasForeignKey("yrNoLanguageCodeId")
+                    b.HasOne("BlazorResortManager1.main.Resort", "resort")
+                        .WithMany("statusSheets")
+                        .HasForeignKey("resortId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("yrNoLanguageCode");
+                    b.Navigation("resort");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Lift", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
+                    b.HasOne("BlazorResortManager1.main.Resort", "resort")
                         .WithMany("lifts")
                         .HasForeignKey("resortId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -569,9 +525,9 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("resort");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.LiftParameter", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.LiftParameter", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Lift", "lift")
+                    b.HasOne("BlazorResortManager1.main.Lift", "lift")
                         .WithMany("parameters")
                         .HasForeignKey("liftId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -580,18 +536,9 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("lift");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.ResortParameter", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", "yrNoCityCode")
-                        .WithMany("resorts")
-                        .HasForeignKey("yrNoCityCodeId");
-
-                    b.Navigation("yrNoCityCode");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.ResortParameter", b =>
-                {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
+                    b.HasOne("BlazorResortManager1.main.Resort", "resort")
                         .WithMany("resortParameters")
                         .HasForeignKey("resortId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -600,9 +547,9 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("resort");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Track", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Track", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
+                    b.HasOne("BlazorResortManager1.main.Resort", "resort")
                         .WithMany("tracks")
                         .HasForeignKey("resortId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -611,9 +558,9 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("resort");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.TrackParameter", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.TrackParameter", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Track", "track")
+                    b.HasOne("BlazorResortManager1.main.Track", "track")
                         .WithMany("parameters")
                         .HasForeignKey("trackId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -622,15 +569,15 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("track");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.LiftStatus", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.LiftStatus", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Lift", "parentLift")
+                    b.HasOne("BlazorResortManager1.main.Lift", "parentLift")
                         .WithMany("statuses")
                         .HasForeignKey("parentLiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
+                    b.HasOne("BlazorResortManager1.StatusSheet", "statusSheet")
                         .WithMany("liftStatuses")
                         .HasForeignKey("statusSheetId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -641,17 +588,17 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("statusSheet");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.ResortStatus", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.ResortStatus", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "parentResort")
+                    b.HasOne("BlazorResortManager1.main.Resort", "parentResort")
                         .WithMany("statuses")
                         .HasForeignKey("parentResortId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
+                    b.HasOne("BlazorResortManager1.StatusSheet", "statusSheet")
                         .WithOne("resortStatus")
-                        .HasForeignKey("BlazorResortManager1.Data.Models.status.ResortStatus", "statusSheetId")
+                        .HasForeignKey("BlazorResortManager1.status.ResortStatus", "statusSheetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -660,26 +607,15 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("statusSheet");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.StatusSheet", b =>
+            modelBuilder.Entity("BlazorResortManager1.status.TrackStatus", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
-                        .WithMany("statusSheets")
-                        .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("resort");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.TrackStatus", b =>
-                {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Track", "parentTrack")
+                    b.HasOne("BlazorResortManager1.main.Track", "parentTrack")
                         .WithMany("statuses")
                         .HasForeignKey("parentTrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
+                    b.HasOne("BlazorResortManager1.StatusSheet", "statusSheet")
                         .WithMany("trackStatuses")
                         .HasForeignKey("statusSheetId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -692,15 +628,13 @@ namespace BlazorResortManager1.Migrations
 
             modelBuilder.Entity("BlazorResortManager1.user.Permit", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
-                        .WithMany("permits")
-                        .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BlazorResortManager1.Data.ApplicationUser", "ApplicationUser")
                         .WithMany("permits")
-                        .HasForeignKey("userId")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("BlazorResortManager1.main.Resort", "resort")
+                        .WithMany("permits")
+                        .HasForeignKey("resortId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -765,24 +699,23 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("permits");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.StatusSheet", b =>
                 {
-                    b.Navigation("resorts");
+                    b.Navigation("liftStatuses");
+
+                    b.Navigation("resortStatus");
+
+                    b.Navigation("trackStatuses");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Navigation("yrNoCityCodes");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Lift", b =>
                 {
                     b.Navigation("parameters");
 
                     b.Navigation("statuses");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Resort", b =>
                 {
                     b.Navigation("lifts");
 
@@ -797,20 +730,11 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("tracks");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Track", b =>
+            modelBuilder.Entity("BlazorResortManager1.main.Track", b =>
                 {
                     b.Navigation("parameters");
 
                     b.Navigation("statuses");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.status.StatusSheet", b =>
-                {
-                    b.Navigation("liftStatuses");
-
-                    b.Navigation("resortStatus");
-
-                    b.Navigation("trackStatuses");
                 });
 #pragma warning restore 612, 618
         }

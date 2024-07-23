@@ -4,6 +4,7 @@ using BlazorResortManager1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240709182902_navigation-fix")]
+    partial class navigationfix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,50 +88,6 @@ namespace BlazorResortManager1.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("cityName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("yrNoLanguageCodeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("yrNoLanguageCodeId");
-
-                    b.ToTable("yrNoCityCode");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("yrNoLanguageCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -212,12 +171,7 @@ namespace BlazorResortManager1.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<Guid?>("yrNoCityCodeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("id");
-
-                    b.HasIndex("yrNoCityCodeId");
 
                     b.ToTable("resort");
                 });
@@ -547,17 +501,6 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
-                {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", "yrNoLanguageCode")
-                        .WithMany("yrNoCityCodes")
-                        .HasForeignKey("yrNoLanguageCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("yrNoLanguageCode");
-                });
-
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
                 {
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
@@ -578,15 +521,6 @@ namespace BlazorResortManager1.Migrations
                         .IsRequired();
 
                     b.Navigation("lift");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
-                {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", "yrNoCityCode")
-                        .WithMany("resorts")
-                        .HasForeignKey("yrNoCityCodeId");
-
-                    b.Navigation("yrNoCityCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.ResortParameter", b =>
@@ -763,16 +697,6 @@ namespace BlazorResortManager1.Migrations
             modelBuilder.Entity("BlazorResortManager1.Data.ApplicationUser", b =>
                 {
                     b.Navigation("permits");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
-                {
-                    b.Navigation("resorts");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Navigation("yrNoCityCodes");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>

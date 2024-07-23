@@ -4,6 +4,7 @@ using BlazorResortManager1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240723071157_quick-fix3")]
+    partial class quickfix3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -87,6 +90,88 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.Camera", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("camera");
+                });
+
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraLiftBinding", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("cameraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("liftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("cameraId");
+
+                    b.HasIndex("liftId");
+
+                    b.ToTable("cameraLiftBinding");
+                });
+
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraResortBinding", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("cameraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("resortId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("cameraId");
+
+                    b.HasIndex("resortId");
+
+                    b.ToTable("cameraResortBinding");
+                });
+
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraTrackBinding", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("cameraId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("trackId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("cameraId");
+
+                    b.HasIndex("trackId");
+
+                    b.ToTable("cameraTrackBinding");
+                });
+
             modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
                 {
                     b.Property<Guid>("id")
@@ -106,29 +191,9 @@ namespace BlazorResortManager1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("yrNoLanguageCodeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("id");
-
-                    b.HasIndex("yrNoLanguageCodeId");
 
                     b.ToTable("yrNoCityCode");
-                });
-
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("yrNoLanguageCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -137,13 +202,30 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("capacityPerSeat")
+                        .HasColumnType("int");
+
+                    b.Property<int>("estimatedDurationTimeMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("lengthMeters")
+                        .HasColumnType("int");
+
                     b.Property<string>("name")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<int>("peoplePerHour")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("resortId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.HasKey("id");
 
@@ -252,6 +334,24 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("difficulty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("illuminated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("inclination")
+                        .HasColumnType("int");
+
+                    b.Property<int>("lengthMeters")
+                        .HasColumnType("int");
+
+                    b.Property<string>("marking")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
                     b.Property<string>("name")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -259,6 +359,12 @@ namespace BlazorResortManager1.Migrations
 
                     b.Property<Guid>("resortId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("snowGroomed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("totalHeightMeters")
+                        .HasColumnType("int");
 
                     b.HasKey("id");
 
@@ -297,8 +403,14 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<TimeOnly>("closingTime")
+                        .HasColumnType("time");
+
                     b.Property<bool>("opened")
                         .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("openingTime")
+                        .HasColumnType("time");
 
                     b.Property<Guid>("parentLiftId")
                         .HasColumnType("uniqueidentifier");
@@ -321,8 +433,14 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<TimeOnly>("closingTime")
+                        .HasColumnType("time");
+
                     b.Property<bool>("opened")
                         .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("openingTime")
+                        .HasColumnType("time");
 
                     b.Property<Guid>("parentResortId")
                         .HasColumnType("uniqueidentifier");
@@ -368,17 +486,20 @@ namespace BlazorResortManager1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("illuminated")
-                        .HasColumnType("bit");
+                    b.Property<TimeOnly>("closingTime")
+                        .HasColumnType("time");
 
                     b.Property<bool>("opened")
                         .HasColumnType("bit");
 
+                    b.Property<TimeOnly>("openingTime")
+                        .HasColumnType("time");
+
                     b.Property<Guid>("parentTrackId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("snowGroomed")
-                        .HasColumnType("bit");
+                    b.Property<int>("snowCover")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("statusSheetId")
                         .HasColumnType("uniqueidentifier");
@@ -547,15 +668,61 @@ namespace BlazorResortManager1.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraLiftBinding", b =>
                 {
-                    b.HasOne("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", "yrNoLanguageCode")
-                        .WithMany("yrNoCityCodes")
-                        .HasForeignKey("yrNoLanguageCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("BlazorResortManager1.Data.Models.camera.Camera", "camera")
+                        .WithMany("liftBindings")
+                        .HasForeignKey("cameraId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("yrNoLanguageCode");
+                    b.HasOne("BlazorResortManager1.Data.Models.main.Lift", "lift")
+                        .WithMany("cameras")
+                        .HasForeignKey("liftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("camera");
+
+                    b.Navigation("lift");
+                });
+
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraResortBinding", b =>
+                {
+                    b.HasOne("BlazorResortManager1.Data.Models.camera.Camera", "camera")
+                        .WithMany("resortBindings")
+                        .HasForeignKey("cameraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
+                        .WithMany("cameras")
+                        .HasForeignKey("resortId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("camera");
+
+                    b.Navigation("resort");
+                });
+
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.CameraTrackBinding", b =>
+                {
+                    b.HasOne("BlazorResortManager1.Data.Models.camera.Camera", "camera")
+                        .WithMany("trackBindings")
+                        .HasForeignKey("cameraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BlazorResortManager1.Data.Models.main.Track", "track")
+                        .WithMany("cameras")
+                        .HasForeignKey("trackId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("camera");
+
+                    b.Navigation("track");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -563,7 +730,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
                         .WithMany("lifts")
                         .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("resort");
@@ -574,7 +741,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Lift", "lift")
                         .WithMany("parameters")
                         .HasForeignKey("liftId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("lift");
@@ -594,7 +761,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
                         .WithMany("resortParameters")
                         .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("resort");
@@ -605,7 +772,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
                         .WithMany("tracks")
                         .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("resort");
@@ -616,7 +783,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Track", "track")
                         .WithMany("parameters")
                         .HasForeignKey("trackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("track");
@@ -627,7 +794,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Lift", "parentLift")
                         .WithMany("statuses")
                         .HasForeignKey("parentLiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
@@ -646,7 +813,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "parentResort")
                         .WithMany("statuses")
                         .HasForeignKey("parentResortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
@@ -665,7 +832,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
                         .WithMany("statusSheets")
                         .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("resort");
@@ -676,7 +843,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Track", "parentTrack")
                         .WithMany("statuses")
                         .HasForeignKey("parentTrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlazorResortManager1.Data.Models.status.StatusSheet", "statusSheet")
@@ -695,13 +862,13 @@ namespace BlazorResortManager1.Migrations
                     b.HasOne("BlazorResortManager1.Data.Models.main.Resort", "resort")
                         .WithMany("permits")
                         .HasForeignKey("resortId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlazorResortManager1.Data.ApplicationUser", "ApplicationUser")
                         .WithMany("permits")
                         .HasForeignKey("userId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -765,18 +932,24 @@ namespace BlazorResortManager1.Migrations
                     b.Navigation("permits");
                 });
 
+            modelBuilder.Entity("BlazorResortManager1.Data.Models.camera.Camera", b =>
+                {
+                    b.Navigation("liftBindings");
+
+                    b.Navigation("resortBindings");
+
+                    b.Navigation("trackBindings");
+                });
+
             modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
                 {
                     b.Navigation("resorts");
                 });
 
-            modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoLanguageCode", b =>
-                {
-                    b.Navigation("yrNoCityCodes");
-                });
-
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
                 {
+                    b.Navigation("cameras");
+
                     b.Navigation("parameters");
 
                     b.Navigation("statuses");
@@ -784,6 +957,8 @@ namespace BlazorResortManager1.Migrations
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
                 {
+                    b.Navigation("cameras");
+
                     b.Navigation("lifts");
 
                     b.Navigation("permits");
@@ -799,6 +974,8 @@ namespace BlazorResortManager1.Migrations
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Track", b =>
                 {
+                    b.Navigation("cameras");
+
                     b.Navigation("parameters");
 
                     b.Navigation("statuses");

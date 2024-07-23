@@ -11,21 +11,15 @@ namespace BlazorResortManager1.Data.Models.status
         [Key]
         public Guid id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "'opened' jest wymagane")]
         public bool opened { get; set; }
 
-        [Required]
-        public TimeOnly openingTime { get; set; }
-
-        [Required]
-        public TimeOnly closingTime { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "'parentLiftId' jest wymagany")]
         public Guid parentLiftId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Lift? parentLift { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "'statusSheetId' jest wymagany")]
         public Guid statusSheetId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public StatusSheet? statusSheet { get; set; } = null!;
