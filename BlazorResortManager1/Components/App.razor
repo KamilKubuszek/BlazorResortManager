@@ -12,17 +12,17 @@
 
 
     <link rel="stylesheet" href="BlazorResortManager1.styles.css" />
-    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
 
     <link rel="stylesheet" href="app.css" />
-    
+    <RadzenTheme Theme="material" @rendermode="InteractiveServer" />
     <HeadOutlet @rendermode=RenderModeForPage />
 </head>
 
 <body style="font-family: 'Montserrat', sans-serif; margin: 0;">
-    <Routes @rendermode=RenderModeForPage />
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
     <script src="_framework/blazor.web.js"></script>
+    <Routes @rendermode=RenderModeForPage />
+
 
 </body>
 

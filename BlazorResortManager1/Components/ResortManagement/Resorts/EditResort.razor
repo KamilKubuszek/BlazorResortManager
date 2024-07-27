@@ -2,21 +2,121 @@
 @using System.ComponentModel.DataAnnotations
 @attribute [Authorize]
 
-<h3>EditResort</h3>
-@if(selectedResort != null)
+<h3>edit resort information</h3>
+@if(resortDto != null)
 {
-    @selectedResort.id
-    @selectedResort.name
+    <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=editResortData>
+        <RadzenStack Style="width: 100%">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="email"><RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="email"/></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem" Style="width: 100%">
+                <RadzenColumn>
+                    <RadzenFormField Text="webpage"><RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="webpage" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="phone number"><RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="phone" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="description"><RadzenTextArea Name="description" Rows="3" @bind-Value="resortDto.description" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="description" /></RadzenColumn>
+            </RadzenRow>
+            
+            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit"/>
+        </RadzenStack>
+    </RadzenTemplateForm>
 }
 
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject ResortChangeManager resortChangeManager
 @code {
     [CascadingParameter]
     private Resort? selectedResort { get; set; }
 
-    private async Task editResortData(Resort resortDto)
+    private Resort? resortDto { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
+        resortChangeManager.ResortChange += updateForm;
+        if (selectedResort != null)
+            resortDto = selectedResort;
+    }
+
+    private void updateForm(ResortChangeEventArgs eventArgs)
+    {
+        resortDto = selectedResort;
+    }
+
+    private async Task editResortData()
+    {
+        bool error = false;
         ValidationContext context = new ValidationContext(resortDto);
         ICollection<ValidationResult> results = new List<ValidationResult>();
         bool isValid = Validator.TryValidateObject(resortDto, context, results, true);
+
+        if (isValid)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                database.Attach(resortDto);
+                database.Entry(resortDto).State = EntityState.Modified;
+
+                dialogService.Open<_LoadingTaskDialog>(
+                    "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                try
+                {
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                }
+                catch
+                {
+                    error = true;
+                }
+            }
+        }
+        else 
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage { 
+                Severity = NotificationSeverity.Success, 
+                Summary = "Edited data successfully!", 
+                Duration = 3000 
+            };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "There was an error while executing the request",
+                Duration = 3000
+            };
+        }
+        notificationService.Notify(notifMessage);
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateForm;
     }
 }

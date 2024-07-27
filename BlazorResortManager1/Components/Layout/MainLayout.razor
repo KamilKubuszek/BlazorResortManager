@@ -1,12 +1,11 @@
-﻿
+﻿@using BlazorResortManager1.Components.ResortManagement
+@implements IDisposable
 @inherits LayoutComponentBase
-
-
     <AuthorizeView>
         <Authorized>
             <CascadingValue Value=@resorts>
                 <_Navbar />
-                <RadzenRow>
+                <RadzenRow RowGap="1rem">
                     <RadzenColumn Size="12" SizeMD="2">
                         <_ResortDropdown onResortChanged="resortChanged" />
                         <_ResortSidebar />
@@ -36,6 +35,7 @@
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NavigationManager NavigationManager
+@inject ResortChangeManager resortChangeManager
 @code {
 
     [CascadingParameter]
@@ -56,10 +56,12 @@
 
     private void resortChanged(Guid resId)
     {
-        Console.WriteLine("res changed: " + resId);
-        //selectedResortId ==
         selectedResort = resorts.FirstOrDefault(e => e.id == resId);
-        Console.WriteLine("id of this mf" + selectedResort.id);
+        StateHasChanged();
+        resortChangeManager.resort = selectedResort;
+
+        Console.WriteLine("res changed: " + resId);
+
     }
 
     private async Task fetchData()
@@ -95,4 +97,9 @@
 
     private async void fetchDataOnLocationChanged(object sender, LocationChangedEventArgs args)
         => await fetchData();
+
+    public void Dispose() 
+        => NavigationManager.LocationChanged -= fetchDataOnLocationChanged;
+
+
 }

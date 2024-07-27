@@ -1,6 +1,8 @@
 ﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
+@inject ResortChangeManager resortChangeManager
 @attribute [Authorize]
+@implements IDisposable
 
 @using Radzen.Blazor.Rendering
 
@@ -11,7 +13,68 @@
 <h3>Resorts</h3>
 
 
+@if(resortData is not null)
+{
+    <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+        CellClick=@(args => cellUpdate(args))
+    >
+        <Columns>
+            <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="120px" Frozen="true" IsInEditMode="IsEditing" />
 
+            <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="280px" IsInEditMode="IsEditing">
+                <EditTemplate Context="track">
+                    <RadzenTextBox @bind-Value="track.name" Style="width:100%"
+                        
+                        @onkeyup=@(args => updateRecordOnEnter(args)) />
+                    <RadzenDataAnnotationValidator Property="name" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+
+            
+        </Columns>
+    </RadzenDataGrid>
+    
+}
+else
+{
+    <p>select resort first</p>
+}
+@code {
+    private Track? currentCellValue = null;
+    private KeyValuePair<string, Track> currentlyEditedCell { get; set; } = new("", new Track());
+    private void cellUpdate(DataGridCellMouseEventArgs<Track> args)
+    {
+        if(currentCellValue != null)
+        {
+            var track = resortData.tracks.FirstOrDefault(e => e.id == currentCellValue.id);
+            if (track != null)
+                track = currentCellValue;
+            StateHasChanged();
+            Console.WriteLine("left unfilled");
+        }
+        currentCellValue = args.Data;
+        currentlyEditedCell = new(args.Column.Property, args.Data);
+    }
+    private bool IsEditing(string columnName, Track track)
+    {
+        //var thisCell = new KeyValuePair<string, Track>(columnName,track);
+
+        return track == currentCellValue;
+    }
+    private void updateRecordOnEnter(KeyboardEventArgs args)
+    {
+        if (args.Code == "Enter" || args.Code == "NumpadEnter")
+        {
+            Console.WriteLine("UPDATE CELL");
+            currentlyEditedCell = new("", new Track());
+            currentCellValue = null;
+        }
+    }
+}
+@if(selectedResort is not null)
+{
+    @selectedResort.id
+}
 
 
 @code {
@@ -22,6 +85,32 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+        resortChangeManager.ResortChange += updateDatabase;
     }
+
+    private async void updateDatabase(ResortChangeEventArgs eventArgs)
+    {
+        // Console.WriteLine("load new resort to child");
+        // if (selectedResort != null && resortChangeManager.resort != null)
+        // {
+        //     Console.WriteLine(selectedResort.name);
+        //     Console.WriteLine(resortChangeManager.resort.name);
+        // }
+        if (selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id).ToListAsync();
+                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id).ToListAsync();
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateDatabase;
+    }
+
 } 

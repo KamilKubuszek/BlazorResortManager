@@ -1,0 +1,17 @@
+﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
+
+
+<RadzenStack Orientation="Radzen.Orientation.Vertical" Style="width: 100%">
+    <RadzenRow>
+        <RadzenColumn><p>loading icon</p></RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>@(displayMessage ?? "Running task...")</RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string displayMessage { get; set; }
+
+}

@@ -1,0 +1,71 @@
+﻿@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<RadzenMenu>
+    <RadzenMenuItem Path="resort" Text="Resorts" />
+    <RadzenMenuItem Path="resort/status" Text="Statuses" />
+    <RadzenMenuItem Path="resort/status/update" Text="Update status" />
+
+    <RadzenProfileMenu Style="float: right">
+        <Template>
+            <RadzenGravatar Email="user@example.com">
+            </RadzenGravatar>
+        </Template>
+        <ChildContent>
+                <form Model=model action="Account/Logout" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    @*                 <button type="submit" class="nav-link" id="logout_button">
+                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                    </button> *@
+                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Style="width: 100%" Text="logout" />
+                    @* <RadzenProfileMenuItem Text="Logout" Icon="logout" onclick="@(() => logOut(logoutContext))"  /> *@
+                </form>
+        </ChildContent>
+    </RadzenProfileMenu>
+</RadzenMenu>
+
+
+
+@* <script>
+    function logout() {
+        var button = document.getElementById("logout_button");
+        button.click();
+    }
+</script> *@
+@* <div class="nav-item px-3" style="display: none;">
+    <EditForm action="Account/Logout" method="post" Context="logoutForm">
+        <AntiforgeryToken />
+        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+        <button type="submit" class="nav-link">
+            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+        </button>
+    </EditForm>
+</div> *@
+
+@code {
+    private object model = new{ };
+    private string? currentUrl;
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void logOut(EditContext editContext)
+    {
+        editContext.Validate();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+    
+}
