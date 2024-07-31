@@ -36,6 +36,7 @@
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NavigationManager NavigationManager
 @inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
 @code {
 
     [CascadingParameter]
@@ -96,7 +97,9 @@
     }
 
     private async void fetchDataOnLocationChanged(object sender, LocationChangedEventArgs args)
-        => await fetchData();
+    {
+        await fetchData();
+    }
 
     public void Dispose() 
         => NavigationManager.LocationChanged -= fetchDataOnLocationChanged;

@@ -1,5 +1,7 @@
 ﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
 @attribute [Authorize]
 @implements IDisposable
@@ -16,58 +18,139 @@
 @if(resortData is not null)
 {
     <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
-        CellClick=@(args => cellUpdate(args))
-    >
+    CellClick="@(args => cellClick(args))" CellContextMenu="OnCellTrackContextMenu">
+     @* RowUpdate="@(args => updateRow(args))" *@
         <Columns>
-            <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="120px" Frozen="true" IsInEditMode="IsEditing" />
+            <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="100px" Frozen="true" />
 
-            <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="280px" IsInEditMode="IsEditing">
+            <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="100px" IsInEditMode="IsEditing">
                 <EditTemplate Context="track">
-                    <RadzenTextBox @bind-Value="track.name" Style="width:100%"
-                        
-                        @onkeyup=@(args => updateRecordOnEnter(args)) />
-                    <RadzenDataAnnotationValidator Property="name" />
+                    <RadzenTextBox @bind-Value="track.name" Style="width:100%" Name="tname"/>
+                    <RadzenDataAnnotationValidator Component="tname" />
                 </EditTemplate>
             </RadzenDataGridColumn>
 
-            
+            <RadzenDataGridColumn TItem="Track" Property="marking" Title="Marking" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="difficulty" Title="Difficulty" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px" IsInEditMode="IsEditing">
+                <EditTemplate Context="track">
+                    <RadzenNumeric @bind-Value="track.inclination" Style="width:100%" Name="tinclination" />
+                    <RadzenDataAnnotationValidator Component="tinclination" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="snowGroomed" Title="Snow groomed" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="illuminated" Title="Illuminated" Width="100px">
+
+            </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
-    
+
+    <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true">
+        <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name" >
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Lift" Property="type" Title="Type">
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="Length">
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="Capacity per unit">
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="People per hour">
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="Average ride duration">
+
+        </RadzenDataGridColumn>
+    </RadzenDataGrid>
 }
 else
 {
     <p>select resort first</p>
 }
 @code {
-    private Track? currentCellValue = null;
-    private KeyValuePair<string, Track> currentlyEditedCell { get; set; } = new("", new Track());
-    private void cellUpdate(DataGridCellMouseEventArgs<Track> args)
+
+    //private Resort? re = null;
+    private KeyValuePair<string, object> cellToUpdate = new("", new());
+    private KeyValuePair<string, object> editedCellValue = new("", new());
+    private Track editedCell = new Track();
+    //private bool cellWasEdited = true;
+    //private Resort? r = null;
+
+    private void updateRow(object obj)
     {
-        if(currentCellValue != null)
+        Console.WriteLine("row getting updated");
+    }
+
+    private void cellClick(DataGridCellMouseEventArgs<Track> args)
+    {
+        if(cellToUpdate.Key != "" && cellToUpdate.Value != args.Data)
         {
-            var track = resortData.tracks.FirstOrDefault(e => e.id == currentCellValue.id);
-            if (track != null)
-                track = currentCellValue;
-            StateHasChanged();
-            Console.WriteLine("left unfilled");
+            updateRow(cellToUpdate.Value);
         }
-        currentCellValue = args.Data;
-        currentlyEditedCell = new(args.Column.Property, args.Data);
+        else
+        {
+            editedCellValue = new(args.Column.Property, args.Data);
+            var prop = editedCellValue.Value.GetType().GetProperty(editedCellValue.Key);
+            if(prop != null)
+            {
+                Console.WriteLine("First time cell is selected to edit: "+ prop.GetValue(editedCellValue.Value) ?? "no value to display");
+            }
+        }
+        // if (!cellWasEdited && currentlyEditedCellValue != null)
+        // {
+        //     Console.WriteLine("left unfilled");
+        //     var track = resortData.tracks.First<Track>(e => e.id == currentlyEditedCellValue.id);
+        //     track = currentlyEditedCellValue;
+        //     StateHasChanged();
+        // }
+        // else
+        // {
+        //     Console.WriteLine("updating data...");
+        // }
+        //cellWasEdited = false;
+        editedCell = args.Data;
+        cellToUpdate = new(args.Column.Property, args.Data);
     }
     private bool IsEditing(string columnName, Track track)
     {
-        //var thisCell = new KeyValuePair<string, Track>(columnName,track);
-
-        return track == currentCellValue;
+        return track == editedCell;
     }
     private void updateRecordOnEnter(KeyboardEventArgs args)
     {
+        //defaultCellValue.Value.GetType().GetProperty(defaultCellValue.Key).GetValue();
+        //Console.WriteLine(args.Code + " : " + args.Key);
+        Console.WriteLine(cellToUpdate.Value.GetType().GetProperty(cellToUpdate.Key).GetValue(cellToUpdate.Value));
         if (args.Code == "Enter" || args.Code == "NumpadEnter")
         {
-            Console.WriteLine("UPDATE CELL");
-            currentlyEditedCell = new("", new Track());
-            currentCellValue = null;
+            updateRow(cellToUpdate.Value);
+            cellToUpdate = new("", new());
+            editedCell = new Track();
+            StateHasChanged();
+        }
+
+        if (args.Code == "Escape")
+        {
+            cellToUpdate = new("", new());
+            editedCell = new Track();
+            StateHasChanged();
         }
     }
 }
@@ -85,10 +168,29 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        resortChangeManager.ResortChange += updateDatabase;
+        resortChangeManager.ResortChange += updateData;
     }
 
-    private async void updateDatabase(ResortChangeEventArgs eventArgs)
+    private void OnCellTrackContextMenu(DataGridCellMouseEventArgs<Track> args)
+    {
+        // var selectedEmployees = new List<Track>() { args.Data };
+
+        contextMenuService.Open(args, new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "EditNote" } }, 
+                (menuArgs) =>
+                {
+                    if (menuArgs.Value.Equals(1))
+                    {
+                        Console.WriteLine(args.Data.name);
+                        contextMenuService.Close();
+                        
+                        navigationManager.NavigateTo("/resort/track/edit/" + args.Data.id);
+                    }
+                });
+    }
+
+
+    private async void updateData(ResortChangeEventArgs eventArgs)
     {
         // Console.WriteLine("load new resort to child");
         // if (selectedResort != null && resortChangeManager.resort != null)
@@ -110,7 +212,7 @@ else
 
     public void Dispose()
     {
-        resortChangeManager.ResortChange -= updateDatabase;
+        resortChangeManager.ResortChange -= updateData;
     }
 
 } 

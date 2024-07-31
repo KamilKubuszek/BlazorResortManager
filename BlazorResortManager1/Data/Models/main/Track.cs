@@ -14,6 +14,7 @@ namespace BlazorResortManager1.Data.Models.main
 
         [Required]
         [MaxLength(32, ErrorMessage = "'name' może mieć maksymalnie 32 znaki")]
+        [MinLength(3)]
         public string name { get; set; }
 
         [Required]

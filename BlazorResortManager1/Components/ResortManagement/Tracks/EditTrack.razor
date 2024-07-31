@@ -1,5 +1,155 @@
-﻿<h3>EditTrack</h3>
+﻿@implements IDisposable
+@page "/resort/track/edit/{selectedTrackId:guid?}"
+@attribute [Authorize]
+@using System.ComponentModel.DataAnnotations
 
-@code {
+<h3>Edit Track</h3>
+@(selectedTrackId.ToString() ?? "no track")
 
+@if (trackDto is not null)
+{
+    <RadzenTemplateForm Data="trackDto" TItem="Track" Submit="submitForm">
+        <RadzenStack Style="width: 100%">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="trackDto.name" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="marking"><RadzenTextBox Name="marking" @bind-Value="trackDto.marking" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="marking" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="difficulty"><RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="difficulty" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="inclination"><RadzenNumeric Name="inclination" @bind-Value="trackDto.inclination" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="inclination" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="length"><RadzenNumeric Name="lengthMeters" @bind-Value="trackDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+               @*  <RadzenColumn><RadzenDataAnnotationValidator Component="lengthMeters" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="illuminated"><RadzenCheckBox Name="illuminated" @bind-Value="trackDto.illuminated" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+@*                 <RadzenColumn><RadzenDataAnnotationValidator Component="illuminated" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+        </RadzenStack>
+    </RadzenTemplateForm>
 }
+
+
+
+@inject ResortChangeManager resortChangeManager
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@code {
+    // [CascadingParameter]
+    // private Resort? selectedResort { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    [Parameter]
+    public Guid? selectedTrackId { get; set; }
+
+    private Track? trackDto { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await validateTrackOwnership();
+
+        resortChangeManager.ResortChange += updateForm;
+        if (selectedTrackId != null)
+        {
+            Console.WriteLine("update form...");
+            updateForm();
+        }
+
+    }
+
+    private async Task submitForm()
+    {
+
+    }
+
+    private async Task validateTrackOwnership()
+    {
+        try
+        {
+            var auth = await authenticationState;
+            var userId = auth.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+            {
+                throw new Exception("user permit for tracks id was not found");
+            }
+
+            using (var database = contextFactory.CreateDbContext())
+            {
+                var track = database.tracks.FirstOrDefault(e => e.id == selectedTrackId);
+                if (track is null)
+                {
+                    throw new Exception("track was not found");
+                }
+
+                var permit = database.permits
+                    .FirstOrDefault(e => e.userId == userId && e.resortId == track.resortId);
+                if (permit is null)
+                {
+                    throw new Exception("user permit for tracks id was not found");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            var notifMessage = new NotificationMessage();
+
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "you dont have permissions to do this or something went wrong",
+                    Duration = 4000
+                };
+
+            notificationService.Notify(notifMessage);
+            navigationManager.NavigateTo("/resort");
+
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private void updateForm(ResortChangeEventArgs? eventArgs = null)
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            trackDto = database.tracks.FirstOrDefault(e => e.id == selectedTrackId);
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateForm;
+    }
+}
+
+
