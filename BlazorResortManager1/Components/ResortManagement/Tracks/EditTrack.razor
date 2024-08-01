@@ -57,12 +57,11 @@
     </RadzenTemplateForm>
 }
 
-
-
 @inject ResortChangeManager resortChangeManager
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NotificationService notificationService
+@inject DialogService dialogService
 @code {
     // [CascadingParameter]
     // private Resort? selectedResort { get; set; }
@@ -90,7 +89,56 @@
 
     private async Task submitForm()
     {
+        bool error = false;
+        ValidationContext context = new ValidationContext(trackDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(trackDto, context, results, true);
 
+        if (isValid)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                database.Attach(trackDto);
+                database.Entry(trackDto).State = EntityState.Modified;
+
+                dialogService.Open<_LoadingTaskDialog>(
+                    "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                try
+                {
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                }
+                catch
+                {
+                    error = true;
+                }
+            }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Edited data successfully!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
     }
 
     private async Task validateTrackOwnership()
