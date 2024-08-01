@@ -1,5 +1,30 @@
-﻿<h3>AddCamera</h3>
+﻿@page "/resort/camera/add"
 
+<h3>AddCamera</h3>
+
+@inject ResortChangeManager resortChangeManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
 
+    private Resort resortData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        resortChangeManager.ResortChange += updateData;
+    }
+
+    private async void updateData(ResortChangeEventArgs eventArgs)
+    {
+        if (selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.cameras = database.cameras.Where(e => e.)
+            }
+            StateHasChanged();
+        }
+    }
 }
