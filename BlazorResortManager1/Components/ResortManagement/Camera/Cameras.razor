@@ -1,5 +1,39 @@
-﻿<h3>Cameras</h3>
+﻿@page "/resort/camera"
 
+<h3>Cameras</h3>
+
+@implements IDisposable
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
 
+    private Resort resortData { get; set; }
+        
+    protected override async Task OnInitializedAsync()
+    {
+        resortChangeManager.ResortChange += updateData;
+        updateData();
+    }
+
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
+    {
+        if(selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.cameras = await database.cameras.Where(e => e.resortId == selectedResort.id).ToListAsync();
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
 }
