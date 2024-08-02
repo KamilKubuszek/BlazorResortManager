@@ -1,30 +1,116 @@
 ﻿@page "/resort/camera/add"
+@using System.ComponentModel.DataAnnotations
 
-<h3>AddCamera</h3>
+<h3>Add camera @(selectedResort is not null ? "for " + selectedResort.name : "")</h3>
 
+@if(selectedResort is not null)
+{
+    <RadzenTemplateForm Data="cameraDto" TItem="Camera" Submit="submitCamera">
+        <RadzenStack Style="width: 100%">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="url to the camera view"><RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="link"/></RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@implements IDisposable
 @inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
 
-    private Resort resortData { get; set; }
+    // private Resort resortData { get; set; }
+    private Camera cameraDto { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         resortChangeManager.ResortChange += updateData;
+        updateData();
     }
 
-    private async void updateData(ResortChangeEventArgs eventArgs)
+    private async Task submitCamera()
     {
-        if (selectedResort is not null)
+        bool error = false;
+        ValidationContext context = new ValidationContext(cameraDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(cameraDto, context, results, true);
+
+        if (isValid)
         {
             using (var database = contextFactory.CreateDbContext())
             {
-                resortData = selectedResort;
-                resortData.cameras = database.cameras.Where(e => e.)
+                await database.cameras.AddAsync(cameraDto);
+
+                dialogService.Open<_LoadingTaskDialog>(
+                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                try
+                {
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                }
+                catch
+                {
+                    error = true;
+                }
             }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Added data successfully!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
+    }
+
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
+    {
+        if (selectedResort is not null)
+        {
+            cameraDto.resortId = selectedResort.id;
+            // using (var database = contextFactory.CreateDbContext())
+            // {
+
+            //     resortData = selectedResort;
+            //     resortData.cameras = database.cameras.Where(e => e.)
+            // }
             StateHasChanged();
         }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
     }
 }

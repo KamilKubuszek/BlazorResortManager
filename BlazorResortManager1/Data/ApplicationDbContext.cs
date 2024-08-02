@@ -1,4 +1,5 @@
 using BlazorResortManager1.Data.Models.camera;
+using BlazorResortManager1.Data.Models.cameras;
 using BlazorResortManager1.Data.Models.forecast;
 using BlazorResortManager1.Data.Models.main;
 using BlazorResortManager1.Data.Models.status;
@@ -30,7 +31,7 @@ namespace BlazorResortManager1.Data
         public DbSet<YrNoCityCode> cityCodes { get; set; }
 
         public DbSet<Camera> cameras { get; set; }
-        public DbSet<CameraResortBinding> cameraResortBindings { get; set; }
+      //  public DbSet<CameraResortBinding> cameraResortBindings { get; set; }
         public DbSet<CameraTrackBinding> cameraTrackBindings { get; set; }
         public DbSet<CameraLiftBinding> cameraLiftBindings { get; set; }
 

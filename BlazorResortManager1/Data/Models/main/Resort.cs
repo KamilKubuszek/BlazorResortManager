@@ -62,7 +62,7 @@ namespace BlazorResortManager1.Data.Models.main
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ICollection<ResortParameter> resortParameters { get; set; } = new List<ResortParameter>();
 
-        public ICollection<CameraResortBinding> cameras { get; set; } = new List<CameraResortBinding>();
+        public ICollection<Camera> cameras { get; set; } = new List<Camera>();
     }
 
 

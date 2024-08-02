@@ -2,11 +2,16 @@
 
 
 <RadzenStack Orientation="Radzen.Orientation.Vertical" Style="width: 100%">
-    <RadzenRow>
+    <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn><p>loading icon</p></RadzenColumn>
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn>@(displayMessage ?? "Running task...")</RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+        </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
 

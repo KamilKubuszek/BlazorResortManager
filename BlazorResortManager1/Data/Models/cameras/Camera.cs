@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlazorResortManager1.Data.Models.camera;
+using BlazorResortManager1.Data.Models.main;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BlazorResortManager1.Data.Models.camera
+namespace BlazorResortManager1.Data.Models.cameras
 {
     [Table("camera")]
     public class Camera
@@ -14,8 +16,11 @@ namespace BlazorResortManager1.Data.Models.camera
 
         [Required]
         public string link { get; set; }
+
+        [Required]
+        public Guid resortId { get; set; }
+        public Resort resort {  get; set; }
         public ICollection<CameraTrackBinding> trackBindings { get; set; } = new List<CameraTrackBinding>();
-        public ICollection<CameraResortBinding> resortBindings { get; set; } = new List<CameraResortBinding>();
         public ICollection<CameraLiftBinding> liftBindings { get; set; } = new List<CameraLiftBinding>();
     }
 }
