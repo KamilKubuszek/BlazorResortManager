@@ -1,4 +1,6 @@
 ﻿@page "/resort/camera/add"
+@attribute [Authorize]
+
 @using System.ComponentModel.DataAnnotations
 
 <h3>Add camera @(selectedResort is not null ? "for " + selectedResort.name : "")</h3>
@@ -19,6 +21,11 @@
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="link"/></RadzenColumn>
             </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="submit"/>
+                </RadzenColumn>
+            </RadzenRow>
         </RadzenStack>
     </RadzenTemplateForm>
 }
@@ -33,7 +40,7 @@
     public Resort? selectedResort { get; set; }
 
     // private Resort resortData { get; set; }
-    private Camera cameraDto { get; set; }
+    private Camera cameraDto { get; set; } = new Camera();
 
     protected override async Task OnInitializedAsync()
     {

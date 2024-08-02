@@ -3,11 +3,14 @@
 
 <RadzenStack Orientation="Radzen.Orientation.Vertical" Style="width: 100%">
     <RadzenRow AlignItems="AlignItems.Center">
-        <RadzenColumn><p>loading icon</p></RadzenColumn>
+        <RadzenColumn><p>Resort Manager Icon</p></RadzenColumn>
     </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn>@(displayMessage ?? "Running task...")</RadzenColumn>
-    </RadzenRow>
+    @if(displayMessage is not null)
+    {
+        <RadzenRow>
+            <RadzenColumn>@displayMessage</RadzenColumn>
+        </RadzenRow>
+    }
     <RadzenRow>
         <RadzenColumn>
             <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />

@@ -1,6 +1,9 @@
 ﻿@using BlazorResortManager1.Components.ResortManagement
 @implements IDisposable
 @inherits LayoutComponentBase
+
+@if (!loading)
+{
     <AuthorizeView>
         <Authorized>
             <CascadingValue Value=@resorts>
@@ -24,6 +27,23 @@
             @Body
         </NotAuthorized>
     </AuthorizeView>
+}
+else
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width: 100%; height: 100vh;">
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn>Resort Manager Icon</RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenStack>
+}
+
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
@@ -38,7 +58,6 @@
 @inject ResortChangeManager resortChangeManager
 @inject NotificationService notificationService
 @code {
-
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
@@ -49,10 +68,14 @@
     public Resort[]? resorts = null;
     private Resort? selectedResort = null;
 
+    private bool loading = false;
     protected override async Task OnInitializedAsync()
     {
         NavigationManager.LocationChanged += fetchDataOnLocationChanged;
-        await fetchData();
+        InvokeAsync(async () =>
+        {
+            await fetchData();
+        });
     }
 
     private void resortChanged(Guid resId)
@@ -72,6 +95,10 @@
             var auth = await authenticationState;
             if (shouldFetchResortData && auth.User != null)
             {
+                loading = true;
+                StateHasChanged();
+
+                //await Task.Delay(1000);
                 Console.WriteLine("fetching resort data...");
                 using (var database = contextFactory.CreateDbContext())
                 {
@@ -87,6 +114,7 @@
                                 .Contains(e.id))
                                 .ToArray();
                     Console.WriteLine(resorts.Count());
+                    loading = false;
                     StateHasChanged();
                 }
             }

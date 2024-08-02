@@ -1,4 +1,5 @@
-﻿using BlazorResortManager1.Data.Models.main;
+﻿using BlazorResortManager1.Data.Models.cameras;
+using BlazorResortManager1.Data.Models.main;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

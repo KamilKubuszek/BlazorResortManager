@@ -1,6 +1,37 @@
 ﻿@page "/resort/camera"
+@attribute [Authorize]
 
 <h3>Cameras</h3>
+<RadzenLink Path="/resort/camera/add" Text="add camera"/>
+@if(resortData is not null)
+{
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenDataGrid Data="resortData.cameras" TItem="Camera"
+                            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedCameras>
+                <Columns>
+                    <RadzenDataGridColumn TItem="Camera" Property="name" Title="Name" Width="100px">
+
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn TItem="Camera" Property="link" Title="url" Width="100px">
+
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+        <RadzenColumn>
+            @if (selectedCameras?.Any() == true)
+            {
+                <iframe src="@selectedCameras[0].link"></iframe>
+            }
+        </RadzenColumn>
+    </RadzenRow>
+
+
+    
+}
+
 
 @implements IDisposable
 @inject ResortChangeManager resortChangeManager
@@ -12,7 +43,9 @@
     public Resort? selectedResort { get; set; }
 
     private Resort resortData { get; set; }
-        
+
+    private IList<Camera> selectedCameras;
+
     protected override async Task OnInitializedAsync()
     {
         resortChangeManager.ResortChange += updateData;
