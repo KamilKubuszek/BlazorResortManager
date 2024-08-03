@@ -27,9 +27,16 @@
             }
         </RadzenColumn>
     </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
 
+        </RadzenColumn>
+    </RadzenRow>
 
-    
+    @foreach(var trackBind in trackBinding)
+    {
+        <p>@(trackBind.cameraId + " : " + trackBind.trackId)</p>
+    }
 }
 
 
@@ -46,6 +53,8 @@
 
     private IList<Camera> selectedCameras;
 
+    private CameraTrackBinding[] trackBinding = [];
+
     protected override async Task OnInitializedAsync()
     {
         resortChangeManager.ResortChange += updateData;
@@ -59,7 +68,28 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 resortData = selectedResort;
+
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id)
+                    // .Select(e => 
+                    //     new Track{ 
+                    //         id = e.id, 
+                    //         resortId = e.resortId 
+                    //     })
+                        .ToListAsync();
+
+                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id)
+                    // .Select(e =>
+                    //     new Lift{
+                    //         id = e.id,
+                    //         resortId = e.resortId
+                    //     })
+                    .ToListAsync();
+
                 resortData.cameras = await database.cameras.Where(e => e.resortId == selectedResort.id).ToListAsync();
+
+                trackBinding = await database.cameraTrackBindings
+                                .Where(e => resortData.tracks.Contains(e.track) 
+                                && resortData.cameras.Contains(e.camera)).ToArrayAsync();
             }
             StateHasChanged();
         }

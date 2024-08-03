@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using BlazorResortManager1.Data.Models.camera;
+using BlazorResortManager1.Data.Models.cameras;
 using BlazorResortManager1.Data.Models.main;
 
 namespace BlazorResortManager1.Data.Models.status

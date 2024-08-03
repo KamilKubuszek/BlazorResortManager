@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BlazorResortManager1.Data.Models.camera
+namespace BlazorResortManager1.Data.Models.cameras
 {
     //[Table("cameraResortBinding")]
     //public class CameraResortBinding
