@@ -56,8 +56,12 @@
                 <RadzenColumn>
                     <RadzenFormField Text="average duration time"><RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
-                <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn>
+@*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
             </RadzenRow>
+
+            <RadzenDropDown Data="cameras" TValue="Camera[]" @bind-Value=@selectedCameras
+                            Multiple="true" TextProperty="name" ValueProperty="id" 
+                            Placeholder="Select cameras"/>
 
             <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
         </RadzenStack>
@@ -80,6 +84,8 @@
     public Guid? selectedLiftId { get; set; }
 
     private Lift? liftDto { get; set; }
+    private Camera[] cameras { get; set; } = [];
+    private Camera[] selectedCameras { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -198,6 +204,7 @@
         using (var database = contextFactory.CreateDbContext())
         {
             liftDto = database.lifts.FirstOrDefault(e => e.id == selectedLiftId);
+            cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).ToArray();
         }
     }
 

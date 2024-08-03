@@ -1,5 +1,88 @@
-﻿<h3>ManageCameras</h3>
+﻿@* @page "/resort/camera/manage" *@
+@* <h3>Manage Cameras</h3>
 
+<RadzenDropDown Data="editTargets" TValue="string"
+                TextProperty="name"
+                ValueProperty="value"
+                @bind-Value=targetToBind
+                AllowFiltering="true">
+
+</RadzenDropDown>
+
+@implements IDisposable
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
 
+    private Resort resortData { get; set; }
+
+    private string[] editTargets = [
+        "lift", "track"
+    ];
+    private string targetToBind = string.Empty;
+
+    private CameraTrackBinding cameraTrackBinding = new();
+    private CameraLiftBinding cameraLiftBinding = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        resortChangeManager.ResortChange += updateData;
+        updateData();
+    }
+
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
+    {
+        if (selectedResort is not null)
+        {
+            resortData = selectedResort;
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id)
+                    .Select(e =>
+                        new Track
+                            {
+                                id = e.id,
+                                name = e.name
+                            })
+                        .ToListAsync();
+
+                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id)
+                    .Select(e =>
+                        new Lift
+                            {
+                                id = e.id,
+                                resortId = e.resortId
+                            })
+                    .ToListAsync();
+
+                resortData.cameras = await database.cameras.Where(e => e.resortId == selectedResort.id).ToListAsync();
+
+                var tBind = await database.cameraTrackBindings
+                                .Where(e => resortData.tracks.Contains(e.track) && resortData.cameras.Contains(e.camera))
+                                .Include(e => e.track)
+                                .Include(e => e.camera)
+                                .ToArrayAsync();
+
+                var lBind = await database.cameraLiftBindings
+                                .Where(e => resortData.lifts.Contains(e.lift) && resortData.cameras.Contains(e.camera))
+                                .Include(e => e.lift)
+                                .Include(e => e.camera)
+                                .ToArrayAsync();
+
+                trackBinding = tBind.GroupBy(e => e.track.name);
+                liftBinding = lBind.GroupBy(e => e.lift.name);
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
 }
+ *@
