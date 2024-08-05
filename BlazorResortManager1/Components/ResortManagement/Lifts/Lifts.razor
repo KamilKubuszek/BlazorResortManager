@@ -58,6 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        updateData();
         resortChangeManager.ResortChange += updateData;
     }
 
@@ -79,7 +80,7 @@ else
                 });
     }
 
-    private async void updateData(ResortChangeEventArgs eventArgs)
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
         if (selectedResort is not null)
         {

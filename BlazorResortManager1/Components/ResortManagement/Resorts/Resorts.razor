@@ -177,6 +177,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        updateData();
         resortChangeManager.ResortChange += updateData;
     }
 
@@ -216,14 +217,8 @@ else
                 });
     }
 
-    private async void updateData(ResortChangeEventArgs eventArgs)
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
-        // Console.WriteLine("load new resort to child");
-        // if (selectedResort != null && resortChangeManager.resort != null)
-        // {
-        //     Console.WriteLine(selectedResort.name);
-        //     Console.WriteLine(resortChangeManager.resort.name);
-        // }
         if (selectedResort is not null)
         {
             using (var database = contextFactory.CreateDbContext())
