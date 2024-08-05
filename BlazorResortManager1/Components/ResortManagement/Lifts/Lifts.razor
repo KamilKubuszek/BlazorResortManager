@@ -1,0 +1,100 @@
+﻿@attribute [Authorize]
+@page "/resort/Lift"
+
+<h3>Lifts</h3>
+
+@if (resortData is not null)
+{
+
+    <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+                    CellContextMenu="OnCellLiftContextMenu">
+        <Columns>
+            <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" Frozen="true">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="type" Title="Type">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="Length">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="Capacity per unit">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="People per hour">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="Average ride duration">
+
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <p>select resort first</p>
+}
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
+@inject ResortChangeManager resortChangeManager
+@implements IDisposable
+@code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
+
+    private Resort resortData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        resortChangeManager.ResortChange += updateData;
+    }
+
+    private void OnCellLiftContextMenu(DataGridCellMouseEventArgs<Lift> args)
+    {
+        // var selectedEmployees = new List<Track>() { args.Data };
+
+        contextMenuService.Open(args, new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "EditNote" } },
+                (menuArgs) =>
+                {
+                    if (menuArgs.Value.Equals(1))
+                    {
+                        Console.WriteLine(args.Data.name);
+                        contextMenuService.Close();
+
+                        navigationManager.NavigateTo("/resort/lift/edit/" + args.Data.id);
+                    }
+                });
+    }
+
+    private async void updateData(ResortChangeEventArgs eventArgs)
+    {
+        if (selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id).ToListAsync();
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
+
+}
