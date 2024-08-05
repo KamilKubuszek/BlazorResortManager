@@ -1,0 +1,84 @@
+﻿@attribute [Authorize]
+@page "/resort/Track"
+
+<h3>Tracks</h3>
+
+
+@if (resortData is not null)
+{
+    <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+                    >
+        @* RowUpdate="@(args => updateRow(args))" *@
+        <Columns>
+            <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="100px" Frozen="true" />
+
+            <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="100px">
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="marking" Title="Marking" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="difficulty" Title="Difficulty" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px" IsInEditMode="IsEditing">
+                <EditTemplate Context="track">
+                    <RadzenNumeric @bind-Value="track.inclination" Style="width:100%" Name="tinclination" />
+                    <RadzenDataAnnotationValidator Component="tinclination" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="snowGroomed" Title="Snow groomed" Width="100px">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Track" Property="illuminated" Title="Illuminated" Width="100px">
+
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+}
+else
+{
+    <p>select resort first</p>
+}
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
+@inject ResortChangeManager resortChangeManager
+@implements IDisposable
+@code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
+
+    private Resort resortData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        resortChangeManager.ResortChange += updateData;
+    }
+
+    private async void updateData(ResortChangeEventArgs eventArgs)
+    {
+        if (selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id).ToListAsync();
+            }
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
+
+}
