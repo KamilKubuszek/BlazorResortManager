@@ -100,11 +100,6 @@
 
     }
 
-    private void setCameraBindings()
-    {
-
-    }
-
     private async Task submitForm()
     {
         bool error = false;
@@ -123,8 +118,11 @@
                 //prepare cameras to 
                 var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking(); ;
                 var cameraEntries = new List<CameraLiftBinding>();
+
+                //check if there are already exiting bindings from selected cameras
                 foreach(var cameraId in selectedCamerasIds)
                 {
+                    
                     var exitingBind = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
                     if(exitingBind is null)
                     {
@@ -132,16 +130,12 @@
                         cameraEntries.Add(bind);
                     }
 
+                    //delete bindings which are no longer needed from database
                     foreach (var existingBind in cameraBindings)
                     {
-                        var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);
-                        // Console.WriteLine(Guid.Empty);
-                        
+                        var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);                        
                         if (duplicate == Guid.Empty)
                         {
-                            //Console.WriteLine("----------------removing no longer using bind: " + duplicate);
-                            // database.Attach(existingBind);
-                            // database.Entry(existingBind).State = EntityState.Deleted;
                             database.Remove(existingBind);
                         }
                     }
