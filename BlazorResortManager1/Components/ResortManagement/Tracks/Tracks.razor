@@ -23,11 +23,8 @@
 
             </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px" IsInEditMode="IsEditing">
-                <EditTemplate Context="track">
-                    <RadzenNumeric @bind-Value="track.inclination" Style="width:100%" Name="tinclination" />
-                    <RadzenDataAnnotationValidator Component="tinclination" />
-                </EditTemplate>
+            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px">
+
             </RadzenDataGridColumn>
 
             <RadzenDataGridColumn TItem="Track" Property="snowGroomed" Title="Snow groomed" Width="100px">
