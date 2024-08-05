@@ -59,9 +59,9 @@
 @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
             </RadzenRow>
 
-            <RadzenDropDown Data="cameras" TValue="Camera[]" @bind-Value=@selectedCameras
+            <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
                             Multiple="true" TextProperty="name" ValueProperty="id" 
-                            Placeholder="Select cameras"/>
+                            Placeholder="Select cameras" Change="setCameraBindings"/>
 
             <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
         </RadzenStack>
@@ -85,7 +85,7 @@
 
     private Lift? liftDto { get; set; }
     private Camera[] cameras { get; set; } = [];
-    private Camera[] selectedCameras { get; set; } = [];
+    private IEnumerable<Guid> selectedCamerasIds { get; set; } 
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,6 +100,11 @@
 
     }
 
+    private void setCameraBindings()
+    {
+
+    }
+
     private async Task submitForm()
     {
         bool error = false;
@@ -111,17 +116,61 @@
         {
             using (var database = contextFactory.CreateDbContext())
             {
+                dialogService.Open<_LoadingTaskDialog>(
+                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+                //prepare cameras to 
+                var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking(); ;
+                var cameraEntries = new List<CameraLiftBinding>();
+                foreach(var cameraId in selectedCamerasIds)
+                {
+                    var exitingBind = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
+                    if(exitingBind is null)
+                    {
+                        var bind = new CameraLiftBinding() { cameraId = cameraId, liftId = liftDto.id };
+                        cameraEntries.Add(bind);
+                    }
+
+                    foreach (var existingBind in cameraBindings)
+                    {
+                        var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);
+                        // Console.WriteLine(Guid.Empty);
+                        
+                        if (duplicate == Guid.Empty)
+                        {
+                            //Console.WriteLine("----------------removing no longer using bind: " + duplicate);
+                            // database.Attach(existingBind);
+                            // database.Entry(existingBind).State = EntityState.Deleted;
+                            database.Remove(existingBind);
+                        }
+                    }
+                }
+                foreach(var existingBind in cameraBindings)
+                {
+                    var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);
+                    // Console.WriteLine(Guid.Empty);
+                    Console.WriteLine("----------------removing no longer using bind: " + duplicate);
+                    if (duplicate != Guid.Empty)
+                    {
+                        
+                        // database.Attach(existingBind);
+                        // database.Entry(existingBind).State = EntityState.Deleted;
+                        //database.Remove(existingBind);
+                    }
+                }
+                liftDto.cameras = cameraEntries;
+                cameraEntries.ForEach(e => Console.WriteLine("updating with camera: "+e.cameraId));
                 database.Attach(liftDto);
                 database.Entry(liftDto).State = EntityState.Modified;
 
-                dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
                 try
                 {
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
                     dialogService.Close();
+                    navigationManager.NavigateTo("/resort");
                 }
                 catch
                 {
@@ -204,7 +253,8 @@
         using (var database = contextFactory.CreateDbContext())
         {
             liftDto = database.lifts.FirstOrDefault(e => e.id == selectedLiftId);
-            cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).ToArray();
+            cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArray();
+            selectedCamerasIds = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
         }
     }
 
