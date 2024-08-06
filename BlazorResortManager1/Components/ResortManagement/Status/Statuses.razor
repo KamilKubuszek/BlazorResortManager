@@ -4,81 +4,50 @@
 @page "/resort/status"
 
 <h3>Statuses</h3>
-<_ResortSidebar />
-@if (loading)
-{
-    <div>loading... </div>
-}
-else
-{
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/" Text="Home" />
-        <RadzenBreadCrumbItem Text="Statuses" />
-    </RadzenBreadCrumb>
 
-    @if (resorts != null)
-    {
-        <RadzenDropDown Change="@setResort" Data=@resorts TValue="string" TextProperty="name" ValueProperty="id"
-                        AllowFiltering="true" Name="DropDownResorts">
-        </RadzenDropDown>
-    }
-    if(selectedResortId != null)
-    {
-        <a href="@("https://localhost:7007/statuses/update/"+selectedResortId)">update this resorts status</a>
-    }
-    if (statusSheets != null)
-    {
-        <RadzenDataGrid Data="@statusSheets" TItem="StatusSheet">
-            <Columns>
-                <RadzenDataGridColumn TItem="StatusSheet" Property="dateTime" Title="datetime" />
-                <RadzenDataGridColumn TItem="StatusSheet" Property="productionVersion" Title="production version" />
-            </Columns>
-        </RadzenDataGrid>
-    }
-}
-
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService DialogService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
+@inject ResortChangeManager resortChangeManager
+@implements IDisposable
 @code {
-    public Resort[]? resorts { get; set; }
-    public Guid? selectedResortId { get; set; }
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
 
-    public StatusSheet[]? statusSheets { get; set; }
-
-    public bool loading { get; set; } = false;
+    private Resort resortData { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        loading = true;
-        await Task.Run(loadResortData);
-
-        loading = false;
+        updateData();
+        resortChangeManager.ResortChange += updateData;
     }
 
-    protected async Task loadResortData()
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
-        using (var database = contextFactory.CreateDbContext())
+        if (selectedResort is not null)
         {
-            resorts = await database.resorts
-            //.Select(e => new Resort{ id = e.id })
-            //.AsNoTracking()
-            .ToArrayAsync();
+            using (var database = contextFactory.CreateDbContext())
+            {
+                resortData = selectedResort;
+                resortData.statusSheets = await database.statusSheets
+                                                .Where(e => e.resortId == selectedResort.id)
+                                                .Include(e => e.resortStatus)
+                                                .Include(e => e.trackStatuses)
+                                                .ThenInclude(e => e.parentTrack)
+                                                .Include(e => e.liftStatuses)
+                                                .ThenInclude(e => e.parentLift)
+                                                .AsSplitQuery()
+                                                .AsNoTracking()
+                                                .ToListAsync();
+            }
+            StateHasChanged();
         }
-        //Console.WriteLine("dataloaded");
     }
 
-    protected async Task setResort(object value)
+    public void Dispose()
     {
-        selectedResortId = (Guid)value;
-        Console.WriteLine($"Resort changed to {value}");
-
-        using (var database = contextFactory.CreateDbContext())
-        {
-            statusSheets = await database.statusSheets
-            .Where(e => e.resortId == selectedResortId && e.productionVersion == true)
-            .OrderByDescending(e => e.dateTime)
-            .IgnoreAutoIncludes()
-            .ToArrayAsync();
-
-        }
+        resortChangeManager.ResortChange -= updateData;
     }
 
 }
