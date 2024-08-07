@@ -6,15 +6,15 @@
 {
     <AuthorizeView>
         <Authorized>
-            <CascadingValue Value=@resorts>e
+            <CascadingValue Value=@resorts>
                 <_Navbar />
-                <RadzenRow RowGap="1rem">e
+                <RadzenRow Gap="0"> 
                     <RadzenColumn Size="12" SizeMD="2">
                         <_ResortDropdown onResortChanged="resortChanged" />
                         <_ResortSidebar />
                     </RadzenColumn>
 
-                    <RadzenColumn Size="12" SizeMD="10">
+                    <RadzenColumn Size="12" SizeMD="10" Style="padding-right: 1rem; padding-left: 1rem;">
                         <CascadingValue Value="selectedResort">
                             @Body
                         </CascadingValue>
