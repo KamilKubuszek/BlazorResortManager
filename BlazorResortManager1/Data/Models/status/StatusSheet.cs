@@ -12,14 +12,14 @@ namespace BlazorResortManager1.Data.Models.status
         [Key]
         public Guid id { get; set; }
 
-        [Required(ErrorMessage = "'dateTime' jest wymagane")]
+        [Required]
         //[DataType(DataType.DateTime)]
         public DateTime dateTime { get; set; }
 
-        [Required(ErrorMessage = "'productionVersion' jest wymagane")]
+        [Required]
         public bool productionVersion { get; set; }
 
-        [Required(ErrorMessage = "'resortId' jest wymagany")]
+        [Required]
         public Guid resortId { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

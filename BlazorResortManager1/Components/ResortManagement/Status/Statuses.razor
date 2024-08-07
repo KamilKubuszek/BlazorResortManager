@@ -4,6 +4,102 @@
 @page "/resort/status"
 
 <h3>Statuses</h3>
+@if(resortData is not null)
+{
+    <RadzenStack>
+        <RadzenRow JustifyContent="JustifyContent.Right">
+            <RadzenButton Text="edit" Click="addNewSheet"/>
+            <RadzenButton Text="delete" Click="deleteSheet"/>
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
+            <RadzenColumn Size="12" SizeMD="6" Style="padding-right: 0.5rem;">
+                <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets>
+                    <Columns>
+                        <RadzenDataGridColumn Property="productionVersion" Title="active" TextAlign="TextAlign.Center">
+
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn Property="datetime" Title="Date and time" TextAlign="TextAlign.Center">
+                            <Template Context="sheet">
+                                @(sheet.dateTime.Date + sheet.dateTime.TimeOfDay)
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenColumn>
+
+            <RadzenColumn Size="12" SizeMD="6" Style="padding-left: 0.5rem;">
+                @if (SelectedSheets?.Any() == true)
+                {
+                    var sheet = SelectedSheets[0];
+                    <RadzenCard Style="width: 100%; height: 100%; " class="rz-shadow-6">
+                        <h3>@sheet.dateTime status</h3>
+                        <hr />
+                        <div style="display: block; height: 69vh; overflow-y: scroll;">
+                            <h2>Tracks</h2>
+                            <RadzenDataGrid Data="sheet.trackStatuses" TItem="TrackStatus">
+                                <Columns>
+                                    <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
+                                        <Template Context="status">
+                                            @status.parentTrack.name
+                                        </Template>
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(TrackStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
+                                        <Template Context="status">
+                                            <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)"/>
+                                        </Template>
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(TrackStatus.snowCover)" Title="snow cover" TextAlign="TextAlign.Center">
+
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+
+                                    </RadzenDataGridColumn>
+                                </Columns>
+                            </RadzenDataGrid>
+
+                            <h2>Lifts</h2>
+                            <RadzenDataGrid Data="sheet.liftStatuses" TItem="LiftStatus">
+                                <Columns>
+                                    <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
+                                        <Template Context="status">
+                                            @status.parentLift.name
+                                        </Template>
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(LiftStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
+                                        <Template Context="status">
+                                            <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
+                                        </Template>
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+
+                                    </RadzenDataGridColumn>
+
+                                    <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+
+                                    </RadzenDataGridColumn>
+                                </Columns>
+                            </RadzenDataGrid>
+                        </div>
+
+                    </RadzenCard>
+                }
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+
+   
+}
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
@@ -17,10 +113,22 @@
 
     private Resort resortData { get; set; }
 
+    private IList<StatusSheet> SelectedSheets;
+
     protected override async Task OnInitializedAsync()
     {
         updateData();
         resortChangeManager.ResortChange += updateData;
+    }
+
+    private void addNewSheet()
+    {
+        
+    }
+
+    private void deleteSheet()
+    {
+
     }
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)
