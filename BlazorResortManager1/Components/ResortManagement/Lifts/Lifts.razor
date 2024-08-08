@@ -3,46 +3,62 @@
 
 <h3>Lifts</h3>
 
-@if (resortData is not null)
-{
+<RadzenStack>
+    @if (resortData is not null)
+    {
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenStack JustifyContent="JustifyContent.Right">
+                    <RadzenButton Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
+                    <RadzenButton Text="Edit" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
+                    <RadzenButton Text="Delete" Click="() => {}" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+                                CellContextMenu="OnCellLiftContextMenu" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" Frozen="true">
 
-    <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
-                    CellContextMenu="OnCellLiftContextMenu">
-        <Columns>
-            <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" Frozen="true">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name">
 
-            <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="type" Title="Type">
 
-            <RadzenDataGridColumn TItem="Lift" Property="type" Title="Type">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="Length">
 
-            <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="Length">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="Capacity per unit">
 
-            <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="Capacity per unit">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="People per hour">
 
-            <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="People per hour">
+                        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="Average ride duration">
 
-            <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="Average ride duration">
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
 
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-}
-else
-{
-    <p>select resort first</p>
-}
+            </RadzenColumn>
+        </RadzenRow>
+    }
+    else
+    {
+        <p>select resort first</p>
+    }
+</RadzenStack>
+
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService DialogService
@@ -55,6 +71,8 @@ else
     public Resort? selectedResort { get; set; }
 
     private Resort resortData { get; set; }
+
+    private IList<Lift> selectedLifts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,12 +90,20 @@ else
                 {
                     if (menuArgs.Value.Equals(1))
                     {
-                        Console.WriteLine(args.Data.name);
                         contextMenuService.Close();
 
                         navigationManager.NavigateTo("/resort/lift/edit/" + args.Data.id);
                     }
                 });
+    }
+
+    private void editLift()
+    {
+        if(selectedLifts?.Any() == true)
+        {
+            navigationManager.NavigateTo("/resort/lift/edit/" + selectedLifts[0].id);
+
+        }
     }
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)
