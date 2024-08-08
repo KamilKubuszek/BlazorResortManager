@@ -1,20 +1,24 @@
 ﻿<RadzenStack>
 	<RadzenRow>
 		<RadzenColumn>
-			<p>Are you sure you want to perform this action?</p>
+			Are you sure you want to perform this action?
 		</RadzenColumn>
 	</RadzenRow>
-	<RadzenRow>
+	<RadzenRow JustifyContent="JustifyContent.Center">
 		<RadzenColumn>
-			<RadzenButton Text="Confirm" />
+			<RadzenButton Text="Confirm" Click="() => takeAction(true)"/>
 		</RadzenColumn>
 
 		<RadzenColumn>
-			<RadzenButton Text="Cancel" />
+			<RadzenButton Text="Cancel" Click="() => takeAction(false)" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined"/>
 		</RadzenColumn>
 	</RadzenRow>
 </RadzenStack>
 
+@inject DialogService dialogService
 @code {
-
+	private void takeAction(bool confimation)
+	{
+		dialogService.Close(confimation);
+	}
 }
