@@ -13,8 +13,9 @@
 
     <link rel="stylesheet" href="BlazorResortManager1.styles.css" />
 
-    <link rel="stylesheet" href="app.css" />
     <RadzenTheme Theme="material" @rendermode="InteractiveServer" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="./css/app.css" />
     <HeadOutlet @rendermode=RenderModeForPage />
 </head>
 
@@ -22,8 +23,6 @@
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
     <script src="_framework/blazor.web.js"></script>
     <Routes @rendermode=RenderModeForPage />
-
-
 </body>
 
 </html>

@@ -1,0 +1,173 @@
+﻿@page "/resort/status/add"
+
+@attribute [Authorize]
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text.Json
+
+<h3>Update status</h3>
+
+@if (statusSheetDto is not null)
+{
+    <RadzenTemplateForm Method="post" TItem="StatusSheet" Data="statusSheetDto" Submit="submitForm">
+        <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus">
+            <Columns>
+                <RadzenDataGridColumn Title="name">
+                    <Template Context="tstatus">
+                        @tstatus.parentTrack.name
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="opened">
+                    <Template Context="tstatus">
+                        <RadzenCheckBox @bind-Value=tstatus.opened />
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="snow cover">
+                    <Template Context="tstatus">
+                        <RadzenNumeric @bind-Value=tstatus.snowCover />
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="opening time">
+                    <Template Context="tstatus">
+                        <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="closing time">
+                    <Template Context="tstatus">
+                        <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+    </RadzenTemplateForm>
+}
+
+@inject ResortChangeManager resortChangeManager
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@implements IDisposable
+@code {
+    [CascadingParameter]
+    private Resort? selectedResort { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private StatusSheet? statusSheetDto { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        updateData();
+        resortChangeManager.ResortChange += updateData;
+    }
+
+    private async Task submitForm()
+    {
+        bool error = false;
+        ValidationContext context = new ValidationContext(statusSheetDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(statusSheetDto, context, results, true);
+
+        if (isValid)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                dialogService.Open<_LoadingTaskDialog>(
+                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+
+
+
+                //prepare new ids for statuses 
+                var sheet = statusSheetDto;
+                sheet.id = Guid.NewGuid();
+                //sheet.resort = new Resort();
+                sheet.resortStatus.id = Guid.NewGuid();
+                // sheet.liftStatuses = [];
+                foreach(var tstatus in sheet.trackStatuses)
+                {
+                    tstatus.id = Guid.NewGuid();
+                    //tstatus.parentTrack = new Track();
+                }
+                foreach(var lstatus in sheet.liftStatuses)
+                {
+                    lstatus.id = Guid.NewGuid();
+
+                    //lstatus.parentLift = new Lift();
+                }
+                Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions{ WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles}));
+                database.statusSheets.Add(sheet);
+
+                await database.SaveChangesAsync();
+                await Task.Delay(2000);
+                dialogService.Close();
+                try
+                {
+                }
+                catch
+                {
+                    error = true;
+                    dialogService.Close();
+                }
+            }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Updated data successfully!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
+       // navigationManager.NavigateTo("/resort/status");
+    }
+
+    private void updateData(ResortChangeEventArgs? eventArgs = null)
+    {
+        if (selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                statusSheetDto = database.statusSheets
+                                    .OrderByDescending(e => e.dateTime)
+                                    .Include(e => e.resortStatus)
+                                    .Include(e => e.trackStatuses)
+                                    .ThenInclude(e => e.parentTrack)
+                                    .Include(e => e.liftStatuses)
+                                    .ThenInclude(e => e.parentLift)
+                                    .AsSplitQuery()
+                                    .AsNoTracking()
+                                    .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
+}
