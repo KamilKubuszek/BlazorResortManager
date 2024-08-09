@@ -1,5 +1,5 @@
 ﻿using BlazorResortManager1.Data.Models.main;
-namespace BlazorResortManager1.Components.ResortManagement
+namespace BlazorResortManager1.Services
 {
     public class ResortChangeManager
     {
@@ -17,14 +17,14 @@ namespace BlazorResortManager1.Components.ResortManagement
             set
             {
                 _tempResort = value;
-                EventArgs = new ResortChangeEventArgs{resort = _tempResort};
+                EventArgs = new ResortChangeEventArgs { resort = _tempResort };
                 ResortChange?.Invoke(EventArgs);
             }
         }
 
         public async Task openLoading(Action action)
         {
-            
+
         }
     }
     public class ResortChangeEventArgs

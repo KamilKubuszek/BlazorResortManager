@@ -3,6 +3,7 @@ using BlazorResortManager1.Components.Account;
 using BlazorResortManager1.Components.ResortManagement;
 using BlazorResortManager1.Data;
 using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

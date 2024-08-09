@@ -578,9 +578,22 @@ video {
   display: none;
 }
 
+.w-1\/4 {
+  width: 25%;
+}
+
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
 }
 
 .transition {

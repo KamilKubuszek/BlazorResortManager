@@ -12,20 +12,28 @@
             </RadzenGravatar>
         </Template>
         <ChildContent>
-                <form Model=model action="Account/Logout" method="post">
-                    <AntiforgeryToken />
-                    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                    @*                 <button type="submit" class="nav-link" id="logout_button">
-                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                    </button> *@
-                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Style="width: 100%" Text="logout" />
-                    @* <RadzenProfileMenuItem Text="Logout" Icon="logout" onclick="@(() => logOut(logoutContext))"  /> *@
-                </form>
+
         </ChildContent>
     </RadzenProfileMenu>
     <RadzenAppearanceToggle/>
-</RadzenMenu>
 
+</RadzenMenu>
+<form Model=model action="Account/Logout" method="post">
+    <AntiforgeryToken />
+    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+    <button type="submit" class="nav-link" id="logout_button">
+        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+    </button>
+    @* <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Style="width: 100%" Text="logout" /> *@
+    @* <RadzenProfileMenuItem Text="Logout" Icon="logout" onclick="@(() => logOut(logoutContext))"  /> *@
+</form>
+@* <EditForm action="Account/Logout" method="post" Context="logoutForm">
+    <AntiforgeryToken />
+    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+    <button type="submit" class="nav-link">
+        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+    </button>
+</EditForm> *@
 
 
 @* <script>

@@ -1,17 +1,18 @@
 ﻿@attribute [Authorize]
 @page "/resort/Lift"
 
-<h3>Lifts</h3>
+<h3 class="text-3xl font-bold">Lifts</h3>
 
 <RadzenStack>
     @if (resortData is not null)
     {
         <RadzenRow>
             <RadzenColumn>
-                <RadzenStack JustifyContent="JustifyContent.Right">
-                    <RadzenButton Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
-                    <RadzenButton Text="Edit" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
-                    <RadzenButton Text="Delete" Click="() => {}" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
+
+                    <RadzenButton Style="width: 10%" Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
+                    <RadzenButton Style="width: 10%" Text="Edit" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
+                    <RadzenButton Style="width: 10%" Text="Delete" Click="() => {}" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
