@@ -88,8 +88,17 @@
 
 
                 //prepare new object to add to database   
+                if(statusSheetDto.resortStatus == null)
+                {
+                    Console.WriteLine("status is null?");
+                }
                 try
                 {
+                    // Console.WriteLine(statusSheetDto.id);
+
+                    // var a = database.resortStatuses.FirstOrDefault(e => e.statusSheetId == statusSheetDto.id);
+                    // Console.WriteLine(JsonSerializer.Serialize(a, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+
                     var rstatus = new ResortStatus()
                     {
                         id = Guid.NewGuid(),
@@ -134,12 +143,11 @@
                         productionVersion = statusSheetDto.productionVersion,
                         dateTime = DateTime.Now,
                         resortId = statusSheetDto.resortId,
-
+                        resortStatus = rstatus,
                         liftStatuses = lstatuses,
                         trackStatuses = tstatuses
                     };
 
-                    Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions{ WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles}));
                     database.statusSheets.Add(sheet);
 
                     await database.SaveChangesAsync();
@@ -188,15 +196,18 @@
             {
                 statusSheetDto = database.statusSheets
                                     .OrderByDescending(e => e.dateTime)
-                                    .Include(e => e.resortStatus)
                                     .Include(e => e.trackStatuses)
                                     .ThenInclude(e => e.parentTrack)
                                     .Include(e => e.liftStatuses)
                                     .ThenInclude(e => e.parentLift)
+                                    .Include(e => e.resortStatus)
+                                    .ThenInclude(e => e.parentResort)
                                     .AsSplitQuery()
                                     .AsNoTracking()
                                     .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
             }
+            Console.WriteLine(JsonSerializer.Serialize(statusSheetDto, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+
         }
     }
 
