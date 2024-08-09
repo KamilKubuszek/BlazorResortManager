@@ -88,64 +88,64 @@
 
 
                 //prepare new object to add to database   
-
-                var rstatus = new ResortStatus()
-                {
-                    id = Guid.NewGuid(),
-                    opened = statusSheetDto.resortStatus.opened,
-                    openingTime = statusSheetDto.resortStatus.openingTime,
-                    closingTime = statusSheetDto.resortStatus.closingTime,
-                    statusSheetId = statusSheetDto.resortStatus.statusSheetId,
-                    parentResortId = statusSheetDto.resortStatus.parentResortId
-                };
-
-                var tstatuses = new List<TrackStatus>();
-                var lstatuses = new List<LiftStatus>();
-                foreach(var tstatus in statusSheetDto.trackStatuses)
-                {
-                    tstatuses.Add(new()
-                    {
-                        id = Guid.NewGuid(),
-                        opened = tstatus.opened,
-                        snowCover = tstatus.snowCover,
-                        openingTime = tstatus.openingTime,
-                        closingTime = tstatus.closingTime,
-                        parentTrackId = tstatus.parentTrackId,
-                        statusSheetId = tstatus.statusSheetId
-                    });
-                }
-                foreach (var lstatus in statusSheetDto.liftStatuses)
-                {
-                    lstatuses.Add(new()
-                    {
-                        id = Guid.NewGuid(),
-                        opened = lstatus.opened,
-                        openingTime = lstatus.openingTime,
-                        closingTime = lstatus.closingTime,
-                        parentLiftId = lstatus.parentLiftId,
-                        statusSheetId = lstatus.statusSheetId
-                    });
-                }
-
-                var sheet = new StatusSheet()
-                {
-                    id = Guid.NewGuid(),
-                    productionVersion = statusSheetDto.productionVersion,
-                    dateTime = DateTime.Now,
-                    resortId = statusSheetDto.resortId,
-
-                    liftStatuses = lstatuses,
-                    trackStatuses = tstatuses
-                };
-
-                Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions{ WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles}));
-                database.statusSheets.Add(sheet);
-
-                await database.SaveChangesAsync();
-                await Task.Delay(2000);
-                dialogService.Close();
                 try
                 {
+                    var rstatus = new ResortStatus()
+                    {
+                        id = Guid.NewGuid(),
+                        opened = statusSheetDto.resortStatus.opened,
+                        openingTime = statusSheetDto.resortStatus.openingTime,
+                        closingTime = statusSheetDto.resortStatus.closingTime,
+                        statusSheetId = statusSheetDto.resortStatus.statusSheetId,
+                        parentResortId = statusSheetDto.resortStatus.parentResortId
+                    };
+
+                    var tstatuses = new List<TrackStatus>();
+                    var lstatuses = new List<LiftStatus>();
+                    foreach(var tstatus in statusSheetDto.trackStatuses)
+                    {
+                        tstatuses.Add(new()
+                        {
+                            id = Guid.NewGuid(),
+                            opened = tstatus.opened,
+                            snowCover = tstatus.snowCover,
+                            openingTime = tstatus.openingTime,
+                            closingTime = tstatus.closingTime,
+                            parentTrackId = tstatus.parentTrackId,
+                            statusSheetId = tstatus.statusSheetId
+                        });
+                    }
+                    foreach (var lstatus in statusSheetDto.liftStatuses)
+                    {
+                        lstatuses.Add(new()
+                        {
+                            id = Guid.NewGuid(),
+                            opened = lstatus.opened,
+                            openingTime = lstatus.openingTime,
+                            closingTime = lstatus.closingTime,
+                            parentLiftId = lstatus.parentLiftId,
+                            statusSheetId = lstatus.statusSheetId
+                        });
+                    }
+
+                    var sheet = new StatusSheet()
+                    {
+                        id = Guid.NewGuid(),
+                        productionVersion = statusSheetDto.productionVersion,
+                        dateTime = DateTime.Now,
+                        resortId = statusSheetDto.resortId,
+
+                        liftStatuses = lstatuses,
+                        trackStatuses = tstatuses
+                    };
+
+                    Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions{ WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles}));
+                    database.statusSheets.Add(sheet);
+
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                
                 }
                 catch
                 {
