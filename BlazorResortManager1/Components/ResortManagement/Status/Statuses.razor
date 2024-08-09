@@ -16,7 +16,9 @@
                                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets>
                     <Columns>
                         <RadzenDataGridColumn Property="productionVersion" Title="active" TextAlign="TextAlign.Center">
-
+                            <Template Context="sheet">
+                                <RadzenIcon Icon="@(sheet.productionVersion ? "Check_Circle" : "Cancel")" IconColor="@(sheet.productionVersion ? Colors.Success : Colors.Danger)" />
+                            </Template>
                         </RadzenDataGridColumn>
 
                         <RadzenDataGridColumn Property="datetime" Title="Date and time" TextAlign="TextAlign.Center">
