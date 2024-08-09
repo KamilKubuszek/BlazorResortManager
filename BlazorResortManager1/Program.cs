@@ -6,6 +6,7 @@ using BlazorResortManager1.Data.Models.main;
 using BlazorResortManager1.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
@@ -54,6 +55,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
+
+EmailService emailService = new EmailService();
+emailService.Send("kamilkubuszek@gmail.com", "sparz.music@gmail.com", "testowy mail", "<h1>Tresc maila</h1>");
 
 //app.MapPost("/end", (IValidatableObject Validator, [FromBody] Resort resort ) =>
 //{
