@@ -12,20 +12,25 @@ namespace BlazorResortManager1.Services
 
     public class EmailService : IEmailService
     {
-        public void Send(string from, string to, string subject, string html)
+        private readonly IConfiguration _config;
+        public EmailService(IConfiguration config)
         {
-            // create message
+            _config = config;
+        }
+        public void Send(string from, string to, string subject, string messageBody)
+        {
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(from));
             email.To.Add(MailboxAddress.Parse(to));
             email.Subject = subject;
-            email.Body = new TextPart(TextFormat.Html) { Text = html };
+            email.Body = new TextPart(TextFormat.Html) { Text = messageBody };
 
-            // send email
             using var smtp = new SmtpClient();
             
             smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            smtp.Authenticate("", "");
+            smtp.Authenticate(
+                _config.GetSection("SenderAdress").Value,
+                _config.GetSection("SenderPass").Value);
             smtp.Send(email);
             smtp.Disconnect(true);
         }
