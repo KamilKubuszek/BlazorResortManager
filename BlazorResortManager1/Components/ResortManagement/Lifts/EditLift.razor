@@ -40,16 +40,9 @@
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="capacity" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="people per hour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
                 @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
-            </RadzenRow>
-
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
-                </RadzenColumn>
-                @* <RadzenColumn><RadzenDataAnnotationValidator Component="peoplePerHour" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
