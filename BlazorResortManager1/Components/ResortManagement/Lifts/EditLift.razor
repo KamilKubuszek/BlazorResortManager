@@ -116,48 +116,44 @@
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
                 //prepare cameras to 
-                var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking(); ;
-                var cameraEntries = new List<CameraLiftBinding>();
+                var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking();
+                var bindingsToRemove = new List<CameraLiftBinding>();
+                var bindingsToAdd = new List<CameraLiftBinding>();
 
-                //check if there are already exiting bindings from selected cameras
-                foreach(var cameraId in selectedCamerasIds)
+                foreach (var cameraId in selectedCamerasIds)
                 {
-                    
-                    var exitingBind = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
-                    if(exitingBind is null)
-                    {
-                        var bind = new CameraLiftBinding() { cameraId = cameraId, liftId = liftDto.id };
-                        cameraEntries.Add(bind);
-                    }
+                    //check if there is already bind with that camera in database
+                    var bindInDb = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
 
-                    //delete bindings which are no longer needed from database
-                    foreach (var existingBind in cameraBindings)
-                    {
-                        var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);                        
-                        if (duplicate == Guid.Empty)
-                        {
-                            database.Remove(existingBind);
-                        }
+                    //if not found, add new bind
+                    //if not, there is no need to add second one
+                    if(bindInDb is null){
+                        var newBind = new CameraLiftBinding
+                            {
+                                id = Guid.NewGuid(),
+                                liftId = (Guid)selectedLiftId,
+                                cameraId = cameraId
+                            };
+                        bindingsToAdd.Add(newBind);
+                        database.cameraLiftBindings.Add(newBind);
                     }
                 }
-                foreach(var existingBind in cameraBindings)
+                foreach(var bindInDb in cameraBindings)
                 {
-                    var duplicate = selectedCamerasIds.FirstOrDefault(e => e == existingBind.cameraId);
-                    // Console.WriteLine(Guid.Empty);
-                    Console.WriteLine("----------------removing no longer using bind: " + duplicate);
-                    if (duplicate != Guid.Empty)
+                    //find bind from db that is not selected in dropdown
+                    var neededBindId = selectedCamerasIds.FirstOrDefault(e => e == bindInDb.cameraId);
+
+                    //if bind was not found, add it to deletion list
+                    if(neededBindId == Guid.Empty)
                     {
-                        
-                        // database.Attach(existingBind);
-                        // database.Entry(existingBind).State = EntityState.Deleted;
-                        //database.Remove(existingBind);
+                        bindingsToRemove.Add(bindInDb);
+                        database.cameraLiftBindings.Remove(bindInDb);
                     }
                 }
-                liftDto.cameras = cameraEntries;
-                cameraEntries.ForEach(e => Console.WriteLine("updating with camera: "+e.cameraId));
+
+                //mark lift as edited
                 database.Attach(liftDto);
                 database.Entry(liftDto).State = EntityState.Modified;
-
 
                 try
                 {
