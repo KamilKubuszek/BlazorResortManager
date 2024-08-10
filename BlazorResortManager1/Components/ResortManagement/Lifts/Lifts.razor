@@ -86,16 +86,23 @@
         // var selectedEmployees = new List<Track>() { args.Data };
 
         contextMenuService.Open(args, new List<ContextMenuItem> {
-                new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "Edit_Note" } },
-                (menuArgs) =>
-                {
-                    if (menuArgs.Value.Equals(1))
-                    {
-                        contextMenuService.Close();
+                new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "Edit_Note" },
+                new ContextMenuItem(){ Text = "Delete", Value = 2, Icon = "Delete" } 
+            },
+            (menuArgs) =>
+            {
 
-                        navigationManager.NavigateTo("/resort/lift/edit/" + args.Data.id);
-                    }
-                });
+                if (menuArgs.Value.Equals(1))
+                {
+                    contextMenuService.Close();
+
+                    navigationManager.NavigateTo("/resort/lift/edit/" + args.Data.id);
+                }
+                else if (menuArgs.Value.Equals(2))
+                {
+                        
+                }
+            });
     }
 
     private void editLift()
