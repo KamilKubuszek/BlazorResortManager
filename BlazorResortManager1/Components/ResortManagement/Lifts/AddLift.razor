@@ -1,8 +1,179 @@
-﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
+﻿@implements IDisposable
+@page "/resort/lift/add"
 @attribute [Authorize]
+@using System.ComponentModel.DataAnnotations
 
-<h3>AddLift</h3>
+<h3>Add Lift</h3>
 
+@if (liftDto is not null)
+{
+    <RadzenTemplateForm Data="liftDto" TItem="Lift" Submit="submitForm">
+        <RadzenStack Style="width: 100%">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="type"><RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="type" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="length"><RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="length" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="capacity per unit"><RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="capacity" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="peoplePerHour" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="average duration time"><RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
+            </RadzenRow>
+
+            <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
+                            Multiple="true" TextProperty="name" ValueProperty="id"
+                            Placeholder="Select cameras" />
+
+            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@inject ResortChangeManager resortChangeManager
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
 @code {
+    [CascadingParameter]
+    public Resort? selectedResort { get; set; }
 
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private Lift? liftDto = new Lift();
+    private Camera[] cameras { get; set; } = [];
+    private IEnumerable<Guid> selectedCamerasIds { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        liftDto.id = Guid.NewGuid();
+        updateData();
+        resortChangeManager.ResortChange += updateData;
+    }
+
+    private async Task submitForm()
+    {
+        bool error = false;
+        ValidationContext context = new ValidationContext(liftDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(liftDto, context, results, true);
+
+        if (isValid)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                dialogService.Open<_LoadingTaskDialog>(
+                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+                //prepare cameras bindings
+                var cameraEntries = new List<CameraLiftBinding>();
+                foreach(var cameraId in selectedCamerasIds)
+                {
+                    cameraEntries.Add(new()
+                    {
+                        id = Guid.NewGuid(),
+                        cameraId = cameraId,
+                        liftId = liftDto.id
+                    });
+                }
+                liftDto.cameras = cameraEntries;
+                //cameraEntries.ForEach(e => Console.WriteLine("updating with camera: " + e.cameraId));
+                database.lifts.Add(liftDto);
+
+                try
+                {
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                    navigationManager.NavigateTo("/resort");
+                }
+                catch
+                {
+                    dialogService.Close();
+                    error = true;
+                }
+            }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Edited data successfully!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
+    }
+
+    private void updateData(ResortChangeEventArgs? eventArgs = null)
+    {
+        if(selectedResort is not null)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                liftDto.resortId = selectedResort.id;
+                cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArray();
+                selectedCamerasIds = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        resortChangeManager.ResortChange -= updateData;
+    }
 }
