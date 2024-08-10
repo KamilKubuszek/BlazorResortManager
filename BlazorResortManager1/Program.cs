@@ -52,12 +52,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+//builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailService>();
 var app = builder.Build();
-
-EmailService emailService = new EmailService();
-emailService.Send("kamilkubuszek@gmail.com", "sparz.music@gmail.com", "testowy mail", "<h1>Tresc maila</h1>");
 
 //app.MapPost("/end", (IValidatableObject Validator, [FromBody] Resort resort ) =>
 //{
