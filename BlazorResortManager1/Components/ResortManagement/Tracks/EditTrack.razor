@@ -52,6 +52,11 @@
 @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="illuminated" /></RadzenColumn> *@
             </RadzenRow>
 
+
+            <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
+                            Multiple="true" TextProperty="name" ValueProperty="id"
+                            Placeholder="Select cameras" />
+
             <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
         </RadzenStack>
     </RadzenTemplateForm>
@@ -71,6 +76,9 @@
 
     [Parameter]
     public Guid? selectedTrackId { get; set; }
+
+    private Camera[] cameras { get; set; } = [];
+    private IEnumerable<Guid> selectedCamerasIds { get; set; }
 
     private Track? trackDto { get; set; }
 
@@ -96,14 +104,53 @@
 
         if (isValid)
         {
+            dialogService.Open<_LoadingTaskDialog>(
+                "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                    new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
             using (var database = contextFactory.CreateDbContext())
             {
+                //prepare cameras to
+                var cameraBindings = database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking();
+                var bindingsToRemove = new List<CameraTrackBinding>();
+                var bindingsToAdd = new List<CameraTrackBinding>();
+
+                foreach (var cameraId in selectedCamerasIds)
+                {
+                    //check if there is already bind with that camera in database
+                    var bindInDb = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
+
+                    //if not found, add new bind
+                    //if not, there is no need to add second one
+                    if (bindInDb is null)
+                    {
+                        var newBind = new CameraTrackBinding
+                            {
+                                id = Guid.NewGuid(),
+                                trackId = (Guid)selectedTrackId,
+                                cameraId = cameraId
+                            };
+                        bindingsToAdd.Add(newBind);
+                        database.cameraTrackBindings.Add(newBind);
+                    }
+                }
+                foreach (var bindInDb in cameraBindings)
+                {
+                    //find bind from db that is not selected in dropdown
+                    var neededBindId = selectedCamerasIds.FirstOrDefault(e => e == bindInDb.cameraId);
+
+                    //if bind was not found, add it to deletion list
+                    if (neededBindId == Guid.Empty)
+                    {
+                        bindingsToRemove.Add(bindInDb);
+                        database.cameraTrackBindings.Remove(bindInDb);
+                    }
+                }
+
                 database.Attach(trackDto);
                 database.Entry(trackDto).State = EntityState.Modified;
 
-                dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
                 try
                 {
                     await database.SaveChangesAsync();
@@ -191,6 +238,8 @@
         using (var database = contextFactory.CreateDbContext())
         {
             trackDto = database.tracks.FirstOrDefault(e => e.id == selectedTrackId);
+            cameras = database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArray();
+            selectedCamerasIds = database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
         }
     }
 
