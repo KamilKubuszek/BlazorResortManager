@@ -10,7 +10,7 @@
 @if (statusSheetDto is not null)
 {
     <RadzenTemplateForm Method="post" TItem="StatusSheet" Data="statusSheetDto" Submit="submitForm">
-        <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus">
+        <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true" ColumnWidth="100px">
             <Columns>
                 <RadzenDataGridColumn Title="name">
                     <Template Context="tstatus">
@@ -44,8 +44,43 @@
             </Columns>
         </RadzenDataGrid>
 
+        <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true" ColumnWidth="100px">
+            <Columns>
+                <RadzenDataGridColumn Title="name">
+                    <Template Context="lstatus">
+                        @lstatus.parentLift.name
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="opened">
+                    <Template Context="lstatus">
+                        <RadzenCheckBox @bind-Value=lstatus.opened />
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="opening time">
+                    <Template Context="lstatus">
+                        <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Title="closing time">
+                    <Template Context="lstatus">
+                        <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+        <RadzenCheckBox Name="prVf" @bind-Value=statusSheetDto.productionVersion />
+        <RadzenLabel Component="prVf">Activate status on submit</RadzenLabel>
+
         <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
     </RadzenTemplateForm>
+}
+else
+{
+    <p>select resort first</p>
 }
 
 @inject ResortChangeManager resortChangeManager
@@ -60,6 +95,8 @@
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+
+    private Resort? resortData { get; set; } = null;
 
     private StatusSheet? statusSheetDto { get; set; }
 
@@ -153,7 +190,7 @@
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
                     dialogService.Close();
-                
+
                 }
                 catch
                 {
@@ -185,7 +222,7 @@
                 };
         }
         notificationService.Notify(notifMessage);
-       // navigationManager.NavigateTo("/resort/status");
+        // navigationManager.NavigateTo("/resort/status");
     }
 
     private void updateData(ResortChangeEventArgs? eventArgs = null)
@@ -194,6 +231,7 @@
         {
             using (var database = contextFactory.CreateDbContext())
             {
+
                 statusSheetDto = database.statusSheets
                                     .OrderByDescending(e => e.dateTime)
                                     .Include(e => e.trackStatuses)
@@ -205,9 +243,26 @@
                                     .AsSplitQuery()
                                     .AsNoTracking()
                                     .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
-            }
-            Console.WriteLine(JsonSerializer.Serialize(statusSheetDto, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
 
+                // var lifts = database.lifts.Where(e => e.resortId == selectedResort.id);
+                // if(lifts.Count() != statusSheetDto.liftStatuses.Count())
+                // {
+                //     foreach(var lift in lifts)
+                //     {
+                //         var existingStatus = statusSheetDto.liftStatuses.FirstOrDefault(e => e.parentLiftId == lift.id);
+                //         if(existingStatus is null)
+                //         {
+                //             //from s in statusSheetDto.liftStatuses where s.parentLiftId == lift.id select Lift;
+                //             // statusSheetDto.liftStatuses.FirstOrDefault(e => e.parentLiftId == lift.id) = new LiftStatus()
+                //             //     {
+                //             //         parentLift = lift
+                //             //     };
+                            
+                //         }
+                //     }
+                // }
+            }
+           // Console.WriteLine(JsonSerializer.Serialize(statusSheetDto, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
         }
     }
 
