@@ -1,0 +1,6 @@
+compare number of lifts to number of statuses
+if there is missing status(eg. for recently added lift) generate closed temprorary status for it
+
+main shadow - separation from white/dark
+2nd shadow - highlight where light is less present
+3rd - complete dark
