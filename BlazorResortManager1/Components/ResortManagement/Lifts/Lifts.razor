@@ -3,7 +3,7 @@
 
 <h3 class="text-3xl font-bold">Lifts</h3>
 
-<RadzenStack>
+<RadzenStack Style="">
     @if (resortData is not null)
     {
         <RadzenRow>
@@ -12,20 +12,20 @@
 
                     <RadzenButton Style="width: 10%" Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
                     <RadzenButton Style="width: 10%" Text="Edit" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
-                    <RadzenButton Style="width: 10%" Text="Delete" Click="() => {}" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                    <RadzenButton Style="width: 10%" Text="Delete" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
-            <RadzenColumn>
-                <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+            <RadzenColumn Size="12">
+                <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true" ColumnWidth="100px"
                                 CellContextMenu="OnCellLiftContextMenu" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
-                        <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" Frozen="true">
+@*                         <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" >
 
-                        </RadzenDataGridColumn>
+                        </RadzenDataGridColumn> *@
 
-                        <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name">
+                        <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name" Frozen="true">
 
                         </RadzenDataGridColumn>
 
@@ -62,7 +62,8 @@
 
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject DialogService DialogService
+@inject DialogService dialogService
+@inject NotificationService notificationService
 @inject ContextMenuService contextMenuService
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
@@ -81,6 +82,7 @@
         resortChangeManager.ResortChange += updateData;
     }
 
+
     private void OnCellLiftContextMenu(DataGridCellMouseEventArgs<Lift> args)
     {
         // var selectedEmployees = new List<Track>() { args.Data };
@@ -89,7 +91,7 @@
                 new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "Edit_Note" },
                 new ContextMenuItem(){ Text = "Delete", Value = 2, Icon = "Delete" } 
             },
-            (menuArgs) =>
+            async (menuArgs) =>
             {
 
                 if (menuArgs.Value.Equals(1))
@@ -100,9 +102,83 @@
                 }
                 else if (menuArgs.Value.Equals(2))
                 {
-                        
+                    
+
+                    selectedLifts[0] = args.Data;
+                    contextMenuService.Close();
+                    await deleteLift();
                 }
             });
+    }
+
+    private async Task deleteLift()
+    {
+        var result = await dialogService.OpenAsync<_ConfirmDialog>(
+            "Confirm action", new Dictionary<string, object>() { },
+            new DialogOptions() { ShowClose = false });
+
+        if (result == true)
+        {
+            bool error = false;
+            try
+            {
+                var lift = selectedLifts[0];
+
+                if (selectedLifts?.Any() == true)
+                {
+                    selectedLifts.Clear();
+
+                }
+                else throw new Exception();
+
+                using (var database = contextFactory.CreateDbContext())
+                {
+                    var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == lift.id).ToArray();
+                    foreach (var bind in cameraBindings)
+                    {
+                        database.cameraLiftBindings.Remove(bind);
+                    }
+
+                    var statuses = database.liftStatuses.Where(e => e.parentLiftId == lift.id).ToArray();
+                    foreach (var lstatus in statuses)
+                    {
+                        database.liftStatuses.Remove(lstatus);
+                    }
+                    database.Remove(lift);
+
+                    database.SaveChanges();
+                }
+
+            }
+            catch
+            {
+                dialogService.Close();
+                error = true;
+            }
+
+            var notifMessage = new NotificationMessage();
+            if (!error)
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Deleted data successfully!",
+                        Duration = 3000
+                    };
+            }
+            else
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "There was an error while executing the request",
+                        Duration = 3000
+                    };
+            }
+            notificationService.Notify(notifMessage);
+            updateData();
+        }
+
     }
 
     private void editLift()
