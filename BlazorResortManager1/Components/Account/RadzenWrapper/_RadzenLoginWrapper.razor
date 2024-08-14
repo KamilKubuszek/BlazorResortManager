@@ -1,0 +1,77 @@
+﻿@* @using System.ComponentModel.DataAnnotations
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@page "/log"
+<RadzenTemplateForm Data="Input" TItem="InputModel" Submit="LoginUser">
+    <RadzenStack Wrap="FlexWrap.Wrap">
+
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="Input.UserName" Style="width: 100%;" /></RadzenFormField>
+            <RadzenDataAnnotationValidator Component="name" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenFormField Text="pass"><RadzenPassword Name="pass" @bind-Value="Input.Password" Style="width: 100%;" /></RadzenFormField>
+            <RadzenDataAnnotationValidator Component="pass" />
+        </RadzenStack>
+
+        <RadzenCheckBox Name="remember" @bind-Value=Input.RememberMe />
+        <RadzenLabel Component="remember">Remember me</RadzenLabel>
+
+        <RadzenButton Text="Log in" ButtonType="ButtonType.Submit" />
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<_RadzenLoginWrapper> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@code {
+    [Parameter]
+    public InputModel Input { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<InputModel> onValidSubmit { get; set; }
+
+    protected async Task validSubmit()
+    {
+        Console.WriteLine("pass");
+        await onValidSubmit.InvokeAsync(Input);
+    }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? errorMessage;
+
+    private async Task LoginUser()
+    {
+        // This doesn't count login failures towards account lockout
+        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+        var result = await SignInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("User account locked out.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
+
+}
+ *@
