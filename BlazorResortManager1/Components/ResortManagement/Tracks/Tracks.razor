@@ -6,37 +6,49 @@
 
 @if (resortData is not null)
 {
-    <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
-                    >
-        @* RowUpdate="@(args => updateRow(args))" *@
-        <Columns>
-            <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="100px" Frozen="true" />
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                <RadzenButton Style="width: 10%" Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/track/add") )" />
+                <RadzenButton Style="width: 10%" Text="Edit" Click="editTrack" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" />
+                <RadzenButton Style="width: 10%" Text="Delete" Click="deleteTrack" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+                            @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single">
+                @* RowUpdate="@(args => updateRow(args))" *@
+                <Columns>
+                    <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="100px" Frozen="true"/>
 
-            <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="100px">
-            </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Track" Property="name" Title="Name" Width="100px">
+                    </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="marking" Title="Marking" Width="100px">
+                    <RadzenDataGridColumn TItem="Track" Property="marking" Title="Marking" Width="100px">
 
-            </RadzenDataGridColumn>
+                    </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="difficulty" Title="Difficulty" Width="100px">
+                    <RadzenDataGridColumn TItem="Track" Property="difficulty" Title="Difficulty" Width="100px">
 
-            </RadzenDataGridColumn>
+                    </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px">
+                    <RadzenDataGridColumn TItem="Track" Property="inclination" Title="Inclination" Width="100px">
 
-            </RadzenDataGridColumn>
+                    </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="snowGroomed" Title="Snow groomed" Width="100px">
+                    <RadzenDataGridColumn TItem="Track" Property="snowGroomed" Title="Snow groomed" Width="100px">
 
-            </RadzenDataGridColumn>
+                    </RadzenDataGridColumn>
 
-            <RadzenDataGridColumn TItem="Track" Property="illuminated" Title="Illuminated" Width="100px">
+                    <RadzenDataGridColumn TItem="Track" Property="illuminated" Title="Illuminated" Width="100px">
 
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
 }
 else
 {
@@ -44,7 +56,8 @@ else
 }
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject DialogService DialogService
+@inject DialogService dialogService
+@inject NotificationService notificationService
 @inject ContextMenuService contextMenuService
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
@@ -55,10 +68,92 @@ else
 
     private Resort resortData { get; set; }
 
+    private IList<Track> selectedTracks { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         updateData();
         resortChangeManager.ResortChange += updateData;
+    }
+
+
+    private async Task deleteTrack()
+    {
+        var result = await dialogService.OpenAsync<_ConfirmDialog>(
+            "Confirm action", new Dictionary<string, object>() { },
+            new DialogOptions() { ShowClose = false });
+
+        if (result == true)
+        {
+            bool error = false;
+            try
+            {
+                var track = selectedTracks[0];
+
+                if (selectedTracks?.Any() == true)
+                {
+                    selectedTracks.Clear();
+
+                }
+                else throw new Exception();
+
+                using (var database = contextFactory.CreateDbContext())
+                {
+                    var cameraBindings = database.cameraTrackBindings.Where(e => e.trackId == track.id).ToArray();
+                    foreach (var bind in cameraBindings)
+                    {
+                        database.cameraTrackBindings.Remove(bind);
+                    }
+
+                    var statuses = database.trackStatuses.Where(e => e.parentTrackId == track.id).ToArray();
+                    foreach (var tstatus in statuses)
+                    {
+                        database.trackStatuses.Remove(tstatus);
+                    }
+                    database.Remove(track);
+
+                    database.SaveChanges();
+                }
+
+            }
+            catch
+            {
+                dialogService.Close();
+                error = true;
+            }
+
+            var notifMessage = new NotificationMessage();
+            if (!error)
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Deleted data successfully!",
+                        Duration = 3000
+                    };
+            }
+            else
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "There was an error while executing the request",
+                        Duration = 3000
+                    };
+            }
+            notificationService.Notify(notifMessage);
+            updateData();
+        }
+
+    }
+
+    private void editTrack()
+    {
+        if (selectedTracks?.Any() == true)
+        {
+            navigationManager.NavigateTo("/resort/track/edit/" + selectedTracks[0].id);
+
+        }
     }
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)
