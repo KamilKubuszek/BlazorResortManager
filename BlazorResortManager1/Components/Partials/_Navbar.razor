@@ -1,9 +1,12 @@
 ﻿@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-
-<RadzenMenu>
-    <RadzenMenuItem Path="resort" Text="Resorts" />
-    <RadzenMenuItem Path="resort/status" Text="Statuses" />
+@* 
+<RadzenStack Orientation="Orientation.Horizontal" Style="width: 100%">
+    <RadzenButton Variant="Variant.Text" Click=@(args => NavigationManager.NavigateTo("resort")) Text="resort" ButtonStyle="ButtonStyle.Base" />
+</RadzenStack> *@
+<RadzenMenu >
+    <RadzenMenuItem Path="home" Text="Home" />
+    <RadzenMenuItem Path="resort/tutorial" Text="Tutorial" />
     <RadzenMenuItem Path="resort/status/update" Text="Update status" />
 
     <RadzenProfileMenu Style="float: right">

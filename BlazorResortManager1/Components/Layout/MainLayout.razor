@@ -6,7 +6,27 @@
 {
     <AuthorizeView>
         <Authorized>
+            <RadzenLayout style="position: relative">
+                <RadzenHeader>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+                        <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                        <_Navbar/>
+                    </RadzenStack>
+                </RadzenHeader>
             <CascadingValue Value=@resorts>
+            <CascadingValue Value=@selectedResort>
+                <RadzenSidebar @bind-Expanded="@sidebarExpanded" >
+                    <_ResortDropdown onResortChanged="resortChanged" />
+                    <_ResortSidebar />
+                </RadzenSidebar>
+                <RadzenBody>
+                    @Body
+                </RadzenBody>
+            </CascadingValue>
+            </CascadingValue>
+
+            </RadzenLayout>
+@*             <CascadingValue Value=@resorts>
             <CascadingValue Value=@selectedResort>
                 <_Navbar />
                 <RadzenRow Gap="0"> 
@@ -20,7 +40,7 @@
                     </RadzenColumn>
                 </RadzenRow>
             </CascadingValue>
-            </CascadingValue>
+            </CascadingValue> *@
         </Authorized>
 
         <NotAuthorized>

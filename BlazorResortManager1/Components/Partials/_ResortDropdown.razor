@@ -1,6 +1,6 @@
 ﻿
 
-<RadzenDropDown Style="width: 100%; text-align: center;"
+<RadzenDropDown Style="width: 100%; text-align: center; margin-top: 1rem; margin-bottom: 1rem;"
                 Change="setResort"
                 @bind-Value=@selectedResortId
                 Data=@resorts
@@ -8,10 +8,6 @@
                 TextProperty="name"
                 ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
 </RadzenDropDown>
-@if(resorts != null)
-{
-    <p>dsadsadsad</p>
-}
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
