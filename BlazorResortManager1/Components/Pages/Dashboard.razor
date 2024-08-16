@@ -1,0 +1,23 @@
+﻿@page "/dashboard"
+@attribute [Authorize]
+
+<h3>dashboard</h3>
+<RadzenStack Wrap="FlexWrap.NoWrap" Style="height: 100%; width:100%">
+	<RadzenCard Style="width: 50%; height: 50%">
+		<p>- actions</p>
+		<p>- set new status</p>
+		<p>- change closing time</p>
+		<p>- add new employee</p>
+	</RadzenCard>
+
+	<RadzenCard Style="width: 50%; height: 100%">
+		statuses
+	</RadzenCard>
+
+	<RadzenCard Style="width: 50%; height: 50%">
+		other things
+	</RadzenCard>
+</RadzenStack>
+@code {
+
+}
