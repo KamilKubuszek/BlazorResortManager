@@ -7,6 +7,7 @@
     <AuthorizeView>
         <Authorized>
             <CascadingValue Value=@resorts>
+            <CascadingValue Value=@selectedResort>
                 <_Navbar />
                 <RadzenRow Gap="0"> 
                     <RadzenColumn Size="12" SizeMD="2">
@@ -14,12 +15,11 @@
                         <_ResortSidebar />
                     </RadzenColumn>
 
-                    <RadzenColumn Size="12" SizeMD="10" Style="padding-right: 1rem; padding-left: 1rem;">
-                        <CascadingValue Value="selectedResort">
+                    <RadzenColumn Size="12" SizeMD="10" Style="padding-right: 1rem; padding-left: 1rem;"> 
                             @Body
-                        </CascadingValue>
                     </RadzenColumn>
                 </RadzenRow>
+            </CascadingValue>
             </CascadingValue>
         </Authorized>
 
@@ -58,6 +58,8 @@ else
 @inject ResortChangeManager resortChangeManager
 @inject NotificationService notificationService
 @code {
+    bool sidebarExpanded = true;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
@@ -113,7 +115,10 @@ else
                                 .Where(e => slopeIdsByPermit
                                 .Contains(e.id))
                                 .ToArray();
-                    Console.WriteLine(resorts.Count());
+                    if(resorts is not null && resorts.Count() > 0)
+                    {
+                        selectedResort = resorts[0];
+                    }
                     loading = false;
                     StateHasChanged();
                 }
