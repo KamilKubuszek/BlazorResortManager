@@ -2,7 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @attribute [Authorize]
 
-<h3>edit resort information</h3>
+<h3 class="text-3xl font-bold">edit resort information</h3>
 @if(resortDto != null)
 {
     <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=editResortData>
