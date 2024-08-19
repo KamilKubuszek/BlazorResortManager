@@ -1,0 +1,42 @@
+﻿@page "/widget/{selectedResortId:guid}"
+@rendermode InteractiveServer
+<RadzenTabs>
+	<Tabs>
+		<RadzenTabsItem Text="Status">
+			<_StatusCard sheet="sheet"/>
+		</RadzenTabsItem>
+
+		<RadzenTabsItem Text="Weather">
+
+		</RadzenTabsItem>
+
+		<RadzenTabsItem Text="Cameras">
+
+		</RadzenTabsItem>
+	</Tabs>
+</RadzenTabs>
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@code {
+    private StatusSheet? sheet = null;
+
+    [Parameter]
+    public Guid selectedResortId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        using (var database = contextFactory.CreateDbContext())
+        {
+            sheet = database.statusSheets.OrderByDescending(e => e.dateTime)
+                                            .Include(e => e.resortStatus)
+                                            .Include(e => e.trackStatuses)
+                                            .ThenInclude(e => e.parentTrack)
+                                            .Include(e => e.liftStatuses)
+                                            .ThenInclude(e => e.parentLift)
+                                            .AsSplitQuery()
+                                            .AsNoTracking()
+                                            .FirstOrDefault(e => e.resortId == selectedResortId);
+        }
+
+    }
+}
