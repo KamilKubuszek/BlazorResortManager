@@ -1,0 +1,124 @@
+﻿@page "/resort/add"
+@using System.ComponentModel.DataAnnotations
+@attribute [Authorize(Roles = "Admin")]
+
+<h3 class="text-3xl font-bold">add resort</h3>
+
+<h1>ADD ID OF A USER WHO REQUESTED RESORT REGISTRATION</h1>
+
+@if (resortDto != null)
+{
+    <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=addResort>
+        <RadzenStack Style="width: 100%">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="email"><RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="email" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem" Style="width: 100%">
+                <RadzenColumn>
+                    <RadzenFormField Text="webpage"><RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="webpage" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="phone number"><RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="phone" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn>
+                    <RadzenFormField Text="description"><RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" /></RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn><RadzenDataAnnotationValidator Component="description" /></RadzenColumn>
+            </RadzenRow>
+
+            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject ResortChangeManager resortChangeManager
+@code {
+    [CascadingParameter]
+    private Resort? selectedResort { get; set; }
+
+    private Resort? resortDto = new Resort(){ id = Guid.NewGuid()};
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task addResort()
+    {
+        bool error = false;
+        ValidationContext context = new ValidationContext(resortDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(resortDto, context, results, true);
+
+        if (isValid)
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                database.resorts.Add(resortDto);
+                //add permits to the user
+                database.statusSheets.Add(new StatusSheet{
+                    id = Guid.NewGuid(),
+                    dateTime = DateTime.Now,
+                    productionVersion = true
+                });
+
+                dialogService.Open<_LoadingTaskDialog>(
+                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                try
+                {
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                }
+                catch
+                {
+                    error = true;
+                }
+            }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Edited data successfully!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
+    }
+
+    public void Dispose()
+    {
+       
+    }
+}
