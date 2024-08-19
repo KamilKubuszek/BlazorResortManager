@@ -23,7 +23,7 @@
         <RadzenColumn>
             @if (selectedCameras?.Any() == true)
             {
-                <iframe src="@selectedCameras[0].link"></iframe>
+                <iframe src="@selectedCameras[0].link" style="width: 100%; height: 40vh;"></iframe>
             }
         </RadzenColumn>
     </RadzenRow>
@@ -35,34 +35,60 @@
 
     @if(trackBinding is not null)
     {
+        <RadzenStack Style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.5rem;" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
         @foreach (var group in trackBinding)
         {
-            <RadzenCard>
+            <RadzenCard Style="width: 20%; text-align:center" >
                 <p>@group.Key</p>
-                <br />
+                <hr />
+                <p>
+                @{ var count = 0;}
                 @foreach (var bind in group)
                 {
-                    <p>@(bind.camera.name + "|" + bind.camera.link)</p>
+                    @if(count == 0){
+                         @(bind.camera.name)
+                    }
+                    else
+                    {
+                         @(", "+bind.camera.name)
+                    }
+                    count++;
                 }
+                </p>
             </RadzenCard>
         }
+        </RadzenStack>
     }
 
     @if (liftBinding is not null)
     {
+        <RadzenStack Style="width: 100%; margin-bottom: 0.5rem" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
         @foreach (var group in liftBinding)
         {
-            <RadzenCard>
+            <RadzenCard Style="width: 20%; text-align:center">
                 <p>@group.Key</p>
-                <br />
-                @foreach (var bind in group)
-                {
-                    <p>@(bind.camera.name + "|" + bind.camera.link)</p>
-                }
+                <hr />
+                <p>
+                    @{
+                        var count = 0;
+                    }
+                    @foreach (var bind in group)
+                    {
+                        @if (count == 0)
+                        {
+                            @(bind.camera.name)
+                        }
+                        else
+                        {
+                            @(", " + bind.camera.name)
+                        }
+                        count++;
+                    }
+                </p>
             </RadzenCard>
         }
+        </RadzenStack>
     }
-    
 }
 
 
