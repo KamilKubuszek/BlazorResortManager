@@ -48,6 +48,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -55,11 +56,33 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 //builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailService>();
 var app = builder.Build();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+//    string[] roleNames = { "Admin" };
+//    foreach (var roleName in roleNames)
+//    {
+//        if (!await roleManager.RoleExistsAsync(roleName))
+//        {
+//            await roleManager.CreateAsync(new IdentityRole(roleName));
+//        }
+//    }
+
+//    // Optional: Assign a role to a user
+//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+//    var user = await userManager.FindByEmailAsync("kamil@kamil.com");
+//    if (user != null)
+//    {
+//        await userManager.AddToRoleAsync(user, "Admin");
+//    }
+//}
+
 
 //app.MapPost("/end", (IValidatableObject Validator, [FromBody] Resort resort ) =>
 //{
 //    var result = Validator.Validate(new ValidationContext(resort));
-    
+
 //});
 
 // Configure the HTTP request pipeline.
