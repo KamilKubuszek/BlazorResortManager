@@ -1,0 +1,64 @@
+﻿
+<h3>@sheet.dateTime Status</h3>
+<hr />
+<div style="display: block; height: 69vh; overflow-y: scroll;">
+    <h2>Tracks</h2>
+    <RadzenDataGrid Data="sheet.trackStatuses" TItem="TrackStatus">
+        <Columns>
+            <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
+                <Template Context="status">
+                    @status.parentTrack.name
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(TrackStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
+                <Template Context="status">
+                    <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(TrackStatus.snowCover)" Title="snow cover" TextAlign="TextAlign.Center">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+    <h2>Lifts</h2>
+    <RadzenDataGrid Data="sheet.liftStatuses" TItem="LiftStatus">
+        <Columns>
+            <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
+                <Template Context="status">
+                    @status.parentLift.name
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(LiftStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
+                <Template Context="status">
+                    <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</div>
+@code {
+    [Parameter]
+    public StatusSheet? sheet { get; set; }
+
+
+}

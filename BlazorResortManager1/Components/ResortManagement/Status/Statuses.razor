@@ -6,9 +6,44 @@
 <h3 class="text-3xl font-bold">Statuses</h3>
 @if(resortData is not null)
 {
+                        <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
+        <RadzenColumn Size="3">
+
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+
+        </RadzenColumn>
+    </RadzenRow>
     <RadzenStack>
         <RadzenRow JustifyContent="JustifyContent.Right">
-            <RadzenButton Text="add new status" Click="addNewSheet"/>
+            <RadzenColumn Size="12">
+                @{
+                    var enableButtons = SelectedSheets?.Any();
+                    StatusSheet? sheet = null;
+                    if(enableButtons == true)
+                        sheet = SelectedSheets[0];
+                }
+                <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem" Style="width: 100%;">
+                    <RadzenButton Style="width: 15%" Text="add new status" Click="addNewSheet" />
+                    <RadzenButton Text="activate"
+                                  Click="() => switchSheetVersion(true)"
+                                  Variant="@(sheet?.productionVersion == true ? Variant.Text : Variant.Outlined)"
+                                  Disabled="@(enableButtons is null || sheet?.productionVersion == true)"
+                                  Style="width: 15%;" />
+                    <RadzenButton Text="deactivate"
+                                  Click="() => switchSheetVersion(false)"
+                                  Variant="@(sheet?.productionVersion == false ? Variant.Text : Variant.Outlined)"
+                                  Disabled="@(enableButtons is null || sheet?.productionVersion == false)"
+                                  Style="width: 15%;" />
+                    <RadzenButton Text="delete"
+                                  Disabled="@(enableButtons is null)"
+                                  Click="deleteSheet"
+                                  Style="width: 15%;" />
+                </RadzenStack>
+            </RadzenColumn>
         </RadzenRow>
         <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
             <RadzenColumn Size="12" SizeMD="6" Style="padding-right: 0.5rem;">
@@ -36,90 +71,12 @@
                 {
                     var sheet = SelectedSheets[0];
                     
-                    <h3>@sheet.dateTime Status</h3>
-                    <hr />
-                    <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
-                        <RadzenColumn Size="3">
-                            <RadzenButton Text="activate"
-                                Click="() => switchSheetVersion(true)"
-                                Variant="@(sheet.productionVersion ? Variant.Text : Variant.Outlined)"
-                                Disabled="@(sheet.productionVersion)" 
-                                Style="width: 100%;" />
-                        </RadzenColumn>
-                        <RadzenColumn Size="3">
-                            <RadzenButton Text="deactivate" 
-                                Click="() => switchSheetVersion(false)" 
-                                Variant="@(!sheet.productionVersion ? Variant.Text : Variant.Outlined)"
-                                Disabled="@(!sheet.productionVersion)" 
-                                Style="width: 100%;" />
-                        </RadzenColumn>
-                        <RadzenColumn Size="3">
-                            <RadzenButton Text="delete" 
-                                Click="deleteSheet" 
-                                Style="width: 100%;" />
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <div style="display: block; height: 69vh; overflow-y: scroll;">
-                        <h2>Tracks</h2>
-                        <RadzenDataGrid Data="sheet.trackStatuses" TItem="TrackStatus">
-                            <Columns>
-                                <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
-                                    <Template Context="status">
-                                        @status.parentTrack.name
-                                    </Template>
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(TrackStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
-                                    <Template Context="status">
-                                        <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)"/>
-                                    </Template>
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(TrackStatus.snowCover)" Title="snow cover" TextAlign="TextAlign.Center">
-
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
-
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
-
-                                </RadzenDataGridColumn>
-                            </Columns>
-                        </RadzenDataGrid>
-
-                        <h2>Lifts</h2>
-                        <RadzenDataGrid Data="sheet.liftStatuses" TItem="LiftStatus">
-                            <Columns>
-                                <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
-                                    <Template Context="status">
-                                        @status.parentLift.name
-                                    </Template>
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(LiftStatus.opened)" Title="opened" TextAlign="TextAlign.Center">
-                                    <Template Context="status">
-                                        <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
-                                    </Template>
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
-
-                                </RadzenDataGridColumn>
-
-                                <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
-
-                                </RadzenDataGridColumn>
-                            </Columns>
-                        </RadzenDataGrid>
-                        </div>
-                    }
-                    else
-                    {
-                        <p>select status to see details</p>
-                    }
+                    <_StatusCard sheet="sheet"/>
+                }
+                else
+                {
+                    <p>select status to see details</p>
+                }
                 </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
@@ -140,6 +97,7 @@
     public Resort? selectedResort { get; set; }
 
     private Resort resortData { get; set; }
+   // private IEnumerable<StatusSheet> qSheet { get; set; }
 
     private IList<StatusSheet> SelectedSheets;
 
@@ -289,6 +247,18 @@
                                                 .AsSplitQuery()
                                                 .AsNoTracking()
                                                 .ToListAsync();
+                // qSheet = database.statusSheets
+                //             .Where(e => e.resortId == selectedResort.id)
+                //             .OrderByDescending(e => e.dateTime)
+                //             .Include(e => e.resortStatus)
+                //             .Include(e => e.trackStatuses)
+                //             .ThenInclude(e => e.parentTrack)
+                //             .Include(e => e.liftStatuses)
+                //             .ThenInclude(e => e.parentLift)
+                //             .AsSplitQuery()
+                //             .AsNoTracking();
+
+                                                
             }
             StateHasChanged();
         }
