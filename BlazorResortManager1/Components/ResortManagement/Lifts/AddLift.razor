@@ -8,99 +8,113 @@
 @if (liftDto is not null)
 {
     <RadzenTemplateForm Data="liftDto" TItem="Lift" Submit="submitForm">
-        <RadzenStack Style="width: 100%">
-            <RadzenRow>
-                
+    <RadzenStack Style="width: 100%">
+        <RadzenRow>
+            <RadzenColumn Size="6">
                 <RadzenFieldset Text="Data">
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
-                </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="name" Text="Name" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="display: block; width: 100%" />
+                            <RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+                        </RadzenColumn>
+                    </RadzenRow>
 
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="type"><RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn><RadzenDataAnnotationValidator Component="type" /></RadzenColumn>
-                </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="type" Text="Type" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" />
+                            <RadzenDataAnnotationValidator Component="type" Style="position: absolute;" />
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="length" Text="Length" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%; display: block;" />
+                            @* <RadzenDataAnnotationValidator Component="length" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="capacity" Text="Capacity Per Unit" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%; display: block;" />
+                            @* <RadzenDataAnnotationValidator Component="capacity" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="peoplePerHour" Text="People Per Hour" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%; display: block;" />
+                            @* <RadzenDataAnnotationValidator Component="peoplePerHour" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
+
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="duration" Text="Average Duration Time" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%; display: block;" />
+                            @* <RadzenDataAnnotationValidator Component="duration" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenFieldset>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenFieldset Text="Bind Cameras">
+                    <RadzenDropDown Data="cameras" @bind-Value="@selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="Select cameras" />
                 </RadzenFieldset>
 
+                <RadzenFieldset Text="Status">
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="opened" Text="Opened" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" />
+                            @* <RadzenDataAnnotationValidator Component="opened" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
 
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="openingTime" Text="Opening Time" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenDatePicker @bind-Value="@statusDto.openingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                            @* <RadzenDataAnnotationValidator Component="openingTime" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
 
-                <RadzenFieldset Text="Parameters">
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="length"><RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @* <RadzenColumn><RadzenDataAnnotationValidator Component="length" /></RadzenColumn> *@
-                </RadzenRow>
-
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="capacity per unit"><RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
-                </RadzenRow>
-
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="people per hour"><RadzenNumeric Name="capacity" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
-                </RadzenRow>
-
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="people per hour"><RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @* <RadzenColumn><RadzenDataAnnotationValidator Component="peoplePerHour" /></RadzenColumn> *@
-                </RadzenRow>
-
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="average duration time"><RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
-                </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn>
+                            <RadzenLabel Component="closingTime" Text="Closing Time" />
+                        </RadzenColumn>
+                        <RadzenColumn>
+                            <RadzenDatePicker @bind-Value="@statusDto.closingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                            @* <RadzenDataAnnotationValidator Component="closingTime" Style="position: absolute;" /> *@
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenFieldset>
+            </RadzenColumn>
+        </RadzenRow>
+        
 
-            </RadzenRow>
-            <RadzenFieldset Text="Bind cameras">
-                <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
-                                Multiple="true" TextProperty="name" ValueProperty="id"
-                                Placeholder="Select cameras" />
-            </RadzenFieldset>
-
-            <RadzenFieldset Text="Status">
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenFormField Text="opened"><RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" Style="width: 100%;" /></RadzenFormField>
-                    </RadzenColumn>
-                    @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
-                </RadzenRow>
-
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenDatePicker @bind-Value=@statusDto.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </RadzenColumn>
-                    @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
-                </RadzenRow>
-                
-                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn>
-                        <RadzenDatePicker @bind-Value=@statusDto.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </RadzenColumn>
-                    @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
-                </RadzenRow>
-
-            </RadzenFieldset>
-
-               
-            
-            <RadzenButton Text="Submit" ButtonType="ButtonType.Submit" />
-        </RadzenStack>
+        <RadzenButton Text="Submit" ButtonType="ButtonType.Submit" />
+    </RadzenStack>
     </RadzenTemplateForm>
 }
 
