@@ -1,0 +1,145 @@
+﻿@using BlazorResortManager1.Components.ResortManagement
+@implements IDisposable
+@inherits LayoutComponentBase
+
+@if (!loading)
+{
+    <AuthorizeView>
+        <Authorized>
+            <RadzenLayout style="position: relative">
+                <RadzenHeader>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+                        <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                        <_Navbar />
+                    </RadzenStack>
+                </RadzenHeader>
+                <CascadingValue Value=@resorts>
+                    <CascadingValue Value=@selectedResort>
+                        <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+                            <_ResortDropdown onResortChanged="resortChanged" />
+                            <_ResortSidebar />
+                        </RadzenSidebar>
+                        <RadzenBody>
+                            @Body
+                        </RadzenBody>
+                    </CascadingValue>
+                </CascadingValue>
+
+            </RadzenLayout>
+
+        </Authorized>
+
+        <NotAuthorized>
+            @Body
+        </NotAuthorized>
+    </AuthorizeView>
+}
+else
+{
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width: 100%; height: 100vh;">
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center">
+                <RadzenColumn>Resort Manager Icon</RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenStack>
+}
+
+
+@* <div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div> *@
+<RadzenComponents @rendermode=@RenderMode.InteractiveServer />
+<RadzenDialog @rendermode="@RenderMode.InteractiveServer" />
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NavigationManager NavigationManager
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@code {
+    bool sidebarExpanded = true;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private bool shouldFetchResortData =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("resort")
+        ? true : false;
+
+    public Resort[]? resorts = null;
+    private Resort? selectedResort = null;
+
+    private bool loading = false;
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += fetchDataOnLocationChanged;
+        InvokeAsync(async () =>
+        {
+            await fetchData();
+        });
+    }
+
+    private void resortChanged(Guid resId)
+    {
+        selectedResort = resorts.FirstOrDefault(e => e.id == resId);
+        StateHasChanged();
+        resortChangeManager.resort = selectedResort;
+
+        Console.WriteLine("res changed: " + resId);
+
+    }
+
+    private async Task fetchData()
+    {
+        if (resorts == null)
+        {
+            var auth = await authenticationState;
+            if (shouldFetchResortData && auth.User != null)
+            {
+                loading = true;
+                StateHasChanged();
+
+                //await Task.Delay(1000);
+                Console.WriteLine("fetching resort data...");
+                using (var database = contextFactory.CreateDbContext())
+                {
+                    var userId = auth.User.FindFirst(
+                        c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    var slopeIdsByPermit = await database.permits
+                                            .Where(e => e.userId == userId)
+                                            .Select(e => e.resortId)
+                                            .ToArrayAsync();
+
+                    resorts = database.resorts
+                                .Where(e => slopeIdsByPermit
+                                .Contains(e.id))
+                                .ToArray();
+                    if (resorts is not null && resorts.Count() > 0)
+                    {
+                        selectedResort = resorts[0];
+                    }
+                    loading = false;
+                    StateHasChanged();
+                }
+            }
+            else
+                Console.WriteLine("user is not provided or there is no need to fetch data");
+        }
+
+    }
+
+    private async void fetchDataOnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        await fetchData();
+    }
+
+    public void Dispose()
+        => NavigationManager.LocationChanged -= fetchDataOnLocationChanged;
+}
