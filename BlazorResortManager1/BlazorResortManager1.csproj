@@ -24,4 +24,8 @@
     <Folder Include="Interface\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Resources\slopeBg.png" />
+  </ItemGroup>
+
 </Project>
