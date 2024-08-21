@@ -1,0 +1,110 @@
+﻿@page "/nlogin"
+
+@using System.ComponentModel.DataAnnotations
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+<RadzenRow Style="width: 100%; height: 100%">
+    <RadzenColumn>
+        <RadzenCard class="rz-background-color-primary" Style="width: 100%; height: 100%; align-items: center; color: white;">
+            <h1 class="text-5xl font-bold">Log in to your account</h1>
+            @* @result *@
+        </RadzenCard>
+	</RadzenColumn>
+	<RadzenColumn>
+@*         <RadzenTemplateForm Data="input" TItem="InputModel" Submit="logIn" Method="POST">
+            <AntiforgeryToken/>
+        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
+            
+
+            <input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" /
+        
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Style="position:relative;" >
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width: 50%; height: 100%">
+                    <RadzenLabel Component="Username" Text="Username" />
+                </RadzenStack>
+
+                <RadzenTextBox Name="Username" @bind-Value="input.username" Style="display: block; width: 50%" />
+                <RadzenDataAnnotationValidator Component="Username" Style="position: absolute; bottom: -17px" />
+            </RadzenStack>
+
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Style="position:relative;">
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width: 50%; height: 100%">
+                    <RadzenLabel Component="password" Text="Password" />
+                </RadzenStack>
+
+                <RadzenPassword Name="password" @bind-Value="input.password" Style="display: block; width: 50%" />
+                <RadzenDataAnnotationValidator Component="password" Style="position: absolute; bottom: -17px" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Right" Style="position:relative;">
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width: 50%; height: 100%">
+                    <RadzenLabel Component="rem" Text="Remember me" />
+                </RadzenStack>
+
+                <RadzenCheckBox Name="rem" @bind-Value="input.RememberMe"/>
+            </RadzenStack>
+
+            <RadzenButton Text="Login" ButtonType="ButtonType.Submit" />
+            
+        </RadzenStack>
+            
+        </RadzenTemplateForm> *@
+
+        <br />
+        <hr />
+
+        <RadzenStack Gap="0.5rem">
+            
+            <RadzenLink Text="Register" Path="/account/register"/>
+            <RadzenLink Text="I forgot my password" Path="/account/register" />
+        </RadzenStack>
+	</RadzenColumn>
+
+</RadzenRow>
+
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using BlazorResortManager1.Data
+@inject SignInManager<ApplicationUser> signInManager
+@inject NavigationManager navigationManager
+@inject IdentityRedirectManager RedirectManager
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private async Task logIn()
+    {
+
+        // var result = await signInManager.PasswordSignInAsync(input.username, input.password, input.RememberMe, lockoutOnFailure: false);
+        // if (result.Succeeded)
+        // {
+        //     RedirectManager.RedirectTo("/home");
+        //     //navigationManager.NavigateTo("/");
+        //     // Logger.LogInformation("User logged in.");
+        //     // RedirectManager.RedirectTo(ReturnUrl);
+        // }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await authenticationState;
+        if(auth.User is not null)
+        {
+           // await signInManager.SignOutAsync();
+        }
+    }
+
+    private string result { get; set; } = "result";
+    private InputModel input = new InputModel();
+    private sealed class InputModel
+    {
+        [Required]
+        //[EmailAddress]
+        public string username { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string password { get; set; } = "";
+
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
+    }
+}
