@@ -6,7 +6,7 @@
 <h3 class="text-3xl font-bold">Statuses</h3>
 @if(resortData is not null)
 {
-                        <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
+    <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
         <RadzenColumn Size="3">
 
         </RadzenColumn>
@@ -41,14 +41,15 @@
                     <RadzenButton Text="delete"
                                   Disabled="@(enableButtons is null)"
                                   Click="deleteSheet"
-                                  Style="width: 15%;" />
+                                  Style="width: 15%;"
+                                  Icon="Delete" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
             <RadzenColumn Size="12" SizeMD="6" Style="padding-right: 0.5rem;">
                 <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
-                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets>
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid">
                     <Columns>
                         <RadzenDataGridColumn Property="productionVersion" Title="active" TextAlign="TextAlign.Center">
                             <Template Context="sheet">
@@ -97,9 +98,11 @@
     public Resort? selectedResort { get; set; }
 
     private Resort resortData { get; set; }
-   // private IEnumerable<StatusSheet> qSheet { get; set; }
+    // private IEnumerable<StatusSheet> qSheet { get; set; }
 
     private IList<StatusSheet> SelectedSheets;
+
+    private bool loadingGrid = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -235,6 +238,7 @@
 
             using (var database = contextFactory.CreateDbContext())
             {
+                loadingGrid = true;
                 resortData = selectedResort;
                 resortData.statusSheets = await database.statusSheets
                                                 .Where(e => e.resortId == selectedResort.id)
@@ -246,7 +250,8 @@
                                                 .ThenInclude(e => e.parentLift)
                                                 .AsSplitQuery()
                                                 .AsNoTracking()
-                                                .ToListAsync();
+                                                .ToListAsync();//
+                loadingGrid = false;
                 // qSheet = database.statusSheets
                 //             .Where(e => e.resortId == selectedResort.id)
                 //             .OrderByDescending(e => e.dateTime)
