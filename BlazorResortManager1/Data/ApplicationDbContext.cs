@@ -1,4 +1,5 @@
 
+using BlazorResortManager1.Data.Models.Admin;
 using BlazorResortManager1.Data.Models.cameras;
 using BlazorResortManager1.Data.Models.forecast;
 using BlazorResortManager1.Data.Models.main;
@@ -15,6 +16,7 @@ namespace BlazorResortManager1.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Permit> permits { get; set; }
+        public DbSet<ResortAdditionRequest> resortAdditionRequests { get; set; }
         public DbSet<TrackStatus> trackStatuses { get; set; }
         public DbSet<ResortStatus> resortStatuses { get; set; }
         public DbSet<LiftStatus> liftStatuses { get; set; }

@@ -4,6 +4,7 @@ using BlazorResortManager1.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorResortManager1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240822071608_add-request-table-fix1")]
+    partial class addrequesttablefix1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,7 +118,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("resortAdditionRequest", (string)null);
+                    b.ToTable("resortAdditionRequest");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.cameras.Camera", b =>
@@ -139,7 +142,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("resortId");
 
-                    b.ToTable("camera", (string)null);
+                    b.ToTable("camera");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.cameras.CameraLiftBinding", b =>
@@ -160,7 +163,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("liftId");
 
-                    b.ToTable("cameraLiftBinding", (string)null);
+                    b.ToTable("cameraLiftBinding");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.cameras.CameraTrackBinding", b =>
@@ -181,7 +184,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("trackId");
 
-                    b.ToTable("cameraTrackBinding", (string)null);
+                    b.ToTable("cameraTrackBinding");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.forecast.YrNoCityCode", b =>
@@ -205,7 +208,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("yrNoCityCode", (string)null);
+                    b.ToTable("yrNoCityCode");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Lift", b =>
@@ -243,7 +246,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("resortId");
 
-                    b.ToTable("lift", (string)null);
+                    b.ToTable("lift");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.LiftParameter", b =>
@@ -267,7 +270,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("liftId");
 
-                    b.ToTable("liftParameter", (string)null);
+                    b.ToTable("liftParameter");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Resort", b =>
@@ -313,7 +316,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("yrNoCityCodeId");
 
-                    b.ToTable("resort", (string)null);
+                    b.ToTable("resort");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.ResortParameter", b =>
@@ -337,7 +340,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("resortId");
 
-                    b.ToTable("resortParameter", (string)null);
+                    b.ToTable("resortParameter");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.Track", b =>
@@ -382,7 +385,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("resortId");
 
-                    b.ToTable("track", (string)null);
+                    b.ToTable("track");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.main.TrackParameter", b =>
@@ -406,7 +409,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("trackId");
 
-                    b.ToTable("trackParameter", (string)null);
+                    b.ToTable("trackParameter");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.status.LiftStatus", b =>
@@ -436,7 +439,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("statusSheetId");
 
-                    b.ToTable("liftStatus", (string)null);
+                    b.ToTable("liftStatus");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.status.ResortStatus", b =>
@@ -467,7 +470,7 @@ namespace BlazorResortManager1.Migrations
                     b.HasIndex("statusSheetId")
                         .IsUnique();
 
-                    b.ToTable("resortStatus", (string)null);
+                    b.ToTable("resortStatus");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.status.StatusSheet", b =>
@@ -489,7 +492,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("resortId");
 
-                    b.ToTable("statusSheet", (string)null);
+                    b.ToTable("statusSheet");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.Data.Models.status.TrackStatus", b =>
@@ -522,7 +525,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("statusSheetId");
 
-                    b.ToTable("trackStatus", (string)null);
+                    b.ToTable("trackStatus");
                 });
 
             modelBuilder.Entity("BlazorResortManager1.user.Permit", b =>
@@ -544,7 +547,7 @@ namespace BlazorResortManager1.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("permit", (string)null);
+                    b.ToTable("permit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
