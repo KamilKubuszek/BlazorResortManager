@@ -92,36 +92,24 @@
                 {
                     <div style="height: 600px" class="relative w-full">
                         <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
-                        <div @onclick=@(() => changeCamera(false)) 
-                            class="text-center absolute top-1/2 left-0 block h-[150px] w-[50px] bg-gray-400 hover:bg-gray-300 opacity-50"> @("<") </div>
-                        <div @onclick=@(() => changeCamera(true))
-                             class="capitalize text-center absolute top-1/2 right-0 block h-[150px] w-[50px] bg-gray-400 hover:bg-gray-300 opacity-50">
-                            @(">")
-                        </div>
-                    </div>
-                    @* /** @type {import('tailwindcss').Config} */
-                    module.exports = {
-                    content: [
-                    './**/*.{html,razor}',
-            './Components/Pages/Home.{html,razor}',
-            './Components/Widget.{razor}'
-                    ],
-            theme:
+                        @if(currentCameraIndex != 0)
                         {
-                        screens:
-                            {
-                                'rz-mdSize': '1024px'
-                        },
-            extend:
-                            {
-                            colors:
-                                {
-                                    'rz-bg-dark': '#376387',
-            }
-                            }
-                        },
-            plugins: [],
-            } *@
+                            <div @onclick=@(() => changeCamera(false))
+                                 class="text-center absolute top-1/2 left-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
+                                @("<")
+                            </div>
+
+                        }
+                        @if (currentCameraIndex+1 < cameras.Count())
+                        {
+                            <div @onclick=@(() => changeCamera(true))
+                                 class="text-center absolute top-1/2 right-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
+                                @(">")
+                            </div>
+                        }
+                        
+                    </div>
+                    
 
                 }
                 else
