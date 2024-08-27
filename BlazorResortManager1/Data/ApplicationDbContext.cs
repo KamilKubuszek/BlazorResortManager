@@ -30,6 +30,7 @@ namespace BlazorResortManager1.Data
         public DbSet<LiftParameter> liftParameters { get; set; }
         public DbSet<TrackParameter> trackParameters { get; set; }
 
+        public DbSet<WidgetWhitelistedUrl> widgetWhitelistedUrls { get; set; }
         public DbSet<YrNoCityCode> cityCodes { get; set; }
 
         public DbSet<Camera> cameras { get; set; }
