@@ -2,7 +2,8 @@
 module.exports = {
     content: [
         './**/*.{html,razor}',
-        './Components/Pages/Home.{html,razor}'
+        './Components/Pages/Home.{html,razor}',
+        './Components/Widget.{razor}'
     ],
     theme: {
         screens: {
@@ -16,4 +17,5 @@ module.exports = {
     },
     plugins: [],
 }
+
 

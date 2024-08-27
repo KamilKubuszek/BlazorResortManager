@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Components\Partials\_LoadingScreen.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MailKit" Version="4.7.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
@@ -22,10 +26,26 @@
 
   <ItemGroup>
     <Folder Include="Interface\" />
+    <Folder Include="wwwroot\Resources\WeatherIcons\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Components\Partials\_LoadingScreen.razor" />
+    <None Include="Components\Widget\_WidgetInteractiveWrapper.razor" />
     <None Include="wwwroot\Resources\slopeBg.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Widget\_WidgetInteractiveWrapper.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Partials\_LoadingScreen.razor" />
+    <_ContentIncludedByDefault Remove="Components\Widget\_WidgetInteractiveWrapper.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Partials\_LoadingScreen.razor" />
   </ItemGroup>
 
 </Project>
