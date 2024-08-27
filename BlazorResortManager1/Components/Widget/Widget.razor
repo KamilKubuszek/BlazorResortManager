@@ -1,43 +1,41 @@
 ﻿@page "/widget/{selectedResortId:guid}"
-@rendermode InteractiveServer
-<RadzenTabs>
-	<Tabs>
-		<RadzenTabsItem Text="Status">
-			<_StatusCard sheet="sheet"/>
-		</RadzenTabsItem>
 
-		<RadzenTabsItem Text="Weather">
 
-		</RadzenTabsItem>
+@if (isUrlAuthorizedToAccess)
+{
+    <_WidgetInteractiveWrapper selectedResortId="selectedResortId" />
+}
+else
+{
+    <p>You cant access widget through this url</p>
+}
 
-		<RadzenTabsItem Text="Cameras">
-
-		</RadzenTabsItem>
-	</Tabs>
-</RadzenTabs>
+@referer
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
-    private StatusSheet? sheet = null;
-
     [Parameter]
     public Guid selectedResortId { get; set; }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
 
+    private string referer => HttpContext.Request.Headers["Referer"].ToString();
+
+    private bool isEmbedded => !string.IsNullOrEmpty(referer);
+
+    private bool isUrlAuthorizedToAccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("a render of widget");
         using (var database = contextFactory.CreateDbContext())
         {
-            sheet = database.statusSheets.OrderByDescending(e => e.dateTime)
-                                            .Include(e => e.resortStatus)
-                                            .Include(e => e.trackStatuses)
-                                            .ThenInclude(e => e.parentTrack)
-                                            .Include(e => e.liftStatuses)
-                                            .ThenInclude(e => e.parentLift)
-                                            .AsSplitQuery()
-                                            .AsNoTracking()
-                                            .FirstOrDefault(e => e.resortId == selectedResortId);
-        }
+            var existingPosition = database.widgetWhitelistedUrls.FirstOrDefault(e => e.siteUrl.Contains(referer));
 
+            if (existingPosition is not null)
+                isUrlAuthorizedToAccess = true;
+            else
+                isUrlAuthorizedToAccess = false;
+        }
     }
 }

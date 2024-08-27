@@ -1,0 +1,227 @@
+﻿@using System.Text.Json
+@using System.Globalization
+@rendermode InteractiveServer
+
+@if (!loading)
+{
+    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="fetchData">
+        @* @rendermode=@RenderMode.InteractiveServer *@
+        <Tabs>
+            <RadzenTabsItem Text="Status">
+                <_StatusCard sheet="sheet" />
+            </RadzenTabsItem>
+
+            <RadzenTabsItem Text="Weather">
+                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel">
+                    <Columns>
+                        <RadzenDataGridColumn Title="Day">
+                            <Template Context="timeserie">
+                                @(timeserie.time.DayOfWeek + " "
+                                + timeserie.time.Day + " "
+                                + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture) 
+                                + "." )
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="00-12">
+                            <Template Context="timeserie">
+                                @if (timeserie.midnightToTwelve is not null)
+                                {
+                                    <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.midnightToTwelve?.symbol_code+".png")" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <p></p>
+                                }
+                                
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="12-00">
+                            <Template Context="timeserie">
+                                @if (timeserie.twelveToMidnight is not null)
+                                {
+                                    <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.twelveToMidnight?.symbol_code+".png")" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <p></p>
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Max/min temp.">
+                            <Template Context="timeserie">
+                                @(timeserie.maxTemp + "/" + timeserie.minTemp)
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn Title="Precipitation">
+                            <Template Context="timeserie">
+                                @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Max/min wind speed m/s">
+                            <Template Context="timeserie">
+                                @(timeserie.maxWind + "/" + timeserie.minWind + " ms")
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+
+                <p>
+                    powered by <a class="text-blue-500 hover:underline" href="https://www.yr.no">Meteorologisk institutt</a>
+                </p>
+                @* <RadzenDataGrid Data="forecastTableData.Where(e => e.time.Hour == 0)" TItem="Timeseries">
+                    <Columns>
+                        <RadzenDataGridColumn Title="Day">
+                            <Template Context="timeserie">
+                                @timeserie.time.DayOfWeek
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn Title="00-12">
+                            <Template Context="timeserie">
+                                @forecastTableData.FirstOrDefault()
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+
+                </RadzenDataGrid> *@
+            </RadzenTabsItem>
+
+            <RadzenTabsItem Text="Cameras">
+                @if (cameras.Any())
+                {
+                    <div style="height: 600px" class="relative w-full">
+                        <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
+                        <div @onclick=@(() => changeCamera(false)) 
+                            class="text-center absolute top-1/2 left-0 block h-[150px] w-[50px] bg-gray-400 hover:bg-gray-300 opacity-50"> @("<") </div>
+                        <div @onclick=@(() => changeCamera(true))
+                             class="capitalize text-center absolute top-1/2 right-0 block h-[150px] w-[50px] bg-gray-400 hover:bg-gray-300 opacity-50">
+                            @(">")
+                        </div>
+                    </div>
+                    @* /** @type {import('tailwindcss').Config} */
+                    module.exports = {
+                    content: [
+                    './**/*.{html,razor}',
+            './Components/Pages/Home.{html,razor}',
+            './Components/Widget.{razor}'
+                    ],
+            theme:
+                        {
+                        screens:
+                            {
+                                'rz-mdSize': '1024px'
+                        },
+            extend:
+                            {
+                            colors:
+                                {
+                                    'rz-bg-dark': '#376387',
+            }
+                            }
+                        },
+            plugins: [],
+            } *@
+
+                }
+                else
+                {
+                   <p>there are no cameras available</p>
+                }
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+else
+{
+    <_LoadingScreen/>
+}   
+
+@pageIndex
+<RadzenButton Text="weather" Click="getWeather"/>
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject IForecastClient forecastClient
+@code {
+    private StatusSheet? sheet = null;
+
+    private Camera[] cameras = [];
+    private int currentCameraIndex { get; set; } = 0; 
+
+    IEnumerable<ForecastTableModel> forecastTableData;
+
+    private int pageIndex { get; set; } = 0;
+
+    [Parameter]
+    public Guid selectedResortId { get; set; }
+
+    private bool loading { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InvokeAsync(() =>
+        {
+            using (var database = contextFactory.CreateDbContext())
+            {
+                sheet = database.statusSheets.OrderByDescending(e => e.dateTime)
+                                            .Include(e => e.resortStatus)
+                                            .Include(e => e.trackStatuses)
+                                            .ThenInclude(e => e.parentTrack)
+                                            .Include(e => e.liftStatuses)
+                                            .ThenInclude(e => e.parentLift)
+                                            .AsSplitQuery()
+                                            .AsNoTracking()
+                                            .FirstOrDefault(e => e.resortId == selectedResortId);
+                cameras = database.cameras.Where(e => e.resortId == selectedResortId).ToArray();
+            }
+            getWeather();
+        });
+
+    }
+
+    private async Task getWeather()
+    {
+        var forecastModel = await forecastClient.GetWeather(11, 30);
+        forecastTableData = forecastClient.ParseForecastModelToTable(forecastModel);
+        // Console.Write(
+        //     System.Text.Json.JsonSerializer.Serialize(
+        //         weather, 
+        //         new JsonSerializerOptions() { 
+        //             WriteIndented = true 
+        //         }
+        //     )
+        // );
+    }
+
+    private async Task fetchData()
+    {
+        switch (pageIndex)
+        {
+            case 0:
+
+                break;
+            case 1:
+                // await getWeather();
+                break;
+
+        }
+
+    }
+
+    private void changeCamera(bool switcher)
+    {
+        if (switcher)
+        {
+            if(cameras.Count() > currentCameraIndex + 1)
+            {
+                currentCameraIndex++;
+            }
+        }
+        else
+        {
+            if(currentCameraIndex > 0)
+            {
+                currentCameraIndex--;
+            }
+        }
+    }
+}
