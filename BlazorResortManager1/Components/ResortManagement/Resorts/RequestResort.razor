@@ -1,0 +1,144 @@
+﻿@page "/resort/request/add"
+@using System.ComponentModel.DataAnnotations
+@attribute [Authorize]
+
+<h3 class="text-3xl font-bold">Send request to create resort</h3>
+
+<br />
+<p>Input coordinates of your resort(you can find them using google earth).</p>
+
+<RadzenTemplateForm Data="requestDto" TItem="ResortAdditionRequest" Style="width: 50%">
+    <RadzenStack Gap="1rem">
+        <RadzenFieldset Text="Coordinates">
+            <RadzenStack Gap="1rem">
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
+                <div>
+                    <RadzenLabel Component="cordX" Text="X axis" />
+                </div>
+                <div class="w-fit">
+                    <RadzenMask Mask="**° **\' **" Placeholder="12° 33' 23" Name="cordX" @bind-Value="requestDto.coordinatesX" />
+                    <RadzenDataAnnotationValidator Component="cordX" Style="position: absolute;" />
+                </div>
+                <div>
+                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedX">
+                        <Items>
+                            <RadzenSelectBarItem Value="1" Text="East " />
+                            <RadzenSelectBarItem Value="2" Text="West"/>
+                        </Items>
+                    </RadzenSelectBar>
+                </div>
+            </RadzenStack>
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
+                <div>
+                    <RadzenLabel Component="cordY" Text="Y axis" />
+                </div>
+                <div class="w-fit">
+                    <RadzenMask Mask="**° **\' **" Placeholder="32° 87' 87" Name="cordY" @bind-Value="requestDto.coordinatesY" Style="width: 33%;" />
+                    <RadzenDataAnnotationValidator Component="cordY" Style="position: absolute;" />
+                </div>
+                <div>
+                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedY">
+                        <Items>
+                            <RadzenSelectBarItem Value="1" Text="North" />
+                            <RadzenSelectBarItem Value="2" Text="South" />
+                        </Items>
+                    </RadzenSelectBar>
+                </div>
+            </RadzenStack>
+            </RadzenStack>
+        </RadzenFieldset>
+
+        <RadzenButton ButtonType="ButtonType.Submit" Text="submit" Style="width: fit-content"/>
+
+        <hr />
+        <p>After your request is sent, it is added to queue. <br /> You will recive message via email about status of your request.</p>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@code {
+    RadzenMask valueMask;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private int SelectedX { get; set; }
+    private int SelectedY { get; set; }
+
+    public ResortAdditionRequest requestDto = new()
+    {
+        id = Guid.NewGuid(),
+        approved = false
+    };
+
+    private async Task sendRequest()
+    {
+        requestDto.date = DateOnly.FromDateTime(DateTime.Now);
+        bool error = false;
+        try
+        {
+            var auth = await authenticationState;
+            var userId = auth.User.FindFirst(
+                            c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId is null)
+                throw new Exception();
+            requestDto.userId = userId;
+
+
+            ValidationContext context = new ValidationContext(requestDto);
+            ICollection<ValidationResult> results = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(requestDto, context, results, true);
+            if (!isValid)
+                throw new Exception();
+
+            dialogService.Open<_LoadingTaskDialog>(
+                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+
+            using (var database = contextFactory.CreateDbContext())
+            {
+                database.Add(requestDto);
+                await database.SaveChangesAsync();
+            }
+        }
+        catch
+        {
+            error = true;
+            dialogService.Close();
+        }
+        var notifMessage = new NotificationMessage();
+        if (!error)
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Sent request!",
+                    Duration = 3000
+                };
+        }
+        else
+        {
+            notifMessage = new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "There was an error while executing the request",
+                    Duration = 3000
+                };
+        }
+        notificationService.Notify(notifMessage);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById(""cordX"").focus()");
+       
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //await valueMask.Element.FocusAsync();
+    }
+}
