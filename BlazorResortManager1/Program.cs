@@ -2,15 +2,15 @@ using BlazorResortManager1.Components;
 using BlazorResortManager1.Components.Account;
 using BlazorResortManager1.Components.ResortManagement;
 using BlazorResortManager1.Data;
-using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Data.Models.yrnoWeatherForecast;
 using BlazorResortManager1.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
-using System.ComponentModel.DataAnnotations;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+//Utility service
 builder.Services.AddScoped<ResortChangeManager>();
 
-//Radzen
+//Yr.No client service
+//builder.Services.AddScoped<IForecastClient, ForecastClient>();
+//builder.Services.AddSingleton<IHttpClientFactory, IHttpClientFactory>();
+builder.Services.AddHttpClient();
+builder.Services.AddTransient<IForecastClient, ForecastClient>();
+//builder.Services.TryAddSingleton<IHttpMessageHandlerFactory>( e => e.GetRequiredService<IHttpMessageHandlerFactory>());
+builder.Services.AddHttpClient("YrnoClient", client =>
+{
+    client.BaseAddress = new Uri("https://api.met.no/weatherapi/locationforecast/2.0/compact");
+    client.DefaultRequestHeaders.Add("User-Agent", builder.Configuration.GetSection("ForecastUserAgent").Value);
+});
+
+
+//Radzen services
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddRadzenComponents();
 
