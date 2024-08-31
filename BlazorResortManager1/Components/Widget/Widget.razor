@@ -1,41 +1,16 @@
 ﻿@page "/widget/{selectedResortId:guid}"
 
-
-@if (isUrlAuthorizedToAccess)
-{
+<div class="h-[400px] block w-full overflow-y-hidden">
     <_WidgetInteractiveWrapper selectedResortId="selectedResortId" />
-}
-else
-{
-    <p>You cant access widget through this url</p>
-}
+</div>
 
-@referer
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
     [Parameter]
     public Guid selectedResortId { get; set; }
 
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
-
-    private string referer => HttpContext.Request.Headers["Referer"].ToString();
-
-    private bool isEmbedded => !string.IsNullOrEmpty(referer);
-
-    private bool isUrlAuthorizedToAccess = false;
-
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("a render of widget");
-        using (var database = contextFactory.CreateDbContext())
-        {
-            var existingPosition = database.widgetWhitelistedUrls.FirstOrDefault(e => e.siteUrl.Contains(referer));
-
-            if (existingPosition is not null)
-                isUrlAuthorizedToAccess = true;
-            else
-                isUrlAuthorizedToAccess = false;
-        }
+        
     }
 }

@@ -98,6 +98,7 @@ var app = builder.Build();
 //    var result = Validator.Validate(new ValidationContext(resort));
 
 //});
+app.UseMiddleware<AllowedDomainsMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

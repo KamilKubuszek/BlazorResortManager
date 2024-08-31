@@ -1,18 +1,18 @@
 ﻿@using System.Text.Json
 @using System.Globalization
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @if (!loading)
 {
-    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="fetchData">
+    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="fetchData" Style="height: 100%;">
         @* @rendermode=@RenderMode.InteractiveServer *@
         <Tabs>
             <RadzenTabsItem Text="Status">
                 <_StatusCard sheet="sheet" />
             </RadzenTabsItem>
 
-            <RadzenTabsItem Text="Weather">
-                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel">
+            <RadzenTabsItem Text="Weather" Style="height:100%; overflow-y: hidden">
+                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 280px;" >
                     <Columns>
                         <RadzenDataGridColumn Title="Day">
                             <Template Context="timeserie">
@@ -22,7 +22,7 @@
                                 + "." )
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="00-12">
+                        <RadzenDataGridColumn Title="00-12" Width="82px" TextAlign="TextAlign.Center">
                             <Template Context="timeserie">
                                 @if (timeserie.midnightToTwelve is not null)
                                 {
@@ -35,7 +35,7 @@
                                 
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="12-00">
+                        <RadzenDataGridColumn Title="12-00" Width="82px" TextAlign="TextAlign.Center">
                             <Template Context="timeserie">
                                 @if (timeserie.twelveToMidnight is not null)
                                 {
@@ -58,44 +58,27 @@
                                 @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="Max/min wind speed m/s">
+                        <RadzenDataGridColumn Title="Max/min wind speed">
                             <Template Context="timeserie">
-                                @(timeserie.maxWind + "/" + timeserie.minWind + " ms")
+                                @(timeserie.maxWind + "/" + timeserie.minWind + " m/s")
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
-
                 <p>
-                    powered by <a class="text-blue-500 hover:underline" href="https://www.yr.no">Meteorologisk institutt</a>
+                    powered by <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
                 </p>
-                @* <RadzenDataGrid Data="forecastTableData.Where(e => e.time.Hour == 0)" TItem="Timeseries">
-                    <Columns>
-                        <RadzenDataGridColumn Title="Day">
-                            <Template Context="timeserie">
-                                @timeserie.time.DayOfWeek
-                            </Template>
-                        </RadzenDataGridColumn>
-
-                        <RadzenDataGridColumn Title="00-12">
-                            <Template Context="timeserie">
-                                @forecastTableData.FirstOrDefault()
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-
-                </RadzenDataGrid> *@
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="Cameras">
                 @if (cameras.Any())
                 {
-                    <div style="height: 600px" class="relative w-full">
+                    <div class="h-[300px] relative w-full">
                         <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
                         @if(currentCameraIndex != 0)
                         {
                             <div @onclick=@(() => changeCamera(false))
-                                 class="text-center absolute top-1/2 left-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
+                                 class="cursor-pointer text-center absolute top-1/4 left-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
                                 @("<")
                             </div>
 
@@ -103,7 +86,7 @@
                         @if (currentCameraIndex+1 < cameras.Count())
                         {
                             <div @onclick=@(() => changeCamera(true))
-                                 class="text-center absolute top-1/2 right-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
+                                 class="cursor-pointer text-center absolute top-1/4 right-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
                                 @(">")
                             </div>
                         }
@@ -125,8 +108,6 @@ else
     <_LoadingScreen/>
 }   
 
-@pageIndex
-<RadzenButton Text="weather" Click="getWeather"/>
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject IForecastClient forecastClient
 @code {
@@ -144,13 +125,14 @@ else
 
     private bool loading { get; set; } = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        InvokeAsync(() =>
+        InvokeAsync(async () =>
         {
+            loading = true;
             using (var database = contextFactory.CreateDbContext())
             {
-                sheet = database.statusSheets.OrderByDescending(e => e.dateTime)
+                sheet = await database.statusSheets.OrderByDescending(e => e.dateTime)
                                             .Include(e => e.resortStatus)
                                             .Include(e => e.trackStatuses)
                                             .ThenInclude(e => e.parentTrack)
@@ -158,10 +140,12 @@ else
                                             .ThenInclude(e => e.parentLift)
                                             .AsSplitQuery()
                                             .AsNoTracking()
-                                            .FirstOrDefault(e => e.resortId == selectedResortId);
+                                            .FirstOrDefaultAsync(e => e.resortId == selectedResortId);
                 cameras = database.cameras.Where(e => e.resortId == selectedResortId).ToArray();
             }
-            getWeather();
+            await getWeather();
+            loading = false;
+            StateHasChanged();
         });
 
     }
