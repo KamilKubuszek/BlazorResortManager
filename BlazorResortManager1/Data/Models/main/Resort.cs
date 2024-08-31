@@ -15,33 +15,39 @@ namespace BlazorResortManager1.Data.Models.main
         [Key]
         public Guid id { get; set; }
 
-        [Required(ErrorMessage = "'name' jest wymagane")]
-        [MaxLength(64, ErrorMessage = "'name' może mieć maksymalnie 64 znaki")]
+        [Required]
+        [MaxLength]
         public string name { get; set; }
 
-        [Required(ErrorMessage = "'description' jest wymagane")]
-        [MaxLength(128, ErrorMessage = "'description' może mieć maksymalnie 128 znaków")]
+        [Required]
+        [MaxLength]
         public string description { get; set; }
 
-        [Required(ErrorMessage = "'address' jest wymagane")]
-        [MaxLength(128, ErrorMessage = "'address' może mieć maksymalnie 128 znaków")]
+        [Required]
+        [MaxLength]
         public string address { get; set; }
 
-        [Required(ErrorMessage = "'phoneNumber' jest wymagane")]
-        [MaxLength(16, ErrorMessage = "'phoneNumber' może mieć maksymalnie 16 znaków")]
+        [Required]
+        [MaxLength]
         public string phoneNumber { get; set; }
 
-        [Required(ErrorMessage = "'email' jest wymagane")]
-        [MaxLength(64, ErrorMessage = "'email' może mieć maksymalnie 64 znaki")]
+        [Required]
+        [MaxLength]
         [EmailAddress(ErrorMessage = "this field should follow email template")]
         public string email { get; set; }
 
-        [Required(ErrorMessage = "'webpage' jest wymagane")]
-        [MaxLength(128, ErrorMessage = "'webpage' może mieć maksymalnie 128 znaków")]
+        [Required]
+        [MaxLength]
         public string webpage { get; set; }
 
         public Guid? yrNoCityCodeId { get; set; }
         public YrNoCityCode? yrNoCityCode { get; set; }
+        [Required]
+        public bool approved { get; set; }
+        [Required]
+        public string coordinatesX { get; set; }
+        [Required]
+        public string coordinatesY { get; set; }
 
         [JsonIgnore]
         public ICollection<Permit> permits { get; set; } = new List<Permit>();
