@@ -51,11 +51,11 @@
     [CascadingParameter]
     private Resort? selectedResort { get; set; }
 
-    private Resort? resortDto = new Resort(){ id = Guid.NewGuid()};
+    private Resort? resortDto = new Resort();
 
     protected override async Task OnInitializedAsync()
     {
-
+        resortDto.id = Guid.NewGuid();
     }
 
     private async Task addResort()
@@ -70,12 +70,7 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 database.resorts.Add(resortDto);
-                //add permits to the user
-                database.statusSheets.Add(new StatusSheet{
-                    id = Guid.NewGuid(),
-                    dateTime = DateTime.Now,
-                    productionVersion = true
-                });
+
 
                 dialogService.Open<_LoadingTaskDialog>(
                     "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
