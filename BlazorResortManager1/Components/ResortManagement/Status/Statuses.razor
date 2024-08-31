@@ -21,25 +21,25 @@
         <RadzenRow JustifyContent="JustifyContent.Right">
             <RadzenColumn Size="12">
                 @{
-                    var enableButtons = SelectedSheets?.Any();
+                    var enableButtons = selectedSheet is not null;
                     StatusSheet? sheet = null;
                     if(enableButtons == true)
-                        sheet = SelectedSheets[0];
+                        sheet = selectedSheet;
                 }
                 <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem" Style="width: 100%;">
                     <RadzenButton Style="width: 15%" Text="add new status" Click="addNewSheet" />
                     <RadzenButton Text="activate"
                                   Click="() => switchSheetVersion(true)"
                                   Variant="@(sheet?.productionVersion == true ? Variant.Text : Variant.Outlined)"
-                                  Disabled="@(enableButtons is null || sheet?.productionVersion == true)"
+                                  Disabled="@(enableButtons is false || sheet?.productionVersion == true)"
                                   Style="width: 15%;" />
                     <RadzenButton Text="deactivate"
                                   Click="() => switchSheetVersion(false)"
                                   Variant="@(sheet?.productionVersion == false ? Variant.Text : Variant.Outlined)"
-                                  Disabled="@(enableButtons is null || sheet?.productionVersion == false)"
+                                  Disabled="@(enableButtons is false || sheet?.productionVersion == false)"
                                   Style="width: 15%;" />
                     <RadzenButton Text="delete"
-                                  Disabled="@(enableButtons is null)"
+                                  Disabled="@(enableButtons is false)"
                                   Click="deleteSheet"
                                   Style="width: 15%;"
                                   Icon="Delete" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" />
@@ -49,7 +49,7 @@
         <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
             <RadzenColumn Size="12" SizeMD="6" Style="padding-right: 0.5rem;">
                 <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
-                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid">
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid" RowClick="(args) => fetchDataForSheet(args)">
                     <Columns>
                         <RadzenDataGridColumn Property="productionVersion" Title="active" TextAlign="TextAlign.Center">
                             <Template Context="sheet">
@@ -68,11 +68,11 @@
 
             <RadzenColumn Size="12" SizeMD="6" Style="padding-left: 0.5rem;">
                 <RadzenCard Style="width: 100%; height: 100%; " class="rz-shadow-6">
-                @if (SelectedSheets?.Any() == true)
+                @if (selectedSheet is not null)
                 {
-                    var sheet = SelectedSheets[0];
                     
-                    <_StatusCard sheet="sheet"/>
+                    
+                    <_StatusCard sheet="selectedSheet"/>
                 }
                 else
                 {
@@ -102,6 +102,8 @@
 
     private IList<StatusSheet> SelectedSheets;
 
+    private StatusSheet? selectedSheet { get; set; } = null;
+
     private bool loadingGrid = false;
 
     protected override async Task OnInitializedAsync()
@@ -117,21 +119,24 @@
 
     private void switchSheetVersion(bool switcher)
     {
-        var sheet = SelectedSheets[0];
+
         bool error = false;
-        sheet.productionVersion = switcher;
+
         try
         {
+            selectedSheet.productionVersion = switcher;
             using (var database = contextFactory.CreateDbContext())
             {
 
-                database.Attach(sheet);
-                database.Entry(sheet).State = EntityState.Modified;
+                database.Attach(selectedSheet);
+                database.Entry(selectedSheet).State = EntityState.Modified;
                 database.SaveChanges();
             }
+            resortData.statusSheets.FirstOrDefault(e => e.id == selectedSheet.id).productionVersion = switcher;
         }
         catch
         {
+            selectedSheet = null;
             error = true;
         }
 
@@ -165,14 +170,14 @@
 
         if (result == true)
         {
-            var sheet = SelectedSheets[0];
+            var sheet = selectedSheet;
             bool error = false;
             try
             {
-                if (SelectedSheets?.Any() == true)
-                {
-                    SelectedSheets.Clear();
-                }
+                // if (SelectedSheets?.Any() == true)
+                // {
+                //     SelectedSheets.Clear();
+                // }
                 using (var database = contextFactory.CreateDbContext())
                 {
                     foreach (var tstatus in sheet.trackStatuses)
@@ -231,10 +236,7 @@
     {
         if (selectedResort is not null)
         {
-            if (SelectedSheets?.Any() == true)
-            {
-                SelectedSheets.Clear();
-            }
+            selectedSheet = null;
 
             using (var database = contextFactory.CreateDbContext())
             {
@@ -243,30 +245,40 @@
                 resortData.statusSheets = await database.statusSheets
                                                 .Where(e => e.resortId == selectedResort.id)
                                                 .OrderByDescending(e => e.dateTime)
-                                                .Include(e => e.resortStatus)
-                                                .Include(e => e.trackStatuses)
-                                                .ThenInclude(e => e.parentTrack)
-                                                .Include(e => e.liftStatuses)
-                                                .ThenInclude(e => e.parentLift)
-                                                .AsSplitQuery()
+                                                // .Include(e => e.resortStatus)
+                                                // .Include(e => e.trackStatuses)
+                                                // .ThenInclude(e => e.parentTrack)
+                                                // .Include(e => e.liftStatuses)
+                                                // .ThenInclude(e => e.parentLift)
+                                                // .AsSplitQuery()
                                                 .AsNoTracking()
                                                 .ToListAsync();//
                 loadingGrid = false;
-                // qSheet = database.statusSheets
-                //             .Where(e => e.resortId == selectedResort.id)
-                //             .OrderByDescending(e => e.dateTime)
-                //             .Include(e => e.resortStatus)
-                //             .Include(e => e.trackStatuses)
-                //             .ThenInclude(e => e.parentTrack)
-                //             .Include(e => e.liftStatuses)
-                //             .ThenInclude(e => e.parentLift)
-                //             .AsSplitQuery()
-                //             .AsNoTracking();
-
-                                                
             }
             StateHasChanged();
         }
+    }
+
+    private async void fetchDataForSheet(DataGridRowMouseEventArgs<StatusSheet> args)
+    {
+
+        using (var database = contextFactory.CreateDbContext())
+        {
+            selectedSheet = database.statusSheets
+                                    .Where(e => e.resortId == selectedResort.id)
+                                    .OrderByDescending(e => e.dateTime)
+                                    .Include(e => e.resortStatus)
+                                    .Include(e => e.trackStatuses)
+                                    .ThenInclude(e => e.parentTrack)
+                                    .Include(e => e.liftStatuses)
+                                    .ThenInclude(e => e.parentLift)
+                                    .AsSplitQuery()
+                                    .AsNoTracking()
+                                    .FirstOrDefault(e => e.id == args.Data.id);
+
+        }
+        StateHasChanged();
+        
     }
 
     public void Dispose()
