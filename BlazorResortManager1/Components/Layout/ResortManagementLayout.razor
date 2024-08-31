@@ -106,10 +106,10 @@ else
                                             .Select(e => e.resortId)
                                             .ToArrayAsync();
 
-                    resorts = database.resorts
+                    resorts = await database.resorts
                                 .Where(e => slopeIdsByPermit
-                                .Contains(e.id))
-                                .ToArray();
+                                .Contains(e.id) && e.approved == true)
+                                .ToArrayAsync();
                     if (resorts is not null && resorts.Count() > 0)
                     {
                         selectedResort = resorts[0];
