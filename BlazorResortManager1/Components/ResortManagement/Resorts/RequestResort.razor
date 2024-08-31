@@ -6,54 +6,105 @@
 
 <br />
 <p>Input coordinates of your resort(you can find them using google earth).</p>
+<RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=addResort>
+    <RadzenStack Style="width: 100%" Gap="1rem">
+        <div>
+            <RadzenLabel Component="name" Text="name" />
+        </div>
+        <div class="w-fit">
+            <RadzenTextBox Name="name" @bind-Value="resortDto.name" Style="width: 100%;" />
+            <RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+        </div>
 
-<RadzenTemplateForm Data="requestDto" TItem="ResortAdditionRequest" Style="width: 50%">
-    <RadzenStack Gap="1rem">
-        <RadzenFieldset Text="Coordinates">
-            <RadzenStack Gap="1rem">
-            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
-                <div>
-                    <RadzenLabel Component="cordX" Text="X axis" />
-                </div>
-                <div class="w-fit">
-                    <RadzenMask Mask="**° **\' **" Placeholder="12° 33' 23" Name="cordX" @bind-Value="requestDto.coordinatesX" />
-                    <RadzenDataAnnotationValidator Component="cordX" Style="position: absolute;" />
-                </div>
-                <div>
-                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedX">
-                        <Items>
-                            <RadzenSelectBarItem Value="1" Text="East " />
-                            <RadzenSelectBarItem Value="2" Text="West"/>
-                        </Items>
-                    </RadzenSelectBar>
-                </div>
-            </RadzenStack>
-            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
-                <div>
-                    <RadzenLabel Component="cordY" Text="Y axis" />
-                </div>
-                <div class="w-fit">
-                    <RadzenMask Mask="**° **\' **" Placeholder="32° 87' 87" Name="cordY" @bind-Value="requestDto.coordinatesY" Style="width: 33%;" />
-                    <RadzenDataAnnotationValidator Component="cordY" Style="position: absolute;" />
-                </div>
-                <div>
-                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedY">
-                        <Items>
-                            <RadzenSelectBarItem Value="1" Text="North" />
-                            <RadzenSelectBarItem Value="2" Text="South" />
-                        </Items>
-                    </RadzenSelectBar>
-                </div>
-            </RadzenStack>
-            </RadzenStack>
+        <div>
+            <RadzenLabel Component="description" Text="description" />
+        </div>
+        <div class="w-fit">
+            <RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" />
+            <RadzenDataAnnotationValidator Component="description" Style="position: absolute;" />
+        </div>
+
+        <div>
+            <RadzenLabel Component="webpage" Text="webpage" />
+        </div>
+        <div class="w-fit">
+            <RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" />
+            <RadzenDataAnnotationValidator Component="webpage" Style="position: absolute;" />
+        </div>
+        <RadzenFieldset Text="Contact">
+
+        
+        <div>
+            <RadzenLabel Component="email" Text="email" />
+        </div>
+        <div class="w-fit">
+            <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
+            <RadzenDataAnnotationValidator Component="email" Style="position: absolute;" />
+        </div>
+
+        <div>
+            <RadzenLabel Component="phone" Text="phone number" />
+        </div>
+        <div class="w-fit">
+            <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
+            <RadzenDataAnnotationValidator Component="phone" Style="position: absolute;" />
+        </div>
         </RadzenFieldset>
 
-        <RadzenButton ButtonType="ButtonType.Submit" Text="submit" Style="width: fit-content"/>
+
+        <RadzenFieldset Text="Location">
+            <div>
+                <RadzenLabel Component="address" Text="address" />
+            </div>
+            <div class="w-fit">
+                <RadzenTextBox Name="address" @bind-Value="resortDto.address" Style="width: 100%;" />
+                <RadzenDataAnnotationValidator Component="address" Style="position: absolute;" />
+            </div>
+
+            <RadzenStack Gap="1rem">
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
+                    <div>
+                        <RadzenLabel Component="cordX" Text="X axis" />
+                    </div>
+                    <div class="w-fit">
+                        <RadzenMask Mask="**° **\'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" />
+                        <RadzenDataAnnotationValidator Component="cordX" Style="position: absolute;" />
+                    </div>
+                    <div>
+                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedX">
+                            <Items>
+                                <RadzenSelectBarItem Value="1" Text="East " />
+                                <RadzenSelectBarItem Value="2" Text="West" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </div>
+                </RadzenStack>
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
+                    <div>
+                        <RadzenLabel Component="cordY" Text="Y axis" />
+                    </div>
+                    <div class="w-fit">
+                        <RadzenMask Mask="**° **\'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 33%;" />
+                        <RadzenDataAnnotationValidator Component="cordY" Style="position: absolute;" />
+                    </div>
+                    <div>
+                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedY">
+                            <Items>
+                                <RadzenSelectBarItem Value="1" Text="North" />
+                                <RadzenSelectBarItem Value="2" Text="South" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </div>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenFieldset>
+        <RadzenButton ButtonType="ButtonType.Submit" Text="submit" Style="width: fit-content" />
 
         <hr />
         <p>After your request is sent, it is added to queue. <br /> You will recive message via email about status of your request.</p>
     </RadzenStack>
 </RadzenTemplateForm>
+
 
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
@@ -65,6 +116,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
+    private Resort? resortDto = new Resort() { id = Guid.NewGuid(), approved=false };
+
     private int SelectedX { get; set; }
     private int SelectedY { get; set; }
 
@@ -74,49 +127,78 @@
         approved = false
     };
 
-    private async Task sendRequest()
+    private async Task addResort()
     {
-        requestDto.date = DateOnly.FromDateTime(DateTime.Now);
         bool error = false;
-        try
+        string? errMessage = null;
+        ValidationContext context = new ValidationContext(resortDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(resortDto, context, results, true);
+
+        if (isValid)
         {
-            var auth = await authenticationState;
-            var userId = auth.User.FindFirst(
-                            c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-                throw new Exception();
-            requestDto.userId = userId;
-
-
-            ValidationContext context = new ValidationContext(requestDto);
-            ICollection<ValidationResult> results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(requestDto, context, results, true);
-            if (!isValid)
-                throw new Exception();
-
-            dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
-
-
             using (var database = contextFactory.CreateDbContext())
             {
-                database.Add(requestDto);
-                await database.SaveChangesAsync();
+                try
+                {
+                    var auth = await authenticationState;
+                    var userId = auth.User.FindFirst(
+                                    c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    if (userId is null)
+                        throw new Exception();
+
+                    var permitsWithoutApproval = await database.permits
+                        .Where(e => e.resort.approved == false && e.ApplicationUser.Id == userId)
+                        .CountAsync();
+
+                    if(permitsWithoutApproval > 3)
+                    {
+                        errMessage = "You already sent the max limit of resort requests(3 out of 3)";
+                        throw new Exception();
+                    }
+
+                    requestDto.userId = userId;
+
+                    database.resorts.Add(resortDto);
+                    database.permits.Add(new Permit
+                        {
+                            id = Guid.NewGuid(),
+                            userId = userId,
+                            resortId = resortDto.id
+                        });
+                    //add permits to the user
+                    // database.statusSheets.Add(new StatusSheet
+                    //     {
+                    //         id = Guid.NewGuid(),
+                    //         dateTime = DateTime.Now,
+                    //         productionVersion = true
+                    //     });
+
+                    dialogService.Open<_LoadingTaskDialog>(
+                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                }
+                catch
+                {
+                    error = true;
+                    dialogService.Close();
+                }
             }
         }
-        catch
-        {
+        else
             error = true;
-            dialogService.Close();
-        }
+
         var notifMessage = new NotificationMessage();
         if (!error)
         {
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Sent request!",
+                    Summary = "Sent request data successfully!",
                     Duration = 3000
                 };
         }
@@ -125,20 +207,78 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = errMessage ?? "There was an error while executing the request",
                     Duration = 3000
                 };
         }
         notificationService.Notify(notifMessage);
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById(""cordX"").focus()");
+    // private async Task sendRequest()
+    // {
+    //     requestDto.date = DateOnly.FromDateTime(DateTime.Now);
+    //     bool error = false;
+    //     try
+    //     {
+    //         var auth = await authenticationState;
+    //         var userId = auth.User.FindFirst(
+    //                         c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+    //         if (userId is null)
+    //             throw new Exception();
+    //         requestDto.userId = userId;
+
+
+    //         ValidationContext context = new ValidationContext(requestDto);
+    //         ICollection<ValidationResult> results = new List<ValidationResult>();
+    //         bool isValid = Validator.TryValidateObject(requestDto, context, results, true);
+    //         if (!isValid)
+    //             throw new Exception();
+
+    //         dialogService.Open<_LoadingTaskDialog>(
+    //                "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+    //                    new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+
+    //         using (var database = contextFactory.CreateDbContext())
+    //         {
+    //             database.Add(requestDto);
+    //             await database.SaveChangesAsync();
+    //         }
+    //     }
+    //     catch
+    //     {
+    //         error = true;
+    //         dialogService.Close();
+    //     }
+    //     var notifMessage = new NotificationMessage();
+    //     if (!error)
+    //     {
+    //         notifMessage = new NotificationMessage
+    //             {
+    //                 Severity = NotificationSeverity.Success,
+    //                 Summary = "Sent request!",
+    //                 Duration = 3000
+    //             };
+    //     }
+    //     else
+    //     {
+    //         notifMessage = new NotificationMessage
+    //             {
+    //                 Severity = NotificationSeverity.Error,
+    //                 Summary = "There was an error while executing the request",
+    //                 Duration = 3000
+    //             };
+    //     }
+    //     notificationService.Notify(notifMessage);
+    // }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     //await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById(""cordX"").focus()");
        
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //await valueMask.Element.FocusAsync();
-    }
+    // }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     //await valueMask.Element.FocusAsync();
+    // }
 }
