@@ -163,7 +163,11 @@
 
                 lastStatusDto.liftStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
                 lastStatusDto.trackStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
-                lastStatusDto.resortStatus.id = Guid.NewGuid();
+                if (lastStatusDto.resortStatus is not null)
+                {
+                    lastStatusDto.resortStatus.id = Guid.NewGuid();
+                }
+
                 lastStatusDto.dateTime = DateTime.Now;
                 List<TrackStatus> ls = lastStatusDto.trackStatuses.ToList();
                 ls.Add(statusDto);
