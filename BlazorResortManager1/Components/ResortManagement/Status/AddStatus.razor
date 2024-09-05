@@ -4,41 +4,42 @@
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
+@inject IStringLocalizer<AppLanguage> local
 
-<h3 class="text-3xl font-bold">Update status</h3>
+<h3 class="text-3xl font-bold">@local["UpdateStatus"]</h3>
 
 @if (statusSheetDto is not null)
 {
     <RadzenTemplateForm Method="post" TItem="StatusSheet" Data="statusSheetDto" Submit="submitForm">
         <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true" ColumnWidth="100px">
             <Columns>
-                <RadzenDataGridColumn Title="name">
+                <RadzenDataGridColumn Title="@local["Name"]">
                     <Template Context="tstatus">
                         @tstatus.parentTrack.name
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="opened">
+                <RadzenDataGridColumn Title="@local["Opened"]">
                     <Template Context="tstatus">
                         <RadzenCheckBox @bind-Value=tstatus.opened />
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="snow cover">
+                <RadzenDataGridColumn Title="@local["SnowCover"]">
                     <Template Context="tstatus">
                         <RadzenNumeric @bind-Value=tstatus.snowCover />
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="opening time">
+                <RadzenDataGridColumn Title="@local["OpeningTime"]">
                     <Template Context="tstatus">
                         <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="closing time">
+                <RadzenDataGridColumn Title="@local["ClosingTime"]">
                     <Template Context="tstatus">
-                        <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                        <RadzenDatePicker @bind-Value=@tstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
@@ -46,41 +47,41 @@
 
         <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true" ColumnWidth="100px">
             <Columns>
-                <RadzenDataGridColumn Title="name">
+                <RadzenDataGridColumn Title="@local["Name"]">
                     <Template Context="lstatus">
                         @lstatus.parentLift.name
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="opened">
+                <RadzenDataGridColumn Title="@local["Opened"]">
                     <Template Context="lstatus">
                         <RadzenCheckBox @bind-Value=lstatus.opened />
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="opening time">
+                <RadzenDataGridColumn Title="@local["OpeningTime"]">
                     <Template Context="lstatus">
                         <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
                     </Template>
                 </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="closing time">
+                <RadzenDataGridColumn Title="@local["ClosingTime"]">
                     <Template Context="lstatus">
-                        <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                        <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
 
         <RadzenCheckBox Name="prVf" @bind-Value=statusSheetDto.productionVersion />
-        <RadzenLabel Component="prVf">Activate status on submit</RadzenLabel>
+        <RadzenLabel Component="prVf">@local["ActivateStatusOnSubmit"]</RadzenLabel>
 
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        <RadzenButton ButtonType="ButtonType.Submit" Text="@local["Save"]" />
     </RadzenTemplateForm>
 }
 else
 {
-    <p>select resort first</p>
+    <p>@local["SelectResortFirst"]</p>
 }
 
 @inject ResortChangeManager resortChangeManager
@@ -118,72 +119,59 @@ else
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                   "", new Dictionary<string, object>() { { "displayMessage", local["EditingData"] } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
-
-
-
-                //prepare new object to add to database   
-                if(statusSheetDto.resortStatus == null)
-                {
-                    Console.WriteLine("status is null?");
-                }
                 try
                 {
-                    // Console.WriteLine(statusSheetDto.id);
-
-                    // var a = database.resortStatuses.FirstOrDefault(e => e.statusSheetId == statusSheetDto.id);
-                    // Console.WriteLine(JsonSerializer.Serialize(a, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
-
-                    var rstatus = new ResortStatus()
-                    {
-                        id = Guid.NewGuid(),
-                        opened = statusSheetDto.resortStatus.opened,
-                        openingTime = statusSheetDto.resortStatus.openingTime,
-                        closingTime = statusSheetDto.resortStatus.closingTime,
-                        statusSheetId = statusSheetDto.resortStatus.statusSheetId,
-                        parentResortId = statusSheetDto.resortStatus.parentResortId
-                    };
+                    var rstatus = statusSheetDto.resortStatus ?? new ResortStatus
+                        {
+                            id = Guid.NewGuid(),
+                            opened = false,
+                            openingTime = TimeOnly.FromDateTime(DateTime.Now),
+                            closingTime = TimeOnly.FromDateTime(DateTime.Now),
+                            statusSheetId = statusSheetDto.id,
+                            parentResortId = statusSheetDto.resortId
+                        };
 
                     var tstatuses = new List<TrackStatus>();
                     var lstatuses = new List<LiftStatus>();
-                    foreach(var tstatus in statusSheetDto.trackStatuses)
+                    foreach (var tstatus in statusSheetDto.trackStatuses)
                     {
                         tstatuses.Add(new()
-                        {
-                            id = Guid.NewGuid(),
-                            opened = tstatus.opened,
-                            snowCover = tstatus.snowCover,
-                            openingTime = tstatus.openingTime,
-                            closingTime = tstatus.closingTime,
-                            parentTrackId = tstatus.parentTrackId,
-                            statusSheetId = tstatus.statusSheetId
-                        });
+                            {
+                                id = Guid.NewGuid(),
+                                opened = tstatus.opened,
+                                snowCover = tstatus.snowCover,
+                                openingTime = tstatus.openingTime,
+                                closingTime = tstatus.closingTime,
+                                parentTrackId = tstatus.parentTrackId,
+                                statusSheetId = tstatus.statusSheetId
+                            });
                     }
                     foreach (var lstatus in statusSheetDto.liftStatuses)
                     {
                         lstatuses.Add(new()
-                        {
-                            id = Guid.NewGuid(),
-                            opened = lstatus.opened,
-                            openingTime = lstatus.openingTime,
-                            closingTime = lstatus.closingTime,
-                            parentLiftId = lstatus.parentLiftId,
-                            statusSheetId = lstatus.statusSheetId
-                        });
+                            {
+                                id = Guid.NewGuid(),
+                                opened = lstatus.opened,
+                                openingTime = lstatus.openingTime,
+                                closingTime = lstatus.closingTime,
+                                parentLiftId = lstatus.parentLiftId,
+                                statusSheetId = lstatus.statusSheetId
+                            });
                     }
 
                     var sheet = new StatusSheet()
-                    {
-                        id = Guid.NewGuid(),
-                        productionVersion = statusSheetDto.productionVersion,
-                        dateTime = DateTime.Now,
-                        resortId = statusSheetDto.resortId,
-                        resortStatus = rstatus,
-                        liftStatuses = lstatuses,
-                        trackStatuses = tstatuses
-                    };
+                        {
+                            id = Guid.NewGuid(),
+                            productionVersion = statusSheetDto.productionVersion,
+                            dateTime = DateTime.Now,
+                            resortId = statusSheetDto.resortId,
+                            resortStatus = rstatus,
+                            liftStatuses = lstatuses,
+                            trackStatuses = tstatuses
+                        };
 
                     database.statusSheets.Add(sheet);
 
@@ -192,10 +180,11 @@ else
                     dialogService.Close();
 
                 }
-                catch
+                catch (Exception ex)
                 {
                     error = true;
                     dialogService.Close();
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             }
         }
@@ -208,7 +197,7 @@ else
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Updated data successfully!",
+                    Summary = local["UpdatedDataSuccessfully"],
                     Duration = 3000
                 };
         }
@@ -217,7 +206,7 @@ else
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = local["ErrorWhileExecutingRequest"],
                     Duration = 3000
                 };
         }
@@ -225,14 +214,13 @@ else
         // navigationManager.NavigateTo("/resort/status");
     }
 
-    private void updateData(ResortChangeEventArgs? eventArgs = null)
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
         if (selectedResort is not null)
         {
             using (var database = contextFactory.CreateDbContext())
             {
-
-                statusSheetDto = database.statusSheets
+                statusSheetDto = await database.statusSheets
                                     .OrderByDescending(e => e.dateTime)
                                     .Include(e => e.trackStatuses)
                                     .ThenInclude(e => e.parentTrack)
@@ -242,27 +230,8 @@ else
                                     .ThenInclude(e => e.parentResort)
                                     .AsSplitQuery()
                                     .AsNoTracking()
-                                    .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
-
-                // var lifts = database.lifts.Where(e => e.resortId == selectedResort.id);
-                // if(lifts.Count() != statusSheetDto.liftStatuses.Count())
-                // {
-                //     foreach(var lift in lifts)
-                //     {
-                //         var existingStatus = statusSheetDto.liftStatuses.FirstOrDefault(e => e.parentLiftId == lift.id);
-                //         if(existingStatus is null)
-                //         {
-                //             //from s in statusSheetDto.liftStatuses where s.parentLiftId == lift.id select Lift;
-                //             // statusSheetDto.liftStatuses.FirstOrDefault(e => e.parentLiftId == lift.id) = new LiftStatus()
-                //             //     {
-                //             //         parentLift = lift
-                //             //     };
-                            
-                //         }
-                //     }
-                // }
+                                    .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
             }
-           // Console.WriteLine(JsonSerializer.Serialize(statusSheetDto, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
         }
     }
 

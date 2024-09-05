@@ -5,24 +5,23 @@
 @if (!loading)
 {
     <RadzenTabs @bind-SelectedIndex=@pageIndex Change="fetchData" Style="height: 100%;">
-        @* @rendermode=@RenderMode.InteractiveServer *@
         <Tabs>
-            <RadzenTabsItem Text="Status">
+            <RadzenTabsItem Text="@local["Status"]">
                 <_StatusCard sheet="sheet" />
             </RadzenTabsItem>
 
-            <RadzenTabsItem Text="Weather" Style="height:100%; overflow-y: hidden">
-                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 280px;" >
+            <RadzenTabsItem Text="@local["Weather"]" Style="height:100%; overflow-y: hidden">
+                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 280px;">
                     <Columns>
-                        <RadzenDataGridColumn Title="Day">
+                        <RadzenDataGridColumn Title="@local["Day"]">
                             <Template Context="timeserie">
                                 @(timeserie.time.DayOfWeek + " "
                                 + timeserie.time.Day + " "
-                                + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture) 
-                                + "." )
+                                + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture)
+                                + ".")
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="00-12" Width="82px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn Title="@local["00-12"]" Width="82px" TextAlign="TextAlign.Center">
                             <Template Context="timeserie">
                                 @if (timeserie.midnightToTwelve is not null)
                                 {
@@ -32,10 +31,10 @@
                                 {
                                     <p></p>
                                 }
-                                
+
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="12-00" Width="82px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn Title="@local["12-00"]" Width="82px" TextAlign="TextAlign.Center">
                             <Template Context="timeserie">
                                 @if (timeserie.twelveToMidnight is not null)
                                 {
@@ -47,18 +46,18 @@
                                 }
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="Max/min temp.">
+                        <RadzenDataGridColumn Title="@local["Max/min temp."]">
                             <Template Context="timeserie">
                                 @(timeserie.maxTemp + "/" + timeserie.minTemp)
                             </Template>
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="Precipitation">
+                        <RadzenDataGridColumn Title="@local["Precipitation"]">
                             <Template Context="timeserie">
                                 @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="Max/min wind speed">
+                        <RadzenDataGridColumn Title="@local["Max/min wind speed"]">
                             <Template Context="timeserie">
                                 @(timeserie.maxWind + "/" + timeserie.minWind + " m/s")
                             </Template>
@@ -66,16 +65,16 @@
                     </Columns>
                 </RadzenDataGrid>
                 <p>
-                    powered by <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
+                    @local["Powered by"] <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
                 </p>
             </RadzenTabsItem>
 
-            <RadzenTabsItem Text="Cameras">
+            <RadzenTabsItem Text="@local["Cameras"]">
                 @if (cameras.Any())
                 {
                     <div class="h-[300px] relative w-full">
                         <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
-                        @if(currentCameraIndex != 0)
+                        @if (currentCameraIndex != 0)
                         {
                             <div @onclick=@(() => changeCamera(false))
                                  class="cursor-pointer text-center absolute top-1/4 left-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
@@ -83,21 +82,21 @@
                             </div>
 
                         }
-                        @if (currentCameraIndex+1 < cameras.Count())
+                        @if (currentCameraIndex + 1 < cameras.Count())
                         {
                             <div @onclick=@(() => changeCamera(true))
                                  class="cursor-pointer text-center absolute top-1/4 right-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
                                 @(">")
                             </div>
                         }
-                        
+
                     </div>
-                    
+
 
                 }
                 else
                 {
-                   <p>there are no cameras available</p>
+                    <p>@local["There are no cameras available"]</p>
                 }
             </RadzenTabsItem>
         </Tabs>
@@ -105,16 +104,17 @@
 }
 else
 {
-    <_LoadingScreen/>
-}   
-
+    <_LoadingScreen />
+}
+}
+@inject IStringLocalizer<AppLanguage> local
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject IForecastClient forecastClient
 @code {
     private StatusSheet? sheet = null;
 
     private Camera[] cameras = [];
-    private int currentCameraIndex { get; set; } = 0; 
+    private int currentCameraIndex { get; set; } = 0;
 
     IEnumerable<ForecastTableModel> forecastTableData;
 
@@ -141,7 +141,7 @@ else
                                             .AsSplitQuery()
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.resortId == selectedResortId);
-                cameras = database.cameras.Where(e => e.resortId == selectedResortId).ToArray();
+                cameras = await database.cameras.Where(e => e.resortId == selectedResortId).ToArrayAsync();
             }
             await getWeather();
             loading = false;
@@ -154,14 +154,6 @@ else
     {
         var forecastModel = await forecastClient.GetWeather(11, 30);
         forecastTableData = forecastClient.ParseForecastModelToTable(forecastModel);
-        // Console.Write(
-        //     System.Text.Json.JsonSerializer.Serialize(
-        //         weather, 
-        //         new JsonSerializerOptions() { 
-        //             WriteIndented = true 
-        //         }
-        //     )
-        // );
     }
 
     private async Task fetchData()
@@ -183,14 +175,14 @@ else
     {
         if (switcher)
         {
-            if(cameras.Count() > currentCameraIndex + 1)
+            if (cameras.Count() > currentCameraIndex + 1)
             {
                 currentCameraIndex++;
             }
         }
         else
         {
-            if(currentCameraIndex > 0)
+            if (currentCameraIndex > 0)
             {
                 currentCameraIndex--;
             }

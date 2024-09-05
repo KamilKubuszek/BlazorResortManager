@@ -3,10 +3,14 @@
 @attribute [Authorize]
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider authStateProvider
+@inject IStringLocalizer<AppLanguage> local 
+@using System.Globalization
+@using Microsoft.Extensions.Localization
 
-<PageTitle>Home</PageTitle>
+<PageTitle>@local["Home"]</PageTitle>
 
-Welcome to your new app.
+@local["Welcome"] to your new app.
+@local["Home"] <br />
 @userId
  <AuthorizeView>
      <Authorized>
@@ -23,6 +27,11 @@ Welcome to your new app.
 <h1 class="text-1xl cursor-text hover:bg-amber-200 hover:font-bold">
     Hello world!
 </h1>
+<ul>
+    <li><b>CurrentCulture</b>: @CultureInfo.CurrentCulture</li>
+    <li><b>CurrentUICulture</b>: @CultureInfo.CurrentUICulture</li>
+</ul>
+
 
 
 @code{

@@ -1,21 +1,23 @@
-﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
+﻿@page "/resort/status"
+@attribute [Authorize]
+
+@inject IStringLocalizer<AppLanguage> local
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
+@inject ResortChangeManager resortChangeManager
+
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-@page "/resort/status"
-
-<h3 class="text-3xl font-bold">Statuses</h3>
-@if(resortData is not null)
+<h3 class="text-3xl font-bold">@local["Statuses"]</h3>
+@if (resortData is not null)
 {
     <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
-        <RadzenColumn Size="3">
-
-        </RadzenColumn>
-        <RadzenColumn Size="3">
-
-        </RadzenColumn>
-        <RadzenColumn Size="3">
-
-        </RadzenColumn>
+        <RadzenColumn Size="3"></RadzenColumn>
+        <RadzenColumn Size="3"></RadzenColumn>
+        <RadzenColumn Size="3"></RadzenColumn>
     </RadzenRow>
     <RadzenStack>
         <RadzenRow JustifyContent="JustifyContent.Right">
@@ -23,22 +25,22 @@
                 @{
                     var enableButtons = selectedSheet is not null;
                     StatusSheet? sheet = null;
-                    if(enableButtons == true)
+                    if (enableButtons == true)
                         sheet = selectedSheet;
                 }
                 <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem" Style="width: 100%;">
-                    <RadzenButton Style="width: 15%" Text="add new status" Click="addNewSheet" />
-                    <RadzenButton Text="activate"
+                    <RadzenButton Style="width: 15%" Text="@local["Add new status"]" Click="addNewSheet" />
+                    <RadzenButton Text="@local["Activate"]"
                                   Click="() => switchSheetVersion(true)"
                                   Variant="@(sheet?.productionVersion == true ? Variant.Text : Variant.Outlined)"
                                   Disabled="@(enableButtons is false || sheet?.productionVersion == true)"
                                   Style="width: 15%;" />
-                    <RadzenButton Text="deactivate"
+                    <RadzenButton Text="@local["Deactivate"]"
                                   Click="() => switchSheetVersion(false)"
                                   Variant="@(sheet?.productionVersion == false ? Variant.Text : Variant.Outlined)"
                                   Disabled="@(enableButtons is false || sheet?.productionVersion == false)"
                                   Style="width: 15%;" />
-                    <RadzenButton Text="delete"
+                    <RadzenButton Text="@local["Delete"]"
                                   Disabled="@(enableButtons is false)"
                                   Click="deleteSheet"
                                   Style="width: 15%;"
@@ -51,13 +53,13 @@
                 <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
                                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid" RowClick="(args) => fetchDataForSheet(args)">
                     <Columns>
-                        <RadzenDataGridColumn Property="productionVersion" Title="active" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn Property="productionVersion" Title="@local["Active"]" TextAlign="TextAlign.Center">
                             <Template Context="sheet">
                                 <RadzenIcon Icon="@(sheet.productionVersion ? "Check_Circle" : "Cancel")" IconColor="@(sheet.productionVersion ? Colors.Success : Colors.Danger)" />
                             </Template>
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="datetime" Title="Date and time" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn Property="datetime" Title="@local["Date and time"]" TextAlign="TextAlign.Center">
                             <Template Context="sheet">
                                 @(sheet.dateTime.Date + sheet.dateTime.TimeOfDay)
                             </Template>
@@ -67,43 +69,29 @@
             </RadzenColumn>
 
             <RadzenColumn Size="12" SizeMD="6" Style="padding-left: 0.5rem;">
-                <RadzenCard Style="width: 100%; height: 100%; " class="rz-shadow-6">
-                @if (selectedSheet is not null)
-                {
-                    
-                    
-                    <_StatusCard sheet="selectedSheet"/>
-                }
-                else
-                {
-                    <p>select status to see details</p>
-                }
+                <RadzenCard Style="width: 100%; height: 100%;" class="rz-shadow-6">
+                    @if (selectedSheet is not null)
+                    {
+                        <_StatusCard sheet="selectedSheet" />
+                    }
+                    else
+                    {
+                        <p>@local["Select status to see details"]</p>
+                    }
                 </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
     </RadzenStack>
-
-   
 }
 
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject DialogService dialogService
-@inject NotificationService notificationService
-@inject ContextMenuService contextMenuService
-@inject NavigationManager navigationManager
-@inject ResortChangeManager resortChangeManager
 @implements IDisposable
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
 
     private Resort resortData { get; set; }
-    // private IEnumerable<StatusSheet> qSheet { get; set; }
-
     private IList<StatusSheet> SelectedSheets;
-
     private StatusSheet? selectedSheet { get; set; } = null;
-
     private bool loadingGrid = false;
 
     protected override async Task OnInitializedAsync()
@@ -119,7 +107,6 @@
 
     private void switchSheetVersion(bool switcher)
     {
-
         bool error = false;
 
         try
@@ -127,7 +114,6 @@
             selectedSheet.productionVersion = switcher;
             using (var database = contextFactory.CreateDbContext())
             {
-
                 database.Attach(selectedSheet);
                 database.Entry(selectedSheet).State = EntityState.Modified;
                 database.SaveChanges();
@@ -146,7 +132,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Edited data successfully!",
+                    Summary = local["Edited data successfully!"],
                     Duration = 3000
                 };
         }
@@ -155,7 +141,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
@@ -165,7 +151,7 @@
     private async Task deleteSheet()
     {
         var result = await dialogService.OpenAsync<_ConfirmDialog>(
-            "Confirm action", new Dictionary<string, object>() { },
+            local["Confirm action"], new Dictionary<string, object>() { },
             new DialogOptions() { ShowClose = false });
 
         if (result == true)
@@ -174,10 +160,6 @@
             bool error = false;
             try
             {
-                // if (SelectedSheets?.Any() == true)
-                // {
-                //     SelectedSheets.Clear();
-                // }
                 using (var database = contextFactory.CreateDbContext())
                 {
                     foreach (var tstatus in sheet.trackStatuses)
@@ -197,7 +179,6 @@
                     }
 
                     database.Remove(sheet);
-
                     database.SaveChanges();
                 }
 
@@ -213,7 +194,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Success,
-                        Summary = "Deleted data successfully!",
+                        Summary = local["Deleted data successfully!"],
                         Duration = 3000
                     };
             }
@@ -222,17 +203,16 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
-                        Summary = "There was an error while executing the request",
+                        Summary = local["There was an error while executing the request"],
                         Duration = 3000
                     };
             }
             notificationService.Notify(notifMessage);
             updateData();
         }
-
     }
 
-    private async void updateData(ResortChangeEventArgs? eventArgs = null)
+    private void updateData(ResortChangeEventArgs? eventArgs = null)
     {
         if (selectedResort is not null)
         {
@@ -242,26 +222,19 @@
             {
                 loadingGrid = true;
                 resortData = selectedResort;
-                resortData.statusSheets = await database.statusSheets
+                resortData.statusSheets = database.statusSheets
                                                 .Where(e => e.resortId == selectedResort.id)
                                                 .OrderByDescending(e => e.dateTime)
-                                                // .Include(e => e.resortStatus)
-                                                // .Include(e => e.trackStatuses)
-                                                // .ThenInclude(e => e.parentTrack)
-                                                // .Include(e => e.liftStatuses)
-                                                // .ThenInclude(e => e.parentLift)
-                                                // .AsSplitQuery()
                                                 .AsNoTracking()
-                                                .ToListAsync();//
+                                                .ToList();
                 loadingGrid = false;
             }
             StateHasChanged();
         }
     }
 
-    private async void fetchDataForSheet(DataGridRowMouseEventArgs<StatusSheet> args)
+    private void fetchDataForSheet(DataGridRowMouseEventArgs<StatusSheet> args)
     {
-
         using (var database = contextFactory.CreateDbContext())
         {
             selectedSheet = database.statusSheets
@@ -275,15 +248,12 @@
                                     .AsSplitQuery()
                                     .AsNoTracking()
                                     .FirstOrDefault(e => e.id == args.Data.id);
-
         }
         StateHasChanged();
-        
     }
 
     public void Dispose()
     {
         resortChangeManager.ResortChange -= updateData;
     }
-
 }

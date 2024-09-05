@@ -1,14 +1,11 @@
 ﻿@inject NavigationManager NavigationManager
-
+@inject IStringLocalizer<AppLanguage> local
 <RadzenPanelMenu Style="width: 100%;" Multiple="false">
-    @* class="rz-background-color-base-100" *@
-    @foreach(var page in pages)
+    @foreach (var page in pages)
     {
-        <RadzenPanelMenuItem Text="@(page.title)" Path="@(page.url)" 
-        Style="text-align: center" />
-    @* class="rz-border-radius-6" *@
+        <RadzenPanelMenuItem Text="@local[page.title]" Path="@(page.url)"
+                             Style="text-align: center" />
     }
-
 </RadzenPanelMenu>
 
 <AuthorizeView Roles="Admin">
@@ -16,30 +13,32 @@
         <br />
         <hr />
         <RadzenPanelMenu Style="width: 100%;" Multiple="false">
-            <RadzenPanelMenuItem Text="Approve resorts" Path="resort/unapproved" Style="text-align: center" />
-            <RadzenPanelMenuItem Text="Register users" Path="account/register" Style="text-align: center" />
+            <RadzenPanelMenuItem Text="@local["Approve resorts"]" Path="resort/unapproved" Style="text-align: center" />
+            <RadzenPanelMenuItem Text="@local["Register users"]" Path="account/register" Style="text-align: center" />
         </RadzenPanelMenu>
     </Authorized>
 </AuthorizeView>
-    
+
 
 @code {
     private string pageUrl = string.Empty;
-    private List<pageInfo> pages = new List<pageInfo>()
-    {
-        new pageInfo{ url = "resort/track", title="Tracks"},
-        new pageInfo{ url = "resort/lift", title="Lifts"},
-        new pageInfo{ url = "resort/status", title="Statuses"}, 
-        new pageInfo{ url = "/resort/camera", title="Cameras"}
-    };
+    private List<pageInfo> pages = new List<pageInfo>();
 
-    protected override void OnInitialized() => pageUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    protected override void OnInitialized() {
+        pages = new List<pageInfo>{
+            new pageInfo { url = "resort/track", title = local["Tracks"] },
+            new pageInfo { url = "resort/lift", title = local["Lifts"] },
+            new pageInfo { url = "resort/status", title = local["Statuses"] },
+            new pageInfo { url = "/resort/camera", title = local["Cameras"] }
+        };
+        pageUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    }
 
     private async void changePage(string url)
     {
         await Task.Delay(200);
         NavigationManager.NavigateTo(url);
-    }  
+    }
 
     private class pageInfo
     {

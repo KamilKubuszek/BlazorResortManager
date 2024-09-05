@@ -3,8 +3,15 @@
 @attribute [Authorize]
 @using System.ComponentModel.DataAnnotations
 
-<h3 class="text-3xl font-bold">Edit Lift</h3>
-@(selectedLiftId.ToString() ?? "no lift selected")
+@inject IStringLocalizer<AppLanguage> local
+@inject ResortChangeManager resortChangeManager
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+
+<h3 class="text-3xl font-bold">@local["Edit Lift"]</h3>
+@(selectedLiftId?.ToString() ?? local["No lift selected"])
 
 @if (liftDto is not null)
 {
@@ -12,64 +19,68 @@
         <RadzenStack Style="width: 100%">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Name"]">
+                        <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
+                <RadzenColumn>
+                    <RadzenDataAnnotationValidator Component="name" />
+                </RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="type"><RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Type"]">
+                        <RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                <RadzenColumn><RadzenDataAnnotationValidator Component="type" /></RadzenColumn>
+                <RadzenColumn>
+                    <RadzenDataAnnotationValidator Component="type" />
+                </RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="length"><RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Length"]">
+                        <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                @* <RadzenColumn><RadzenDataAnnotationValidator Component="length" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="capacity per unit"><RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Capacity Per Unit"]">
+                        <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="people per hour"><RadzenNumeric Name="people per hour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["People Per Hour"]">
+                        <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                @* <RadzenColumn><RadzenDataAnnotationValidator Component="capacity" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="average duration time"><RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Average Duration Time"]">
+                        <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-@*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
             </RadzenRow>
 
-            <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
-                            Multiple="true" TextProperty="name" ValueProperty="id" 
-                            Placeholder="Select cameras"/>
+            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds"
+                            Multiple="true" TextProperty="name" ValueProperty="id"
+                            Placeholder="@local["Select Cameras"]" />
 
-            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+            <RadzenButton Text="@local["Submit Changes"]" ButtonType="ButtonType.Submit" />
         </RadzenStack>
     </RadzenTemplateForm>
 }
 
-@inject ResortChangeManager resortChangeManager
-@inject NavigationManager navigationManager
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject NotificationService notificationService
-@inject DialogService dialogService
 @code {
-    // [CascadingParameter]
-    // private Resort? selectedResort { get; set; }
-
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
@@ -78,7 +89,7 @@
 
     private Lift? liftDto { get; set; }
     private Camera[] cameras { get; set; } = [];
-    private IEnumerable<Guid> selectedCamerasIds { get; set; } 
+    private IEnumerable<Guid> selectedCamerasIds { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,7 +101,6 @@
             Console.WriteLine("update form...");
             updateForm();
         }
-
     }
 
     private async Task submitForm()
@@ -105,22 +115,18 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                   "", new Dictionary<string, object>() { { "displayMessage", local["Editing data..."] } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
-                //prepare cameras to 
                 var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking();
                 var bindingsToRemove = new List<CameraLiftBinding>();
                 var bindingsToAdd = new List<CameraLiftBinding>();
 
                 foreach (var cameraId in selectedCamerasIds)
                 {
-                    //check if there is already bind with that camera in database
                     var bindInDb = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
-
-                    //if not found, add new bind
-                    //if not, there is no need to add second one
-                    if(bindInDb is null){
+                    if (bindInDb is null)
+                    {
                         var newBind = new CameraLiftBinding
                             {
                                 id = Guid.NewGuid(),
@@ -131,20 +137,17 @@
                         database.cameraLiftBindings.Add(newBind);
                     }
                 }
-                foreach(var bindInDb in cameraBindings)
-                {
-                    //find bind from db that is not selected in dropdown
-                    var neededBindId = selectedCamerasIds.FirstOrDefault(e => e == bindInDb.cameraId);
 
-                    //if bind was not found, add it to deletion list
-                    if(neededBindId == Guid.Empty)
+                foreach (var bindInDb in cameraBindings)
+                {
+                    var neededBindId = selectedCamerasIds.FirstOrDefault(e => e == bindInDb.cameraId);
+                    if (neededBindId == Guid.Empty)
                     {
                         bindingsToRemove.Add(bindInDb);
                         database.cameraLiftBindings.Remove(bindInDb);
                     }
                 }
 
-                //mark lift as edited
                 database.Attach(liftDto);
                 database.Entry(liftDto).State = EntityState.Modified;
 
@@ -162,7 +165,9 @@
             }
         }
         else
+        {
             error = true;
+        }
 
         var notifMessage = new NotificationMessage();
         if (!error)
@@ -170,7 +175,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Edited data successfully!",
+                    Summary = local["Edited data successfully!"],
                     Duration = 3000
                 };
         }
@@ -179,7 +184,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
@@ -194,33 +199,31 @@
             var userId = auth.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId is null)
             {
-                throw new Exception("user permit for lifts id was not found");
+                throw new Exception("User permit for lifts ID was not found");
             }
 
             using (var database = contextFactory.CreateDbContext())
             {
-                var lift = database.lifts.FirstOrDefault(e => e.id == selectedLiftId);
+                var lift = await database.lifts.FirstOrDefaultAsync(e => e.id == selectedLiftId);
                 if (lift is null)
                 {
-                    throw new Exception("lift was not found");
+                    throw new Exception("Lift was not found");
                 }
 
-                var permit = database.permits
-                    .FirstOrDefault(e => e.userId == userId && e.resortId == lift.resortId);
+                var permit = await database.permits
+                    .FirstOrDefaultAsync(e => e.userId == userId && e.resortId == lift.resortId);
                 if (permit is null)
                 {
-                    throw new Exception("user permit for lifts id was not found");
+                    throw new Exception("User permit for lifts ID was not found");
                 }
             }
         }
         catch (Exception e)
         {
-            var notifMessage = new NotificationMessage();
-
-            notifMessage = new NotificationMessage
+            var notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "you dont have permissions to do this or something went wrong",
+                    Summary = local["You don't have permissions to do this or something went wrong"],
                     Duration = 4000
                 };
 
@@ -231,13 +234,13 @@
         }
     }
 
-    private void updateForm(ResortChangeEventArgs? eventArgs = null)
+    private async void updateForm(ResortChangeEventArgs? eventArgs = null)
     {
         using (var database = contextFactory.CreateDbContext())
         {
-            liftDto = database.lifts.FirstOrDefault(e => e.id == selectedLiftId);
-            cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArray();
-            selectedCamerasIds = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
+            liftDto = await database.lifts.FirstOrDefaultAsync(e => e.id == selectedLiftId);
+            cameras = await database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArrayAsync();
+            selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
         }
     }
 

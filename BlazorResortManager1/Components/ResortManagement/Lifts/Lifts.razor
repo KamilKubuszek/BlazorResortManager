@@ -1,7 +1,7 @@
 ﻿@attribute [Authorize]
 @page "/resort/Lift"
 
-<h3 class="text-3xl font-bold">Lifts</h3>
+<h3 class="text-3xl font-bold">@local["Lifts"]</h3>
 
 <RadzenStack Style="">
     @if (resortData is not null)
@@ -10,9 +10,9 @@
             <RadzenColumn>
                 <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
 
-                    <RadzenButton Style="width: 10%" Text="Add new" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
-                    <RadzenButton Style="width: 10%" Text="Edit" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
-                    <RadzenButton Style="width: 10%" Text="Delete" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                    <RadzenButton Style="width: 10%" Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
+                    <RadzenButton Style="width: 10%" Text="@local["Edit"]" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
+                    <RadzenButton Style="width: 10%" Text="@local["Delete"]" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
@@ -21,32 +21,22 @@
                 <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true" ColumnWidth="100px"
                                 CellContextMenu="OnCellLiftContextMenu" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
-@*                         <RadzenDataGridColumn TItem="Lift" Property="id" Title="ID" >
-
-                        </RadzenDataGridColumn> *@
-
-                        <RadzenDataGridColumn TItem="Lift" Property="name" Title="Name" Frozen="true">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="name" Title="@local["Name"]" Frozen="true">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="type" Title="Type">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="type" Title="@local["Type"]">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="Length">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="@local["Length meters"]">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="Capacity per unit">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="capacityPerSeat" Title="@local["Capacity per seat"]">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="People per hour">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="peoplePerHour" Title="@local["People per hour"]">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="Average ride duration">
-
+                        <RadzenDataGridColumn TItem="Lift" Property="estimatedDurationTimeMinutes" Title="@local["Estimated duration time minutes"]">
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
@@ -56,10 +46,9 @@
     }
     else
     {
-        <p>select resort first</p>
+        <p>@local["SelectResortFirst"]</p>
     }
 </RadzenStack>
-
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject DialogService dialogService
@@ -67,7 +56,9 @@
 @inject ContextMenuService contextMenuService
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
+@inject IStringLocalizer<AppLanguage> local
 @implements IDisposable
+
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
@@ -82,28 +73,21 @@
         resortChangeManager.ResortChange += updateData;
     }
 
-
     private void OnCellLiftContextMenu(DataGridCellMouseEventArgs<Lift> args)
     {
-        // var selectedEmployees = new List<Track>() { args.Data };
-
         contextMenuService.Open(args, new List<ContextMenuItem> {
-                new ContextMenuItem(){ Text = "Edit information", Value = 1, Icon = "Edit_Note" },
-                new ContextMenuItem(){ Text = "Delete", Value = 2, Icon = "Delete" } 
+                new ContextMenuItem(){ Text = local["EditInformation"], Value = 1, Icon = "Edit_Note" },
+                new ContextMenuItem(){ Text = local["Delete"], Value = 2, Icon = "Delete" }
             },
             async (menuArgs) =>
             {
-
                 if (menuArgs.Value.Equals(1))
                 {
                     contextMenuService.Close();
-
                     navigationManager.NavigateTo("/resort/lift/edit/" + args.Data.id);
                 }
                 else if (menuArgs.Value.Equals(2))
                 {
-                    
-
                     selectedLifts[0] = args.Data;
                     contextMenuService.Close();
                     await deleteLift();
@@ -114,7 +98,7 @@
     private async Task deleteLift()
     {
         var result = await dialogService.OpenAsync<_ConfirmDialog>(
-            "Confirm action", new Dictionary<string, object>() { },
+            local["ConfirmAction"], new Dictionary<string, object>() { },
             new DialogOptions() { ShowClose = false });
 
         if (result == true)
@@ -127,19 +111,18 @@
                 if (selectedLifts?.Any() == true)
                 {
                     selectedLifts.Clear();
-
                 }
                 else throw new Exception();
 
                 using (var database = contextFactory.CreateDbContext())
                 {
-                    var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == lift.id).ToArray();
+                    var cameraBindings = await database.cameraLiftBindings.Where(e => e.liftId == lift.id).ToArrayAsync();
                     foreach (var bind in cameraBindings)
                     {
                         database.cameraLiftBindings.Remove(bind);
                     }
 
-                    var statuses = database.liftStatuses.Where(e => e.parentLiftId == lift.id).ToArray();
+                    var statuses = await database.liftStatuses.Where(e => e.parentLiftId == lift.id).ToArrayAsync();
                     foreach (var lstatus in statuses)
                     {
                         database.liftStatuses.Remove(lstatus);
@@ -148,7 +131,6 @@
 
                     database.SaveChanges();
                 }
-
             }
             catch
             {
@@ -162,7 +144,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Success,
-                        Summary = "Deleted data successfully!",
+                        Summary = @local["DeletedDataSuccess"],
                         Duration = 3000
                     };
             }
@@ -171,22 +153,20 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
-                        Summary = "There was an error while executing the request",
+                        Summary = @local["ErrorWhileExecutingRequest"],
                         Duration = 3000
                     };
             }
             notificationService.Notify(notifMessage);
             updateData();
         }
-
     }
 
     private void editLift()
     {
-        if(selectedLifts?.Any() == true)
+        if (selectedLifts?.Any() == true)
         {
             navigationManager.NavigateTo("/resort/lift/edit/" + selectedLifts[0].id);
-
         }
     }
 
@@ -207,5 +187,4 @@
     {
         resortChangeManager.ResortChange -= updateData;
     }
-
 }

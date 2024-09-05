@@ -1,65 +1,35 @@
 ﻿@inject NavigationManager NavigationManager
-@rendermode InteractiveServer
-@* 
-<RadzenStack Orientation="Orientation.Horizontal" Style="width: 100%">
-    <RadzenButton Variant="Variant.Text" Click=@(args => NavigationManager.NavigateTo("resort")) Text="resort" ButtonStyle="ButtonStyle.Base" />
-</RadzenStack> *@
-<RadzenMenu >
-    <RadzenMenuItem Path="home" Text="Home" />
-    <RadzenMenuItem Path="resort" Text="Resort" />
-    <RadzenMenuItem Path="resort/widget" Text="Widget" />
-    <RadzenMenuItem Path="resort/tutorial" Text="Tutorial" />
-    <RadzenMenuItem Path="resort/status/update" Text="Update status" />
+@inject IStringLocalizer<AppLanguage> local
+
+<RadzenMenu>
+    <RadzenMenuItem Path="home" Text="@local["Home"]" />
+    <RadzenMenuItem Path="resort" Text="@local["Resort"]" />
+    <RadzenMenuItem Path="resort/widget" Text="@local["Widget"]" />
+    <RadzenMenuItem Path="resort/tutorial" Text="@local["Tutorial"]" />
+    <RadzenMenuItem Path="resort/status/update" Text="@local["Update status"]" />
 
     <RadzenProfileMenu Style="float: right">
         <Template>
-            <RadzenGravatar Email="user@example.com">
-            </RadzenGravatar>
+            <RadzenGravatar Email="user@example.com" />
         </Template>
         <ChildContent>
-
         </ChildContent>
     </RadzenProfileMenu>
-    <RadzenAppearanceToggle/>
-
+    <RadzenAppearanceToggle />
 </RadzenMenu>
-<form Model=model action="Account/Logout" method="post">
+
+<form Model="model" action="Account/Logout" method="post">
     <AntiforgeryToken />
     <input type="hidden" name="ReturnUrl" value="@currentUrl" />
     <button type="submit" class="nav-link" id="logout_button">
-        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> @local["Logout"]
     </button>
-    @* <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Style="width: 100%" Text="logout" /> *@
-    @* <RadzenProfileMenuItem Text="Logout" Icon="logout" onclick="@(() => logOut(logoutContext))"  /> *@
 </form>
-@* <EditForm action="Account/Logout" method="post" Context="logoutForm">
-    <AntiforgeryToken />
-    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-    <button type="submit" class="nav-link">
-        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-    </button>
-</EditForm> *@
-
-
-@* <script>
-    function logout() {
-        var button = document.getElementById("logout_button");
-        button.click();
-    }
-</script> *@
-@* <div class="nav-item px-3" style="display: none;">
-    <EditForm action="Account/Logout" method="post" Context="logoutForm">
-        <AntiforgeryToken />
-        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-        <button type="submit" class="nav-link">
-            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-        </button>
-    </EditForm>
-</div> *@
 
 @code {
-    private object model = new{ };
+    private object model = new { };
     private string? currentUrl;
+
     protected override void OnInitialized()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
@@ -81,5 +51,4 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
-    
 }

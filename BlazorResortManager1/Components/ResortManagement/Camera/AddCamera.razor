@@ -3,43 +3,53 @@
 
 @using System.ComponentModel.DataAnnotations
 
-<h3 class="text-3xl font-bold">Add camera @(selectedResort is not null ? "for " + selectedResort.name : "")</h3>
+@inject IStringLocalizer<AppLanguage> local
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
 
-@if(selectedResort is not null)
+<h3 class="text-3xl font-bold">@local["Add Camera"] @(selectedResort is not null ? local["For"] + " " + selectedResort.name : "")</h3>
+
+@if (selectedResort is not null)
 {
     <RadzenTemplateForm Data="cameraDto" TItem="Camera" Submit="submitCamera">
         <RadzenStack Style="width: 100%">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Name"]">
+                        <RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
+                <RadzenColumn>
+                    <RadzenDataAnnotationValidator Component="name" />
+                </RadzenColumn>
             </RadzenRow>
+
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="url to the camera view"><RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["URL to the Camera View"]">
+                        <RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
-                <RadzenColumn><RadzenDataAnnotationValidator Component="link"/></RadzenColumn>
+                <RadzenColumn>
+                    <RadzenDataAnnotationValidator Component="link" />
+                </RadzenColumn>
             </RadzenRow>
+
             <RadzenRow>
                 <RadzenColumn>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="submit"/>
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="@local["Submit"]" />
                 </RadzenColumn>
             </RadzenRow>
         </RadzenStack>
     </RadzenTemplateForm>
 }
 
-@implements IDisposable
-@inject ResortChangeManager resortChangeManager
-@inject NotificationService notificationService
-@inject DialogService dialogService
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
 
-    // private Resort resortData { get; set; }
     private Camera cameraDto { get; set; } = new Camera();
 
     protected override async Task OnInitializedAsync()
@@ -62,8 +72,9 @@
                 await database.cameras.AddAsync(cameraDto);
 
                 dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
-                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                    "", new Dictionary<string, object>() { { "displayMessage", local["Adding data..."] } },
+                    new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
                 try
                 {
                     await database.SaveChangesAsync();
@@ -77,27 +88,17 @@
             }
         }
         else
+        {
             error = true;
+        }
 
-        var notifMessage = new NotificationMessage();
-        if (!error)
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Added data successfully!",
-                    Duration = 3000
-                };
-        }
-        else
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
-                    Duration = 3000
-                };
-        }
+        var notifMessage = new NotificationMessage
+            {
+                Severity = error ? NotificationSeverity.Error : NotificationSeverity.Success,
+                Summary = error ? local["There was an error while executing the request"] : local["Added data successfully!"],
+                Duration = 3000
+            };
+
         notificationService.Notify(notifMessage);
     }
 
@@ -106,12 +107,6 @@
         if (selectedResort is not null)
         {
             cameraDto.resortId = selectedResort.id;
-            // using (var database = contextFactory.CreateDbContext())
-            // {
-
-            //     resortData = selectedResort;
-            //     resortData.cameras = database.cameras.Where(e => e.)
-            // }
             StateHasChanged();
         }
     }

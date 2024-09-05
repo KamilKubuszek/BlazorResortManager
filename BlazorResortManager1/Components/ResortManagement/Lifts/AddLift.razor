@@ -3,126 +3,120 @@
 @attribute [Authorize]
 @using System.ComponentModel.DataAnnotations
 
-<h3 class="text-3xl font-bold">Add Lift</h3>
-
-@if (liftDto is not null)
-{
-    <RadzenTemplateForm Data="liftDto" TItem="Lift" Submit="submitForm">
-    <RadzenStack Style="width: 100%">
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenFieldset Text="Data">
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="name" Text="Name" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="display: block; width: 100%" />
-                            <RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="type" Text="Type" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" />
-                            <RadzenDataAnnotationValidator Component="type" Style="position: absolute;" />
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="length" Text="Length" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%; display: block;" />
-                            @* <RadzenDataAnnotationValidator Component="length" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="capacity" Text="Capacity Per Unit" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%; display: block;" />
-                            @* <RadzenDataAnnotationValidator Component="capacity" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="peoplePerHour" Text="People Per Hour" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%; display: block;" />
-                            @* <RadzenDataAnnotationValidator Component="peoplePerHour" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="duration" Text="Average Duration Time" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%; display: block;" />
-                            @* <RadzenDataAnnotationValidator Component="duration" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-                </RadzenFieldset>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenFieldset Text="Bind Cameras">
-                    <RadzenDropDown Data="cameras" @bind-Value="@selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="Select cameras" />
-                </RadzenFieldset>
-
-                <RadzenFieldset Text="Status">
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="opened" Text="Opened" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" />
-                            @* <RadzenDataAnnotationValidator Component="opened" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="openingTime" Text="Opening Time" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenDatePicker @bind-Value="@statusDto.openingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                            @* <RadzenDataAnnotationValidator Component="openingTime" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-
-                    <RadzenRow>
-                        <RadzenColumn>
-                            <RadzenLabel Component="closingTime" Text="Closing Time" />
-                        </RadzenColumn>
-                        <RadzenColumn>
-                            <RadzenDatePicker @bind-Value="@statusDto.closingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                            @* <RadzenDataAnnotationValidator Component="closingTime" Style="position: absolute;" /> *@
-                        </RadzenColumn>
-                    </RadzenRow>
-                </RadzenFieldset>
-            </RadzenColumn>
-        </RadzenRow>
-        
-
-        <RadzenButton Text="Submit" ButtonType="ButtonType.Submit" />
-    </RadzenStack>
-    </RadzenTemplateForm>
-}
-
+@inject IStringLocalizer<AppLanguage> local
 @inject ResortChangeManager resortChangeManager
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NotificationService notificationService
 @inject DialogService dialogService
+
+<h3 class="text-3xl font-bold">@local["Add Lift"]</h3>
+
+@if (liftDto is not null)
+{
+    <RadzenTemplateForm Data="liftDto" TItem="Lift" Submit="submitForm">
+        <RadzenStack Style="width: 100%">
+            <RadzenRow>
+                <RadzenColumn Size="6">
+                    <RadzenFieldset Text="@local["Data"]">
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="name" Text="@local["Name"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="display: block; width: 100%" />
+                                <RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="type" Text="@local["Type"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" />
+                                <RadzenDataAnnotationValidator Component="type" Style="position: absolute;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="length" Text="@local["Length"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%; display: block;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="capacity" Text="@local["Capacity Per Unit"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%; display: block;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="peoplePerHour" Text="@local["People Per Hour"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%; display: block;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="duration" Text="@local["Average Duration Time"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%; display: block;" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenFieldset>
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenFieldset Text="@local["Bind Cameras"]">
+                        <RadzenDropDown Data="cameras" @bind-Value="@selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" />
+                    </RadzenFieldset>
+
+                    <RadzenFieldset Text="@local["Status"]">
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="opened" Text="@local["Opened"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="openingTime" Text="@local["Opening Time"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenDatePicker @bind-Value="@statusDto.openingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn>
+                                <RadzenLabel Component="closingTime" Text="@local["Closing Time"]" />
+                            </RadzenColumn>
+                            <RadzenColumn>
+                                <RadzenDatePicker @bind-Value="@statusDto.closingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenFieldset>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenButton Text="@local["Submit"]" ButtonType="ButtonType.Submit" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+}
+
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
@@ -162,32 +156,30 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                   "", new Dictionary<string, object>() { { "displayMessage", local["Editing data..."] } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
-                //prepare cameras bindings
+                // Prepare cameras bindings
                 var cameraEntries = new List<CameraLiftBinding>();
-                foreach(var cameraId in selectedCamerasIds)
+                foreach (var cameraId in selectedCamerasIds)
                 {
                     cameraEntries.Add(new()
-                    {
-                        id = Guid.NewGuid(),
-                        cameraId = cameraId,
-                        liftId = liftDto.id
-                    });
+                        {
+                            id = Guid.NewGuid(),
+                            cameraId = cameraId,
+                            liftId = liftDto.id
+                        });
                 }
                 liftDto.cameras = cameraEntries;
-                //cameraEntries.ForEach(e => Console.WriteLine("updating with camera: " + e.cameraId));
 
-                //you will update db with new status that will contain this new lift's
-                var lastStatusDto = database.statusSheets.OrderByDescending(e => e.dateTime)
+                // Update db with new status that will contain this new lift's
+                var lastStatusDto = await database.statusSheets.OrderByDescending(e => e.dateTime)
                                     .Include(e => e.trackStatuses)
                                     .Include(e => e.liftStatuses)
                                     .Include(e => e.resortStatus)
                                     .AsSplitQuery()
                                     .AsNoTracking()
-                                    .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
-                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(lastStatusDto, new System.Text.Json.JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+                                    .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
 
                 lastStatusDto.liftStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
                 lastStatusDto.trackStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
@@ -224,7 +216,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Added data successfully!",
+                    Summary = local["Added data successfully!"],
                     Duration = 3000
                 };
         }
@@ -233,25 +225,23 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
         notificationService.Notify(notifMessage);
     }
 
-    private void updateData(ResortChangeEventArgs? eventArgs = null)
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
-        if(selectedResort is not null)
+        if (selectedResort is not null)
         {
             using (var database = contextFactory.CreateDbContext())
             {
                 liftDto.resortId = selectedResort.id;
 
-
-
-                cameras = database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArray();
-                selectedCamerasIds = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
+                cameras = await database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArrayAsync();
+                selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
             }
         }
     }

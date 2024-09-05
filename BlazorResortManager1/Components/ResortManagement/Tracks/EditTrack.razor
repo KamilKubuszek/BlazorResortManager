@@ -201,14 +201,14 @@
 
             using (var database = contextFactory.CreateDbContext())
             {
-                var track = database.tracks.FirstOrDefault(e => e.id == selectedTrackId);
+                var track = await database.tracks.FirstOrDefaultAsync(e => e.id == selectedTrackId);
                 if (track is null)
                 {
                     throw new Exception("track was not found");
                 }
 
-                var permit = database.permits
-                    .FirstOrDefault(e => e.userId == userId && e.resortId == track.resortId);
+                var permit = await database.permits
+                    .FirstOrDefaultAsync(e => e.userId == userId && e.resortId == track.resortId);
                 if (permit is null)
                 {
                     throw new Exception("user permit for tracks id was not found");
@@ -233,13 +233,13 @@
         }
     }
 
-    private void updateForm(ResortChangeEventArgs? eventArgs = null)
+    private async void updateForm(ResortChangeEventArgs? eventArgs = null)
     {
         using (var database = contextFactory.CreateDbContext())
         {
-            trackDto = database.tracks.FirstOrDefault(e => e.id == selectedTrackId);
-            cameras = database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArray();
-            selectedCamerasIds = database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
+            trackDto = await database.tracks.FirstOrDefaultAsync(e => e.id == selectedTrackId);
+            cameras = await database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArrayAsync();
+            selectedCamerasIds = await database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
         }
     }
 

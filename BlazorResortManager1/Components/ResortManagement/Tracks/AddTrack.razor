@@ -1,9 +1,9 @@
-﻿@implements IDisposable
-@page "/resort/track/add"
+﻿@page "/resort/track/add"
 @attribute [Authorize]
 @using System.ComponentModel.DataAnnotations
+@inject IStringLocalizer<AppLanguage> local
 
-<h3 class="text-3xl font-bold">Add Track</h3>
+<h3 class="text-3xl font-bold">@local["Add Track"]</h3>
 
 @if (trackDto is not null)
 {
@@ -11,80 +11,79 @@
         <RadzenStack Style="width: 100%">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="name"><RadzenTextBox Name="name" @bind-Value="trackDto.name" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Name"]"><RadzenTextBox Name="name" @bind-Value="trackDto.name" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="name" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="marking"><RadzenTextBox Name="marking" @bind-Value="trackDto.marking" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Marking"]"><RadzenTextBox Name="marking" @bind-Value="trackDto.marking" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="marking" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="difficulty"><RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Difficulty"]"><RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="difficulty" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="inclination"><RadzenNumeric Name="inclination" @bind-Value="trackDto.inclination" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Inclination"]"><RadzenNumeric Name="inclination" @bind-Value="trackDto.inclination" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
                 @* <RadzenColumn><RadzenDataAnnotationValidator Component="inclination" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="length"><RadzenNumeric Name="lengthMeters" @bind-Value="trackDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Length"]"><RadzenNumeric Name="lengthMeters" @bind-Value="trackDto.lengthMeters" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
-                @*  <RadzenColumn><RadzenDataAnnotationValidator Component="lengthMeters" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="lengthMeters" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="illuminated"><RadzenCheckBox Name="illuminated" @bind-Value="trackDto.illuminated" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Illuminated"]"><RadzenCheckBox Name="illuminated" @bind-Value="trackDto.illuminated" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
-                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="illuminated" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="illuminated" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="opened"><RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Opened"]"><RadzenCheckBox Name="opened" @bind-Value="statusDto.opened" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
-                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="opened" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="snow cover"><RadzenNumeric Name="duration" @bind-Value="statusDto.snowCover" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Snow cover"]"><RadzenNumeric Name="snowCover" @bind-Value="statusDto.snowCover" Style="width: 100%;" /></RadzenFormField>
                 </RadzenColumn>
-                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="snowCover" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenDatePicker @bind-Value=@statusDto.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    <RadzenFormField Text="@local["Opening Time"]"><RadzenDatePicker @bind-Value="statusDto.openingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" /></RadzenFormField>
                 </RadzenColumn>
-                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="openingTime" /></RadzenColumn> *@
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenDatePicker @bind-Value=@statusDto.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+                    <RadzenFormField Text="@local["Closing Time"]"><RadzenDatePicker @bind-Value="statusDto.closingTime" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" /></RadzenFormField>
                 </RadzenColumn>
-                @*                 <RadzenColumn><RadzenDataAnnotationValidator Component="duration" /></RadzenColumn> *@
+                @* <RadzenColumn><RadzenDataAnnotationValidator Component="closingTime" /></RadzenColumn> *@
             </RadzenRow>
 
-
-            <RadzenDropDown Data="cameras" @bind-Value=@selectedCamerasIds
+            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds"
                             Multiple="true" TextProperty="name" ValueProperty="id"
-                            Placeholder="Select cameras" />
+                            Placeholder="@local["Select cameras"]" />
 
-            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+            <RadzenButton Text="@local["Submit changes"]" ButtonType="ButtonType.Submit" />
         </RadzenStack>
     </RadzenTemplateForm>
 }
@@ -94,6 +93,7 @@
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NotificationService notificationService
 @inject DialogService dialogService
+
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
@@ -109,7 +109,7 @@
     protected override async Task OnInitializedAsync()
     {
         trackDto.id = Guid.NewGuid();
-        statusDto = new TrackStatus()
+        statusDto = new TrackStatus
             {
                 id = Guid.NewGuid(),
                 parentTrackId = trackDto.id,
@@ -134,53 +134,43 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                    "", new Dictionary<string, object> { { "displayMessage", local["Editing data..."] } },
+                    new DialogOptions { CloseDialogOnEsc = false, ShowClose = false });
 
-                //prepare cameras bindings
-                var cameraEntries = new List<CameraTrackBinding>();
-                foreach (var cameraId in selectedCamerasIds)
-                {
-                    cameraEntries.Add(new()
-                        {
-                            id = Guid.NewGuid(),
-                            cameraId = cameraId,
-                            trackId = trackDto.id
-                        });
-                }
+                var cameraEntries = selectedCamerasIds.Select(cameraId => new CameraTrackBinding
+                    {
+                        id = Guid.NewGuid(),
+                        cameraId = cameraId,
+                        trackId = trackDto.id
+                    }).ToList();
                 trackDto.cameras = cameraEntries;
-                //cameraEntries.ForEach(e => Console.WriteLine("updating with camera: " + e.cameraId));
 
-                //you will update db with new status that will contain this new lift's
-                var lastStatusDto = database.statusSheets.OrderByDescending(e => e.dateTime)
-                                    .Include(e => e.trackStatuses)
-                                    .Include(e => e.liftStatuses)
-                                    .Include(e => e.resortStatus)
-                                    .AsSplitQuery()
-                                    .AsNoTracking()
-                                    .FirstOrDefault(e => e.resortId == selectedResort.id && e.productionVersion == true);
-                Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(lastStatusDto, new System.Text.Json.JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+                var lastStatusDto = await database.statusSheets
+                    .OrderByDescending(e => e.dateTime)
+                    .Include(e => e.trackStatuses)
+                    .Include(e => e.liftStatuses)
+                    .Include(e => e.resortStatus)
+                    .AsSplitQuery()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
 
-                lastStatusDto.liftStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
-                lastStatusDto.trackStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
-                if (lastStatusDto.resortStatus is not null)
+                if (lastStatusDto != null)
                 {
+                    lastStatusDto.liftStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
+                    lastStatusDto.trackStatuses.ToList().ForEach(e => e.id = Guid.NewGuid());
                     lastStatusDto.resortStatus.id = Guid.NewGuid();
+                    lastStatusDto.dateTime = DateTime.Now;
+                    lastStatusDto.trackStatuses.Add(statusDto);
+                    lastStatusDto.id = Guid.NewGuid();
+                    database.statusSheets.Add(lastStatusDto);
                 }
-
-                lastStatusDto.dateTime = DateTime.Now;
-                List<TrackStatus> ls = lastStatusDto.trackStatuses.ToList();
-                ls.Add(statusDto);
-                lastStatusDto.trackStatuses = ls;
-                lastStatusDto.id = Guid.NewGuid();
-                database.statusSheets.Add(lastStatusDto);
 
                 database.tracks.Add(trackDto);
 
                 try
                 {
                     await database.SaveChangesAsync();
-                    await Task.Delay(2000);
+                    await Task.Delay(2000); // Simulating some processing delay
                     dialogService.Close();
                     navigationManager.NavigateTo("/resort");
                 }
@@ -192,27 +182,16 @@
             }
         }
         else
+        {
             error = true;
+        }
 
-        var notifMessage = new NotificationMessage();
-        if (!error)
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Added data successfully!",
-                    Duration = 3000
-                };
-        }
-        else
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
-                    Duration = 3000
-                };
-        }
+        var notifMessage = new NotificationMessage
+            {
+                Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                Summary = !error ? local["Added data successfully!"] : local["There was an error while executing the request"],
+                Duration = 3000
+            };
         notificationService.Notify(notifMessage);
     }
 
@@ -224,7 +203,11 @@
             {
                 trackDto.resortId = selectedResort.id;
                 cameras = database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArray();
-                selectedCamerasIds = database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking().Select(e => e.cameraId).ToArray();
+                selectedCamerasIds = database.cameraTrackBindings
+                    .Where(e => e.trackId == trackDto.id)
+                    .AsNoTracking()
+                    .Select(e => e.cameraId)
+                    .ToArray();
             }
         }
     }

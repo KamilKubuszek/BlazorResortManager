@@ -1,75 +1,87 @@
-﻿<div class="h-[280px] block">
-    <h3>@sheet.dateTime Status</h3>
+﻿@rendermode InteractiveServer
+@inject IStringLocalizer<AppLanguage> local
+<div class="h-[280px] block">
+    <h3>@($"{sheet.dateTime} {local["Status"]}")</h3>
     <hr />
-    <div class="h-[250]">
+    <div class="h-[350]">
         <RadzenTabs>
-            <RadzenTabsItem Text="Tracks">
-                <h2 class="text-2xl font-bold">Tracks</h2>
-                <RadzenDataGrid Data="sheet.trackStatuses" TItem="TrackStatus">
-                    <Columns>
-                        <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
-                            <Template Context="status">
-                                @status.parentTrack.name
-                            </Template>
-                        </RadzenDataGridColumn>
+            <Tabs>
+                <RadzenTabsItem Text="@local["Tracks"]">
+                    <h2 class="text-2xl font-bold">@local["Tracks"]</h2>
+                    <RadzenDataGrid Data="sheet.trackStatuses.OrderByDescending(e => e.parentTrack.name)" TItem="TrackStatus" AllowVirtualization="true" Style="height: 250px">
+                        <Columns>
+                            <RadzenDataGridColumn Title="@local["Name"]" TextAlign="TextAlign.Center">
+                                <Template Context="status">
+                                    @status.parentTrack.name
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(TrackStatus.opened)" Title="aktive" TextAlign="TextAlign.Center">
-                            <Template Context="status">
-                                <div class="notranslate">
-                                    <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
+                            <RadzenDataGridColumn Property="@nameof(TrackStatus.opened)" Title="@local["Active"]" TextAlign="TextAlign.Center">
+                                <Template Context="status">
+                                    <div class="notranslate">
+                                        <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
 
-                                </div>
-                            </Template>
-                        </RadzenDataGridColumn>
+                                    </div>
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(TrackStatus.snowCover)" Title="snow cover" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(TrackStatus.snowCover)" Title="@local["Snow cover"]" TextAlign="TextAlign.Center">
 
-                        </RadzenDataGridColumn>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="@local["Opening at"]" TextAlign="TextAlign.Center">
 
-                        </RadzenDataGridColumn>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="@local["Closing at"]" TextAlign="TextAlign.Center">
 
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Lifts">
-                <h2 class="text-2xl font-bold">Lifts</h2>
-                <RadzenDataGrid Data="sheet.liftStatuses" TItem="LiftStatus">
-                    <Columns>
-                        <RadzenDataGridColumn Title="name" TextAlign="TextAlign.Center">
-                            <Template Context="status">
-                                @status.parentLift.name
-                            </Template>
-                        </RadzenDataGridColumn>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="@local["Lifts"]">
+                    <h2 class="text-2xl font-bold">@local["Lifts"]</h2>
+                    <RadzenDataGrid Data="sheet.liftStatuses.OrderByDescending(e => e.parentLift.name)" TItem="LiftStatus">
+                        <Columns>
+                            <RadzenDataGridColumn Title="@local["Name"]" TextAlign="TextAlign.Center">
+                                <Template Context="status">
+                                    @status.parentLift.name
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(LiftStatus.opened)" Title="aktive" TextAlign="TextAlign.Center">
-                            <Template Context="status">
-                                <div class="notranslate">
-                                    <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
-                                </div>
-                            </Template>
-                        </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Property="@nameof(LiftStatus.opened)" Title="@local["Active"]" TextAlign="TextAlign.Center">
+                                <Template Context="status">
+                                    <div class="notranslate">
+                                        <RadzenIcon Icon="@(status.opened ? "Check_Circle" : "Cancel")" IconColor="@(status.opened ? Colors.Success : Colors.Danger)" />
+                                    </div>
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="opening at" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="@local["Opening at"]" TextAlign="TextAlign.Center">
 
-                        </RadzenDataGridColumn>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="closing at" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="@local["Closing at"]" TextAlign="TextAlign.Center">
 
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenTabsItem>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenTabsItem>
+            </Tabs>
         </RadzenTabs>
     </div>
 </div>
+
 @code {
     [Parameter]
     public StatusSheet? sheet { get; set; }
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        // @using System.Text.Json
 
+        // Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+
+    }
 }

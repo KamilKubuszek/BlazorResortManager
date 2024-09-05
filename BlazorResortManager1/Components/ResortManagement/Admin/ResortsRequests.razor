@@ -1,155 +1,147 @@
 ﻿@page "/resort/unapproved"
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Resorts Requests</h3>
-
-<RadzenDataGrid Data="permitsWithUnapprovedResorts" TItem="Permit">
-	<Template Context="permit">
-		<RadzenRow>
-			<RadzenColumn><p>name</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.name</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>description</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.description</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>address</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.address</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>phoneNumber</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.phoneNumber</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>email</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.email</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>webpage</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.webpage</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>approved</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.approved</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>coordinatesX</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.coordinatesX</p></RadzenColumn>
-		</RadzenRow>
-
-		<RadzenRow>
-			<RadzenColumn><p>coordinatesY</p></RadzenColumn>
-			<RadzenColumn><p>@permit.resort.coordinatesY</p></RadzenColumn>
-		</RadzenRow>
-		<RadzenButton Text="approve" Click="() => approveResort(permit.resort)" Style="width: fit-content" />
-	</Template>
-	<Columns>
-		<RadzenDataGridColumn Title="User">
-			<Template Context="permit">
-				@permit.ApplicationUser.UserName
-			</Template>
-		</RadzenDataGridColumn>
-
-		<RadzenDataGridColumn Title="Resort name">
-			<Template Context="permit">
-				@permit.resort.name
-			</Template>
-		</RadzenDataGridColumn>
-	</Columns>
-</RadzenDataGrid>
-
+@inject IStringLocalizer<AppLanguage> local
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject NotificationService notificationService
 @inject DialogService dialogService
+
+<h3>@local["Resorts Requests"]</h3>
+
+<RadzenDataGrid Data="permitsWithUnapprovedResorts" TItem="Permit">
+    <Template Context="permit">
+        <RadzenRow>
+            <RadzenColumn><p>@local["Name"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.name</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Description"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.description</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Address"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.address</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Phone Number"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.phoneNumber</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Email"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.email</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Webpage"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.webpage</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Approved"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.approved</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Coordinates X"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.coordinatesX</p></RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn><p>@local["Coordinates Y"]</p></RadzenColumn>
+            <RadzenColumn><p>@permit.resort.coordinatesY</p></RadzenColumn>
+        </RadzenRow>
+        <RadzenButton Text="@local["Approve"]" Click="() => approveResort(permit.resort)" Style="width: fit-content" />
+    </Template>
+    <Columns>
+        <RadzenDataGridColumn Title="@local["User"]">
+            <Template Context="permit">
+                @permit.ApplicationUser.UserName
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Title="@local["Resort Name"]">
+            <Template Context="permit">
+                @permit.resort.name
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
 @code {
-	private Permit[] permitsWithUnapprovedResorts { get; set; } = [];
+    private Permit[] permitsWithUnapprovedResorts { get; set; } = Array.Empty<Permit>();
 
-	protected override async Task OnInitializedAsync()
-	{
-		using (var database = contextFactory.CreateDbContext())
-		{
-			permitsWithUnapprovedResorts = await database.permits.Where(e => e.resort.approved == false).Select(e => new Permit
-			{
-				resortId = e.resortId,
-				resort = e.resort,
-				userId = e.userId,
-				ApplicationUser = new ApplicationUser{ UserName = e.ApplicationUser.UserName}
-			}).ToArrayAsync();
-		}
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            permitsWithUnapprovedResorts = await database.permits
+                .Where(e => e.resort.approved == false)
+                .Select(e => new Permit
+                    {
+                        resortId = e.resortId,
+                        resort = e.resort,
+                        userId = e.userId,
+                        ApplicationUser = new ApplicationUser { UserName = e.ApplicationUser.UserName }
+                    }).ToArrayAsync();
+        }
+    }
 
-	private async Task approveResort(Resort resort)
-	{
-		using (var database = contextFactory.CreateDbContext())
-		{
-			bool error = false;
-			resort.approved = true;
-			database.Attach(resort);
-			database.Entry(resort).State = EntityState.Modified;
+    private async Task approveResort(Resort resort)
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            bool error = false;
+            resort.approved = true;
+            database.Attach(resort);
+            database.Entry(resort).State = EntityState.Modified;
 
-			var sheet = new StatusSheet{
-				id = Guid.NewGuid(),
-				dateTime = DateTime.Now,
-				productionVersion = true,
-				resortId = resort.id
-			};
-			sheet.resortStatus = new ResortStatus
-			{
-				id = Guid.NewGuid(),
-				opened = false,
-				openingTime = TimeOnly.Parse("9:00"),
-				closingTime = TimeOnly.Parse("18:00"),
-				parentResortId = resort.id
-			};
+            var sheet = new StatusSheet
+                {
+                    id = Guid.NewGuid(),
+                    dateTime = DateTime.Now,
+                    productionVersion = true,
+                    resortId = resort.id
+                };
+            sheet.resortStatus = new ResortStatus
+                {
+                    id = Guid.NewGuid(),
+                    opened = false,
+                    openingTime = TimeOnly.Parse("9:00"),
+                    closingTime = TimeOnly.Parse("18:00"),
+                    parentResortId = resort.id
+                };
 
-			database.statusSheets.Add(sheet);
+            database.statusSheets.Add(sheet);
 
-			dialogService.Open<_LoadingTaskDialog>(
-				"", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-					new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
-			try
-			{
-				await database.SaveChangesAsync();
-				await Task.Delay(2000);
-				dialogService.Close();
-			}
-			catch
-			{
-				resort.approved = false;
-				dialogService.Close();
-				error = true;
-			}
-			
+            dialogService.Open<_LoadingTaskDialog>(
+                "", new Dictionary<string, object> { { "displayMessage", local["Editing data..."] } },
+                new DialogOptions { CloseDialogOnEsc = false, ShowClose = false });
 
-			var notifMessage = new NotificationMessage();
-			if (!error)
-			{
-				notifMessage = new NotificationMessage
-					{
-						Severity = NotificationSeverity.Success,
-						Summary = "Approved successfully!",
-						Duration = 3000
-					};
-			}
-			else
-			{
-				notifMessage = new NotificationMessage
-					{
-						Severity = NotificationSeverity.Error,
-						Summary = "There was an error while executing the request",
-						Duration = 3000
-					};
-			}
-			notificationService.Notify(notifMessage);
-		}
-	}
+            try
+            {
+                await database.SaveChangesAsync();
+                await Task.Delay(2000); // Simulate processing delay
+                dialogService.Close();
+            }
+            catch
+            {
+                resort.approved = false;
+                dialogService.Close();
+                error = true;
+            }
+
+            var notifMessage = new NotificationMessage
+                {
+                    Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                    Summary = !error ? local["Approved successfully!"] : local["There was an error while executing the request"],
+                    Duration = 3000
+                };
+            notificationService.Notify(notifMessage);
+        }
+    }
 }

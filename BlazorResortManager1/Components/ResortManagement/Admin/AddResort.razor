@@ -2,55 +2,62 @@
 @using System.ComponentModel.DataAnnotations
 @attribute [Authorize(Roles = "Admin")]
 
-<h3 class="text-3xl font-bold">add resort</h3>
+@inject IStringLocalizer<AppLanguage> local
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject ResortChangeManager resortChangeManager
 
-<h1>ADD ID OF A USER WHO REQUESTED RESORT REGISTRATION</h1>
+<h3 class="text-3xl font-bold">@local["Add Resort"]</h3>
+
+<h1>@local["Add ID of a User Who Requested Resort Registration"]</h1>
 
 @if (resortDto != null)
 {
-    <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=addResort>
+    <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit="addResort">
         <RadzenStack Style="width: 100%">
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="email"><RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Email"]">
+                        <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="email" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem" Style="width: 100%">
                 <RadzenColumn>
-                    <RadzenFormField Text="webpage"><RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Webpage"]">
+                        <RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="webpage" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="phone number"><RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Phone Number"]">
+                        <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="phone" /></RadzenColumn>
             </RadzenRow>
 
             <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
                 <RadzenColumn>
-                    <RadzenFormField Text="description"><RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" /></RadzenFormField>
+                    <RadzenFormField Text="@local["Description"]">
+                        <RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" />
+                    </RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn><RadzenDataAnnotationValidator Component="description" /></RadzenColumn>
             </RadzenRow>
 
-            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+            <RadzenButton Text="@local["Submit Changes"]" ButtonType="ButtonType.Submit" />
         </RadzenStack>
     </RadzenTemplateForm>
 }
 
-@inject DialogService dialogService
-@inject NotificationService notificationService
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject ResortChangeManager resortChangeManager
 @code {
-    [CascadingParameter]
-    private Resort? selectedResort { get; set; }
-
     private Resort? resortDto = new Resort();
 
     protected override async Task OnInitializedAsync()
@@ -71,14 +78,14 @@
             {
                 database.resorts.Add(resortDto);
 
-
                 dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
-                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                    "", new Dictionary<string, object> { { "displayMessage", local["Adding data..."] } },
+                    new DialogOptions { CloseDialogOnEsc = false, ShowClose = false });
+
                 try
                 {
                     await database.SaveChangesAsync();
-                    await Task.Delay(2000);
+                    await Task.Delay(2000); // Simulate processing delay
                     dialogService.Close();
                 }
                 catch
@@ -88,32 +95,17 @@
             }
         }
         else
+        {
             error = true;
+        }
 
-        var notifMessage = new NotificationMessage();
-        if (!error)
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Edited data successfully!",
-                    Duration = 3000
-                };
-        }
-        else
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
-                    Duration = 3000
-                };
-        }
+        var notifMessage = new NotificationMessage
+            {
+                Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                Summary = !error ? local["Edited data successfully!"] : local["There was an error while executing the request"],
+                Duration = 3000
+            };
+
         notificationService.Notify(notifMessage);
-    }
-
-    public void Dispose()
-    {
-       
     }
 }

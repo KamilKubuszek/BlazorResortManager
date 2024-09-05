@@ -1,21 +1,26 @@
 ﻿@page "/resort/camera"
 @attribute [Authorize]
 
-<h3 class="text-3xl font-bold">Cameras</h3>
-<RadzenLink Path="/resort/camera/add" Text="add camera"/>
-@if(resortData is not null)
+@inject IStringLocalizer<AppLanguage> local
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+
+<h3 class="text-3xl font-bold">@local["Cameras"]</h3>
+<RadzenLink Path="/resort/camera/add" Text="@local["Add Camera"]" />
+
+@if (resortData is not null)
 {
     <RadzenRow>
         <RadzenColumn>
             <RadzenDataGrid Data="resortData.cameras" TItem="Camera"
                             SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedCameras>
                 <Columns>
-                    <RadzenDataGridColumn TItem="Camera" Property="name" Title="Name" Width="100px">
-
+                    <RadzenDataGridColumn TItem="Camera" Property="name" Title="@local["Name"]" Width="100px">
                     </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="Camera" Property="link" Title="url" Width="100px">
-
+                    <RadzenDataGridColumn TItem="Camera" Property="link" Title="@local["URL"]" Width="100px">
                     </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
@@ -27,76 +32,73 @@
             }
         </RadzenColumn>
     </RadzenRow>
+
     <RadzenRow>
         <RadzenColumn>
-
         </RadzenColumn>
     </RadzenRow>
 
-    @if(trackBinding is not null)
+    @if (trackBinding is not null)
     {
         <RadzenStack Style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.5rem;" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-        @foreach (var group in trackBinding)
-        {
-            <RadzenCard Style="width: 20%; text-align:center" >
-                <p>@group.Key</p>
-                <hr />
-                <p>
-                @{ var count = 0;}
-                @foreach (var bind in group)
-                {
-                    @if(count == 0){
-                         @(bind.camera.name)
-                    }
-                    else
-                    {
-                         @(", "+bind.camera.name)
-                    }
-                    count++;
-                }
-                </p>
-            </RadzenCard>
-        }
+            @foreach (var group in trackBinding)
+            {
+                <RadzenCard Style="width: 20%; text-align:center">
+                    <p>@group.Key</p>
+                    <hr />
+                    <p>
+                        @{
+                            var count = 0;
+                        }
+                        @foreach (var bind in group)
+                        {
+                            @if (count == 0)
+                            {
+                                @(bind.camera.name)
+                            }
+                            else
+                            {
+                                @(", " + bind.camera.name)
+                            }
+                            count++;
+                        }
+                    </p>
+                </RadzenCard>
+            }
         </RadzenStack>
     }
 
     @if (liftBinding is not null)
     {
         <RadzenStack Style="width: 100%; margin-bottom: 0.5rem" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-        @foreach (var group in liftBinding)
-        {
-            <RadzenCard Style="width: 20%; text-align:center">
-                <p>@group.Key</p>
-                <hr />
-                <p>
-                    @{
-                        var count = 0;
-                    }
-                    @foreach (var bind in group)
-                    {
-                        @if (count == 0)
-                        {
-                            @(bind.camera.name)
+            @foreach (var group in liftBinding)
+            {
+                <RadzenCard Style="width: 20%; text-align:center">
+                    <p>@group.Key</p>
+                    <hr />
+                    <p>
+                        @{
+                            var count = 0;
                         }
-                        else
+                        @foreach (var bind in group)
                         {
-                            @(", " + bind.camera.name)
+                            @if (count == 0)
+                            {
+                                @(bind.camera.name)
+                            }
+                            else
+                            {
+                                @(", " + bind.camera.name)
+                            }
+                            count++;
                         }
-                        count++;
-                    }
-                </p>
-            </RadzenCard>
-        }
+                    </p>
+                </RadzenCard>
+            }
         </RadzenStack>
     }
 }
 
-
-@implements IDisposable
-@inject ResortChangeManager resortChangeManager
-@inject NotificationService notificationService
-@inject DialogService dialogService
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
@@ -107,7 +109,6 @@
 
     private IEnumerable<IGrouping<string, CameraTrackBinding>>? trackBinding = null;
     private IEnumerable<IGrouping<string, CameraLiftBinding>>? liftBinding = null;
-    // private CameraTrackBinding[]? cameraTrackBindings = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -117,26 +118,28 @@
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
-        if(selectedResort is not null)
+        if (selectedResort is not null)
         {
             using (var database = contextFactory.CreateDbContext())
             {
                 resortData = selectedResort;
 
                 resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id)
-                    .Select(e => 
-                        new Track{ 
-                            id = e.id, 
-                            resortId = e.resortId 
-                        })
-                        .ToListAsync();
+                    .Select(e =>
+                        new Track
+                            {
+                                id = e.id,
+                                resortId = e.resortId
+                            })
+                    .ToListAsync();
 
                 resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id)
                     .Select(e =>
-                        new Lift{
-                            id = e.id,
-                            resortId = e.resortId
-                        })
+                        new Lift
+                            {
+                                id = e.id,
+                                resortId = e.resortId
+                            })
                     .ToListAsync();
 
                 resortData.cameras = await database.cameras.Where(e => e.resortId == selectedResort.id).ToListAsync();
