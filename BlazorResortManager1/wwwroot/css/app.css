@@ -618,16 +618,16 @@ video {
   height: 150px;
 }
 
-.h-\[250\] {
-  height: 250;
-}
-
 .h-\[280px\] {
   height: 280px;
 }
 
 .h-\[300px\] {
   height: 300px;
+}
+
+.h-\[350\] {
+  height: 350;
 }
 
 .h-\[400px\] {
@@ -698,11 +698,6 @@ video {
 .bg-gray-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(156 163 175 / var(--tw-bg-opacity));
-}
-
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
 }
 
 .text-center {
