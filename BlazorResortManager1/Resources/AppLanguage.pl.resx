@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Id" xml:space="preserve">
+    <value>Identyfikator</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+  <data name="Length meters" xml:space="preserve">
+    <value>Długość w metrach</value>
+  </data>
+  <data name="Estimated duration time minutes" xml:space="preserve">
+    <value>Szacowany czas trwania w minutach</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="People per hour" xml:space="preserve">
+    <value>Osób na godzinę</value>
+  </data>
+  <data name="Capacity per seat" xml:space="preserve">
+    <value>Pojemność na miejsce</value>
+  </data>
+  <data name="Statuses" xml:space="preserve">
+    <value>Statusy</value>
+  </data>
+  <data name="Parameters" xml:space="preserve">
+    <value>Parametry</value>
+  </data>
+  <data name="Resort Id" xml:space="preserve">
+    <value>Identyfikator kurortu</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Zatwierdzony</value>
+  </data>
+  <data name="Coordinates X" xml:space="preserve">
+    <value>Współrzędne X</value>
+  </data>
+  <data name="Coordinates Y" xml:space="preserve">
+    <value>Współrzędne Y</value>
+  </data>
+  <data name="Opened" xml:space="preserve">
+    <value>Otwarty</value>
+  </data>
+  <data name="Opening time" xml:space="preserve">
+    <value>Godzina otwarcia</value>
+  </data>
+  <data name="Closing time" xml:space="preserve">
+    <value>Godzina zamknięcia</value>
+  </data>
+  <data name="Snow cover" xml:space="preserve">
+    <value>Pokrywa śnieżna</value>
+  </data>
+  <data name="Total height meters" xml:space="preserve">
+    <value>Całkowita wysokość w metrach</value>
+  </data>
+  <data name="Inclination" xml:space="preserve">
+    <value>Nachylenie</value>
+  </data>
+  <data name="Illuminated" xml:space="preserve">
+    <value>Oświetlony</value>
+  </data>
+  <data name="Snow groomed" xml:space="preserve">
+    <value>Ratrakowany</value>
+  </data>
+  <data name="Marking" xml:space="preserve">
+    <value>Oznaczenie</value>
+  </data>
+  <data name="Difficulty" xml:space="preserve">
+    <value>Trudność</value>
+  </data>
+  <data name="Status sheet Id" xml:space="preserve">
+    <value>Identyfikator arkusza statusu</value>
+  </data>
+  <data name="Edited data successfully!" xml:space="preserve">
+    <value>Edytowano dane pomyślnie!</value>
+  </data>
+  <data name="There was an error while executing the request" xml:space="preserve">
+    <value>Wystąpił błąd podczas wykonywania żądania</value>
+  </data>
+  <data name="editing data..." xml:space="preserve">
+    <value>Edytowanie danych...</value>
+  </data>
+  <data name="Please enter a valid email address." xml:space="preserve">
+    <value>Proszę wprowadzić prawidłowy adres e-mail.</value>
+  </data>
+  <data name="Please enter a valid phone number." xml:space="preserve">
+    <value>Proszę wprowadzić prawidłowy numer telefonu.</value>
+  </data>
+  <data name="Submit changes" xml:space="preserve">
+    <value>Zatwierdź zmiany</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Wyloguj się</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Trasy</value>
+  </data>
+  <data name="Lifts" xml:space="preserve">
+    <value>Wyciągi</value>
+  </data>
+  <data name="Cameras" xml:space="preserve">
+    <value>Kamery</value>
+  </data>
+  <data name="Activate" xml:space="preserve">
+    <value>Aktywuj</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktywny</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="Add new" xml:space="preserve">
+    <value>Dodaj nowy</value>
+  </data>
+  <data name="Add new status" xml:space="preserve">
+    <value>Dodaj nowy status</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Adres</value>
+  </data>
+  <data name="Approve resorts" xml:space="preserve">
+    <value>Zatwierdź ośrodki</value>
+  </data>
+  <data name="Camera" xml:space="preserve">
+    <value>Kamera</value>
+  </data>
+  <data name="Date and time" xml:space="preserve">
+    <value>Data i czas</value>
+  </data>
+  <data name="Deactivate" xml:space="preserve">
+    <value>Deaktywuj</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Opis</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edytuj</value>
+  </data>
+  <data name="Lift" xml:space="preserve">
+    <value>wyciąg</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>Numer telefonu</value>
+  </data>
+  <data name="Register users" xml:space="preserve">
+    <value>Zarejestruj użytkowników</value>
+  </data>
+  <data name="Resort" xml:space="preserve">
+    <value>Ośrodek</value>
+  </data>
+  <data name="Resort name" xml:space="preserve">
+    <value>Nazwa ośrodka</value>
+  </data>
+  <data name="Resorts" xml:space="preserve">
+    <value>Ośrodki</value>
+  </data>
+  <data name="Select status to see details" xml:space="preserve">
+    <value>Wybierz status by wyświetlić informacje</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>trasa</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>Poradnik</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Użytkownik</value>
+  </data>
+  <data name="Webpage" xml:space="preserve">
+    <value>Strona internetowa</value>
+  </data>
+</root>

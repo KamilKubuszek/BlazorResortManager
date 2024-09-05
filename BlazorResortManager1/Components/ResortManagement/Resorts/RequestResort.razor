@@ -2,14 +2,21 @@
 @using System.ComponentModel.DataAnnotations
 @attribute [Authorize]
 
-<h3 class="text-3xl font-bold">Send request to create resort</h3>
+@inject IStringLocalizer<AppLanguage> local
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+
+<h3 class="text-3xl font-bold">@local["Send Request to Create Resort"]</h3>
 
 <br />
-<p>Input coordinates of your resort(you can find them using google earth).</p>
-<RadzenTemplateForm Data="resortDto" TItem="Resort" Submit=addResort>
+<p>@local["Input coordinates of your resort (you can find them using Google Earth)."]</p>
+
+<RadzenTemplateForm Data="resortDto" TItem="Resort" Submit="addResort">
     <RadzenStack Style="width: 100%" Gap="1rem">
         <div>
-            <RadzenLabel Component="name" Text="name" />
+            <RadzenLabel Component="name" Text="@local["Name"]" />
         </div>
         <div class="w-fit">
             <RadzenTextBox Name="name" @bind-Value="resortDto.name" Style="width: 100%;" />
@@ -17,7 +24,7 @@
         </div>
 
         <div>
-            <RadzenLabel Component="description" Text="description" />
+            <RadzenLabel Component="description" Text="@local["Description"]" />
         </div>
         <div class="w-fit">
             <RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" />
@@ -25,36 +32,34 @@
         </div>
 
         <div>
-            <RadzenLabel Component="webpage" Text="webpage" />
+            <RadzenLabel Component="webpage" Text="@local["Webpage"]" />
         </div>
         <div class="w-fit">
             <RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" />
             <RadzenDataAnnotationValidator Component="webpage" Style="position: absolute;" />
         </div>
-        <RadzenFieldset Text="Contact">
 
-        
-        <div>
-            <RadzenLabel Component="email" Text="email" />
-        </div>
-        <div class="w-fit">
-            <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
-            <RadzenDataAnnotationValidator Component="email" Style="position: absolute;" />
-        </div>
+        <RadzenFieldset Text="@local["Contact"]">
+            <div>
+                <RadzenLabel Component="email" Text="@local["Email"]" />
+            </div>
+            <div class="w-fit">
+                <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
+                <RadzenDataAnnotationValidator Component="email" Style="position: absolute;" />
+            </div>
 
-        <div>
-            <RadzenLabel Component="phone" Text="phone number" />
-        </div>
-        <div class="w-fit">
-            <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
-            <RadzenDataAnnotationValidator Component="phone" Style="position: absolute;" />
-        </div>
+            <div>
+                <RadzenLabel Component="phone" Text="@local["Phone Number"]" />
+            </div>
+            <div class="w-fit">
+                <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
+                <RadzenDataAnnotationValidator Component="phone" Style="position: absolute;" />
+            </div>
         </RadzenFieldset>
 
-
-        <RadzenFieldset Text="Location">
+        <RadzenFieldset Text="@local["Location"]">
             <div>
-                <RadzenLabel Component="address" Text="address" />
+                <RadzenLabel Component="address" Text="@local["Address"]" />
             </div>
             <div class="w-fit">
                 <RadzenTextBox Name="address" @bind-Value="resortDto.address" Style="width: 100%;" />
@@ -64,68 +69,57 @@
             <RadzenStack Gap="1rem">
                 <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
                     <div>
-                        <RadzenLabel Component="cordX" Text="X axis" />
+                        <RadzenLabel Component="cordX" Text="@local["X Axis"]" />
                     </div>
                     <div class="w-fit">
-                        <RadzenMask Mask="**° **\'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" />
+                        <RadzenMask Mask="**° **'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" />
                         <RadzenDataAnnotationValidator Component="cordX" Style="position: absolute;" />
                     </div>
                     <div>
-                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedX">
+                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedX">
                             <Items>
-                                <RadzenSelectBarItem Value="1" Text="East " />
-                                <RadzenSelectBarItem Value="2" Text="West" />
+                                <RadzenSelectBarItem Value="1" Text="@local["East"]" />
+                                <RadzenSelectBarItem Value="2" Text="@local["West"]" />
                             </Items>
                         </RadzenSelectBar>
                     </div>
                 </RadzenStack>
+
                 <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
                     <div>
-                        <RadzenLabel Component="cordY" Text="Y axis" />
+                        <RadzenLabel Component="cordY" Text="@local["Y Axis"]" />
                     </div>
                     <div class="w-fit">
-                        <RadzenMask Mask="**° **\'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 33%;" />
+                        <RadzenMask Mask="**° **'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 33%;" />
                         <RadzenDataAnnotationValidator Component="cordY" Style="position: absolute;" />
                     </div>
                     <div>
-                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedY">
+                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedY">
                             <Items>
-                                <RadzenSelectBarItem Value="1" Text="North" />
-                                <RadzenSelectBarItem Value="2" Text="South" />
+                                <RadzenSelectBarItem Value="1" Text="@local["North"]" />
+                                <RadzenSelectBarItem Value="2" Text="@local["South"]" />
                             </Items>
                         </RadzenSelectBar>
                     </div>
                 </RadzenStack>
             </RadzenStack>
         </RadzenFieldset>
-        <RadzenButton ButtonType="ButtonType.Submit" Text="submit" Style="width: fit-content" />
+
+        <RadzenButton ButtonType="ButtonType.Submit" Text="@local["Submit"]" Style="width: fit-content" />
 
         <hr />
-        <p>After your request is sent, it is added to queue. <br /> You will recive message via email about status of your request.</p>
+        <p>@local["After your request is sent, it is added to queue. You will receive a message via email about the status of your request."]</p>
     </RadzenStack>
 </RadzenTemplateForm>
 
-
-@inject NavigationManager navigationManager
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject NotificationService notificationService
-@inject DialogService dialogService
 @code {
-    RadzenMask valueMask;
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationState { get; set; }
-
-    private Resort? resortDto = new Resort() { id = Guid.NewGuid(), approved=false };
-
     private int SelectedX { get; set; }
     private int SelectedY { get; set; }
 
-    public ResortAdditionRequest requestDto = new()
-    {
-        id = Guid.NewGuid(),
-        approved = false
-    };
+    private Resort? resortDto = new Resort() { id = Guid.NewGuid(), approved = false };
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
     private async Task addResort()
     {
@@ -142,8 +136,7 @@
                 try
                 {
                     var auth = await authenticationState;
-                    var userId = auth.User.FindFirst(
-                                    c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    var userId = auth.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                     if (userId is null)
                         throw new Exception();
 
@@ -151,13 +144,13 @@
                         .Where(e => e.resort.approved == false && e.ApplicationUser.Id == userId)
                         .CountAsync();
 
-                    if(permitsWithoutApproval > 3)
+                    if (permitsWithoutApproval > 3)
                     {
-                        errMessage = "You already sent the max limit of resort requests(3 out of 3)";
+                        errMessage = local["You already sent the max limit of resort requests (3 out of 3)"];
                         throw new Exception();
                     }
 
-                    requestDto.userId = userId;
+                    //requestDto.userId = userId;
 
                     database.resorts.Add(resortDto);
                     database.permits.Add(new Permit
@@ -166,18 +159,11 @@
                             userId = userId,
                             resortId = resortDto.id
                         });
-                    //add permits to the user
-                    // database.statusSheets.Add(new StatusSheet
-                    //     {
-                    //         id = Guid.NewGuid(),
-                    //         dateTime = DateTime.Now,
-                    //         productionVersion = true
-                    //     });
 
                     dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", "adding data..." } },
+                        "", new Dictionary<string, object>() { { "displayMessage", local["Adding data..."] } },
                         new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
-                
+
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
                     dialogService.Close();
@@ -190,95 +176,16 @@
             }
         }
         else
+        {
             error = true;
+        }
 
-        var notifMessage = new NotificationMessage();
-        if (!error)
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Sent request data successfully!",
-                    Duration = 3000
-                };
-        }
-        else
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = errMessage ?? "There was an error while executing the request",
-                    Duration = 3000
-                };
-        }
+        var notifMessage = new NotificationMessage
+            {
+                Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                Summary = !error ? local["Sent request data successfully!"] : errMessage ?? local["There was an error while executing the request"],
+                Duration = 3000
+            };
         notificationService.Notify(notifMessage);
     }
-
-    // private async Task sendRequest()
-    // {
-    //     requestDto.date = DateOnly.FromDateTime(DateTime.Now);
-    //     bool error = false;
-    //     try
-    //     {
-    //         var auth = await authenticationState;
-    //         var userId = auth.User.FindFirst(
-    //                         c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-    //         if (userId is null)
-    //             throw new Exception();
-    //         requestDto.userId = userId;
-
-
-    //         ValidationContext context = new ValidationContext(requestDto);
-    //         ICollection<ValidationResult> results = new List<ValidationResult>();
-    //         bool isValid = Validator.TryValidateObject(requestDto, context, results, true);
-    //         if (!isValid)
-    //             throw new Exception();
-
-    //         dialogService.Open<_LoadingTaskDialog>(
-    //                "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
-    //                    new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
-
-
-    //         using (var database = contextFactory.CreateDbContext())
-    //         {
-    //             database.Add(requestDto);
-    //             await database.SaveChangesAsync();
-    //         }
-    //     }
-    //     catch
-    //     {
-    //         error = true;
-    //         dialogService.Close();
-    //     }
-    //     var notifMessage = new NotificationMessage();
-    //     if (!error)
-    //     {
-    //         notifMessage = new NotificationMessage
-    //             {
-    //                 Severity = NotificationSeverity.Success,
-    //                 Summary = "Sent request!",
-    //                 Duration = 3000
-    //             };
-    //     }
-    //     else
-    //     {
-    //         notifMessage = new NotificationMessage
-    //             {
-    //                 Severity = NotificationSeverity.Error,
-    //                 Summary = "There was an error while executing the request",
-    //                 Duration = 3000
-    //             };
-    //     }
-    //     notificationService.Notify(notifMessage);
-    // }
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     //await JSRuntime.InvokeVoidAsync("eval", $@"document.getElementById(""cordX"").focus()");
-       
-    // }
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     //await valueMask.Element.FocusAsync();
-    // }
 }
