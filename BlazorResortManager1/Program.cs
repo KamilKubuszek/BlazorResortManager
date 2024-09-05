@@ -6,10 +6,12 @@ using BlazorResortManager1.Data.Models.yrnoWeatherForecast;
 using BlazorResortManager1.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using BlazorResortManager1.Resources;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Radzen;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using System.Globalization;
+using Microsoft.Extensions.Localization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+//Radzen services
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddRadzenComponents();
+
+#region Custom Implementation
 //Utility service
 builder.Services.AddScoped<ResortChangeManager>();
 
@@ -34,9 +41,18 @@ builder.Services.AddHttpClient("YrnoClient", client =>
 });
 
 
-//Radzen services
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddRadzenComponents();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
+//builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailService>();
+
+#endregion
+
+#region identity
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
@@ -51,11 +67,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(connectionString);
-});
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -67,9 +79,17 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-//builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailService>();
+#endregion
+
+builder.Services.AddLocalization();
+//builder.Services.AddScoped<IStringLocalizer<AppLanguage>, StringLocalizer<AppLanguage>>();
 var app = builder.Build();
+
+//check which website can embed this thing
+app.UseMiddleware<AllowedDomainsMiddleware>();
+
+
+#region misc code
 //using (var scope = app.Services.CreateScope())
 //{
 //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -98,7 +118,8 @@ var app = builder.Build();
 //    var result = Validator.Validate(new ValidationContext(resort));
 
 //});
-app.UseMiddleware<AllowedDomainsMiddleware>();
+#endregion
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -111,6 +132,10 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseRequestLocalization(new RequestLocalizationOptions()
+     .AddSupportedCultures(new[] { "pl-PL", "en-US" })
+     .AddSupportedUICultures(new[] { "pl-PL", "en-US" }));
 
 app.UseHttpsRedirection();
 
