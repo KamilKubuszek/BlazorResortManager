@@ -1,0 +1,118 @@
+﻿@page "/resort/camera/edit/{selectedCameraId:guid?}"
+@using System.ComponentModel.DataAnnotations
+@attribute [Authorize]
+
+<h3 class="text-3xl font-bold">@local["Edit Camera"]</h3>
+
+@if(selectedCameraId is not null)
+{
+	<RadzenTemplateForm Data="cameraDto" TItem="Camera">
+		<RadzenRow>
+			<RadzenColumn>
+				<RadzenLabel Component="name" Text="@local["Name"]" />
+			</RadzenColumn>
+			<RadzenColumn>
+				<RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="display: block; width: 100%" />
+				<RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+			</RadzenColumn>
+		</RadzenRow>
+		<RadzenRow>
+			<RadzenColumn>
+				<RadzenLabel Component="link" Text="@local["Url"]" />
+			</RadzenColumn>
+			<RadzenColumn>
+				<RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="display: block; width: 100%" />
+				<RadzenDataAnnotationValidator Component="link" Style="position: absolute;" />
+			</RadzenColumn>
+		</RadzenRow>
+		<RadzenRow>
+			<RadzenButton Click="editCamera" Style="width: fit-content" ButtonType="ButtonType.Submit" Text="@local["Submit changes"]"/>
+		</RadzenRow>
+	</RadzenTemplateForm>
+}
+else
+{
+	@local["no camera selected"]
+}
+
+
+@inject IStringLocalizer<AppLanguage> local
+@inject ResortChangeManager resortChangeManager
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NavigationManager navigationManager
+@code {
+	[Parameter]
+	public Guid? selectedCameraId { get; set; }
+
+	private Camera cameraDto = new Camera();
+
+	protected override async Task OnInitializedAsync()
+	{
+		if(selectedCameraId is not null)
+		{
+			using (var database = contextFactory.CreateDbContext())
+			{
+				cameraDto = await database.cameras.FirstOrDefaultAsync(e => e.id == selectedCameraId);
+			}
+		}
+
+	}
+
+	private async Task editCamera()
+	{
+		bool error = false;
+		ValidationContext context = new ValidationContext(cameraDto);
+		ICollection<ValidationResult> results = new List<ValidationResult>();
+		bool isValid = Validator.TryValidateObject(cameraDto, context, results, true);
+
+		if (isValid)
+		{
+			using (var database = contextFactory.CreateDbContext())
+			{
+				dialogService.Open<_LoadingTaskDialog>(
+								"", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
+									new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+				try
+				{
+					database.Attach(cameraDto);
+					database.Entry(cameraDto).State = EntityState.Modified;
+
+
+					await database.SaveChangesAsync();
+					await Task.Delay(2000);
+					dialogService.Close();
+					navigationManager.NavigateTo("resort/camera");
+				}
+				catch
+				{
+					error = true;
+				}
+			}
+		}
+		else
+			error = true;
+
+		var notifMessage = new NotificationMessage();
+		if (!error)
+		{
+			notifMessage = new NotificationMessage
+				{
+					Severity = NotificationSeverity.Success,
+					Summary = "Edited data successfully!",
+					Duration = 3000
+				};
+		}
+		else
+		{
+			notifMessage = new NotificationMessage
+				{
+					Severity = NotificationSeverity.Error,
+					Summary = "There was an error while executing the request",
+					Duration = 3000
+				};
+		}
+		notificationService.Notify(notifMessage);
+	}
+}

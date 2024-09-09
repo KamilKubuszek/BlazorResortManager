@@ -72,19 +72,20 @@
                 await database.cameras.AddAsync(cameraDto);
 
                 dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", local["Adding data..."] } },
+                    "", new Dictionary<string, object>() { { "displayMessage", "Adding data" } },
                     new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
                 try
                 {
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
-                    dialogService.Close();
+                    
                 }
                 catch
                 {
                     error = true;
                 }
+                dialogService.Close();
             }
         }
         else

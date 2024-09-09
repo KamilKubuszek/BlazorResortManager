@@ -6,14 +6,28 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NavigationManager navigationManager
 
 <h3 class="text-3xl font-bold">@local["Cameras"]</h3>
-<RadzenLink Path="/resort/camera/add" Text="@local["Add Camera"]" />
+@* <RadzenLink Path="/resort/camera/add" Text="@local["Add Camera"]" /> *@
 
 @if (resortData is not null)
 {
+    <RadzenStack>
+    <RadzenRow JustifyContent="JustifyContent.Right">
+        <RadzenColumn SizeMD="6" Size="12">
+            <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/camera/add") )" />
+                    <RadzenButton Text="@local["Edit"]" Click="@(() => navigationManager.NavigateTo("resort/camera/edit/"+selectedCameras[0].id))" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedCameras?.Any() == true ? false : true)" />
+                    <RadzenButton Text="@local["Delete"]" Click="deleteCamera" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedCameras?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                </RadzenStack>
+            </RadzenCard>
+
+        </RadzenColumn>
+    </RadzenRow>
     <RadzenRow>
-        <RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
             <RadzenDataGrid Data="resortData.cameras" TItem="Camera"
                             SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedCameras>
                 <Columns>
@@ -25,11 +39,17 @@
                 </Columns>
             </RadzenDataGrid>
         </RadzenColumn>
-        <RadzenColumn>
-            @if (selectedCameras?.Any() == true)
-            {
-                <iframe src="@selectedCameras[0].link" style="width: 100%; height: 40vh;"></iframe>
-            }
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Style="width: 100%; height: 40vh; padding: 0.5rem;">
+                @if (selectedCameras?.Any() == true)
+                {
+                        <iframe src="@selectedCameras[0].link" style="width: 100%; height: calc(40vh - 1rem);"></iframe>
+                }
+                else
+                {
+                    <p>@local["Select camera to see the preview"]</p>
+                }
+            </RadzenCard> 
         </RadzenColumn>
     </RadzenRow>
 
@@ -97,6 +117,8 @@
             }
         </RadzenStack>
     }
+
+    </RadzenStack>
 }
 
 @code {
@@ -114,6 +136,74 @@
     {
         resortChangeManager.ResortChange += updateData;
         updateData();
+    }
+
+    private async Task deleteCamera()
+    {
+        var result = await dialogService.OpenAsync<_ConfirmDialog>(
+            "Confirm", new Dictionary<string, object>() { },
+            new DialogOptions() { ShowClose = false });
+
+        if (result == true)
+        {
+            bool error = false;
+            try
+            {
+                var camera = selectedCameras[0];
+
+                if (selectedCameras?.Any() == true)
+                {
+                    selectedCameras.Clear();
+                }
+                else throw new Exception();
+
+                using (var database = contextFactory.CreateDbContext())
+                {
+                    var cameraBindingsL = await database.cameraLiftBindings.Where(e => e.cameraId == camera.id).ToArrayAsync();
+                    foreach (var bind in cameraBindingsL)
+                    {
+                        database.cameraLiftBindings.Remove(bind);
+                    }
+                    var cameraBindingsT = await database.cameraTrackBindings.Where(e => e.cameraId == camera.id).ToArrayAsync();
+
+                    foreach (var bind in cameraBindingsT)
+                    {
+                        database.cameraTrackBindings.Remove(bind);
+                    }
+                    
+                    database.Remove(camera);
+
+                    database.SaveChanges();
+                }
+            }
+            catch
+            {
+                dialogService.Close();
+                error = true;
+            }
+
+            var notifMessage = new NotificationMessage();
+            if (!error)
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = @local["Deleted data successfuly!"],
+                        Duration = 3000
+                    };
+            }
+            else
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = @local["There was an error while executing the request"],
+                        Duration = 3000
+                    };
+            }
+            notificationService.Notify(notifMessage);
+            updateData();
+        }
     }
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)
