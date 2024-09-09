@@ -291,4 +291,40 @@
   <data name="Webpage" xml:space="preserve">
     <value>Strona internetowa</value>
   </data>
+  <data name="Select resort first" xml:space="preserve">
+    <value>Wybierz najpierw ośrodek</value>
+  </data>
+  <data name="Deleted data successfuly!" xml:space="preserve">
+    <value>Usunięto dane pomyślnie!</value>
+  </data>
+  <data name="Select camera to see the preview" xml:space="preserve">
+    <value>Wybierz kamerę by zobaczyć podgląd</value>
+  </data>
+  <data name="Activate status on submit" xml:space="preserve">
+    <value>Dodaj status jako już aktywny</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Zatwierdź</value>
+  </data>
+  <data name="Update status" xml:space="preserve">
+    <value>Zaaktualizuj status</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="Are you sure you want to perform this action?" xml:space="preserve">
+    <value>Jesteś pewny że chcesz wykonać tą operacje?</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="Deny" xml:space="preserve">
+    <value>Odrzuć</value>
+  </data>
+  <data name="Resorts Requests" xml:space="preserve">
+    <value>Wnioski o utworzenie ośrodka narciarskiego</value>
+  </data>
 </root>

@@ -8,49 +8,52 @@
 @inject ContextMenuService contextMenuService
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
+@inject IJSRuntime JSRuntime
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3 class="text-3xl font-bold">@local["Statuses"]</h3>
 @if (resortData is not null)
 {
-    <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
+@*     <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
         <RadzenColumn Size="3"></RadzenColumn>
         <RadzenColumn Size="3"></RadzenColumn>
         <RadzenColumn Size="3"></RadzenColumn>
-    </RadzenRow>
+    </RadzenRow> *@
     <RadzenStack>
         <RadzenRow JustifyContent="JustifyContent.Right">
-            <RadzenColumn Size="12">
+            <RadzenColumn SizeMD="6" Size="12">
+                <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
                 @{
                     var enableButtons = selectedSheet is not null;
                     StatusSheet? sheet = null;
                     if (enableButtons == true)
                         sheet = selectedSheet;
                 }
-                <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem" Style="width: 100%;">
-                    <RadzenButton Style="width: 15%" Text="@local["Add new status"]" Click="addNewSheet" />
+                <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" Gap="0.5rem" Style="width: 100%;">
+                    <RadzenButton Text="@local["Add"]" Click="addNewSheet" />
+                    <RadzenButton Text="@local["Delete"]"
+                                  Disabled="@(enableButtons is false)"
+                                  Click="deleteSheet"
+                                  Icon="Delete" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" />
                     <RadzenButton Text="@local["Activate"]"
                                   Click="() => switchSheetVersion(true)"
                                   Variant="@(sheet?.productionVersion == true ? Variant.Text : Variant.Outlined)"
                                   Disabled="@(enableButtons is false || sheet?.productionVersion == true)"
-                                  Style="width: 15%;" />
+                                  />
                     <RadzenButton Text="@local["Deactivate"]"
                                   Click="() => switchSheetVersion(false)"
                                   Variant="@(sheet?.productionVersion == false ? Variant.Text : Variant.Outlined)"
                                   Disabled="@(enableButtons is false || sheet?.productionVersion == false)"
-                                  Style="width: 15%;" />
-                    <RadzenButton Text="@local["Delete"]"
-                                  Disabled="@(enableButtons is false)"
-                                  Click="deleteSheet"
-                                  Style="width: 15%;"
-                                  Icon="Delete" Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Danger" />
+                                  />
+                    
                 </RadzenStack>
+                </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
-            <RadzenColumn Size="12" SizeMD="6" Style="padding-right: 0.5rem;">
-                <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
+            <RadzenColumn Size="12" SizeMD="3" >
+                <RadzenDataGrid id="toResize" Style="height: 40vh" Data="resortData.statusSheets" TItem="StatusSheet"
                                 SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid" RowClick="(args) => fetchDataForSheet(args)">
                     <Columns>
                         <RadzenDataGridColumn Property="productionVersion" Title="@local["Active"]" TextAlign="TextAlign.Center">
@@ -61,18 +64,19 @@
 
                         <RadzenDataGridColumn Property="datetime" Title="@local["Date and time"]" TextAlign="TextAlign.Center">
                             <Template Context="sheet">
-                                @(sheet.dateTime.Date + sheet.dateTime.TimeOfDay)
+                                @(sheet.dateTime.ToShortDateString()) <br />
+                                @(sheet.dateTime.ToShortTimeString())
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
             </RadzenColumn>
 
-            <RadzenColumn Size="12" SizeMD="6" Style="padding-left: 0.5rem;">
-                <RadzenCard Style="width: 100%; height: 100%;" class="rz-shadow-6">
+            <RadzenColumn Size="12" SizeMD="9" >
+                <RadzenCard Style="width: 100%; height: fit-content; overflow: auto;" id="toResize2" class="rz-shadow-6">
                     @if (selectedSheet is not null)
                     {
-                        <_StatusCard sheet="selectedSheet" />
+                        <_StatusCard displayInfo="true" sheet="selectedSheet" />
                     }
                     else
                     {
@@ -86,6 +90,15 @@
 
 @implements IDisposable
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize2");
+        }
+    }
+
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
 

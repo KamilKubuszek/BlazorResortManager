@@ -1,78 +1,84 @@
 ﻿@using System.Text.Json
 @using System.Globalization
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-
+<style>
+    .rz-tabview-panels{
+        overflow-y: hidden;
+    }
+</style>
 @if (!loading)
 {
-    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="fetchData" Style="height: 100%;">
+    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="tabChanged" Style="height: 100%; overflow-y: hidden">
         <Tabs>
-            <RadzenTabsItem Text="@local["Status"]">
-                <_StatusCard sheet="sheet" />
+            <RadzenTabsItem Text="@local["Status"]" Style="height:100%; overflow-y: hidden">
+                <_StatusCard displayInfo="false" sheet="sheet" />
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="@local["Weather"]" Style="height:100%; overflow-y: hidden">
-                <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 280px;">
-                    <Columns>
-                        <RadzenDataGridColumn Title="@local["Day"]">
-                            <Template Context="timeserie">
-                                @(timeserie.time.DayOfWeek + " "
-                                + timeserie.time.Day + " "
-                                + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture)
-                                + ".")
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="@local["00-12"]" Width="82px" TextAlign="TextAlign.Center">
-                            <Template Context="timeserie">
-                                @if (timeserie.midnightToTwelve is not null)
-                                {
-                                    <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.midnightToTwelve?.symbol_code+".png")" loading="lazy" />
-                                }
-                                else
-                                {
-                                    <p></p>
-                                }
+                <div id="weatherContainer">
+                    <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 300px;">
+                        <Columns>
+                            <RadzenDataGridColumn Title="@local["Day"]">
+                                <Template Context="timeserie">
+                                    @(timeserie.time.DayOfWeek + " "
+                                    + timeserie.time.Day + " "
+                                    + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture)
+                                    + ".")
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Title="@local["00-12"]" Width="82px" TextAlign="TextAlign.Center">
+                                <Template Context="timeserie">
+                                    @if (timeserie.midnightToTwelve is not null)
+                                    {
+                                        <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.midnightToTwelve?.symbol_code+".png")" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
 
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="@local["12-00"]" Width="82px" TextAlign="TextAlign.Center">
-                            <Template Context="timeserie">
-                                @if (timeserie.twelveToMidnight is not null)
-                                {
-                                    <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.twelveToMidnight?.symbol_code+".png")" loading="lazy" />
-                                }
-                                else
-                                {
-                                    <p></p>
-                                }
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="@local["Max/min temp."]">
-                            <Template Context="timeserie">
-                                @(timeserie.maxTemp + "/" + timeserie.minTemp)
-                            </Template>
-                        </RadzenDataGridColumn>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Title="@local["12-00"]" Width="82px" TextAlign="TextAlign.Center">
+                                <Template Context="timeserie">
+                                    @if (timeserie.twelveToMidnight is not null)
+                                    {
+                                        <img width="50px" draggable="false" src="@("Resources/WeatherIcons/"+timeserie.twelveToMidnight?.symbol_code+".png")" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Title="@local["Max/min temp."]">
+                                <Template Context="timeserie">
+                                    @(timeserie.maxTemp + "/" + timeserie.minTemp)
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Precipitation"]">
-                            <Template Context="timeserie">
-                                @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="@local["Max/min wind speed"]">
-                            <Template Context="timeserie">
-                                @(timeserie.maxWind + "/" + timeserie.minWind + " m/s")
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
-                <p>
-                    @local["Powered by"] <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
-                </p>
+                            <RadzenDataGridColumn Title="@local["Precipitation"]">
+                                <Template Context="timeserie">
+                                    @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Title="@local["Max/min wind speed"]">
+                                <Template Context="timeserie">
+                                    @(timeserie.maxWind + "/" + timeserie.minWind + " m/s")
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                    <p>
+                        @local["Powered by"] <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
+                    </p>
+                </div>
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="@local["Cameras"]">
                 @if (cameras.Any())
                 {
-                    <div class="h-[300px] relative w-full">
+                    <div class="relative h-[300px] w-full">
                         <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
                         @if (currentCameraIndex != 0)
                         {
@@ -106,10 +112,12 @@ else
 {
     <_LoadingScreen />
 }
-}
+
 @inject IStringLocalizer<AppLanguage> local
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @inject IForecastClient forecastClient
+@inject IJSRuntime JSRuntime
+
 @code {
     private StatusSheet? sheet = null;
 
@@ -149,6 +157,23 @@ else
         });
 
     }
+
+    private async Task tabChanged()
+    {
+        switch (pageIndex)
+        {
+            case 0:
+
+                break;
+            case 1:
+                await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "weatherContainer");
+                break;
+
+        }
+        
+    }
+   
+
 
     private async Task getWeather()
     {
