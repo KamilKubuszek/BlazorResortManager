@@ -7,57 +7,78 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 
-<h3>@local["Resorts Requests"]</h3>
+<h3 class="text-3xl font-bold">@local["Resorts Requests"]</h3>
 
-<RadzenDataGrid Data="permitsWithUnapprovedResorts" TItem="Permit">
+<RadzenDataList Data="permitsWithUnapprovedResorts" TItem="Permit">
     <Template Context="permit">
-        <RadzenRow>
-            <RadzenColumn><p>@local["Name"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.name</p></RadzenColumn>
-        </RadzenRow>
+        <RadzenCard>
+            @* @permit.ApplicationUser.UserName
+            @permit.resort.name *@
+            
+            <RadzenStack>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Name"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.name</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Description"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.description</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Description"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.description</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Address"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.address</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Address"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.address</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Phone Number"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.phoneNumber</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Phone Number"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.phoneNumber</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Email"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.email</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Email"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.email</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Webpage"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.webpage</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Webpage"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.webpage</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Approved"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.approved</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Approved"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.approved</p></RadzenColumn>
-        </RadzenRow>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Coordinates X"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.coordinatesX</p></RadzenColumn>
+                </RadzenRow>
+                <hr />
 
-        <RadzenRow>
-            <RadzenColumn><p>@local["Coordinates X"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.coordinatesX</p></RadzenColumn>
-        </RadzenRow>
-
-        <RadzenRow>
-            <RadzenColumn><p>@local["Coordinates Y"]</p></RadzenColumn>
-            <RadzenColumn><p>@permit.resort.coordinatesY</p></RadzenColumn>
-        </RadzenRow>
-        <RadzenButton Text="@local["Approve"]" Click="() => approveResort(permit.resort)" Style="width: fit-content" />
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Coordinates Y"]</p></RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8"><p>@permit.resort.coordinatesY</p></RadzenColumn>
+                </RadzenRow>
+           
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenButton Text="@local["Approve"]" Click="() => approveResort(permit.resort)" Style="width: fit-content" />
+                        <RadzenButton Text="@local["Deny"]" Click="() => denyResort(permit.resort)" Style="width: fit-content" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenCard>
+        
     </Template>
-    <Columns>
+@*     <Columns>
         <RadzenDataGridColumn Title="@local["User"]">
             <Template Context="permit">
                 @permit.ApplicationUser.UserName
@@ -69,13 +90,18 @@
                 @permit.resort.name
             </Template>
         </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+    </Columns> *@
+</RadzenDataList>
 
 @code {
     private Permit[] permitsWithUnapprovedResorts { get; set; } = Array.Empty<Permit>();
 
     protected override async Task OnInitializedAsync()
+    {
+        await updateData();
+    }
+
+    private async Task updateData()
     {
         using (var database = contextFactory.CreateDbContext())
         {
@@ -89,6 +115,7 @@
                         ApplicationUser = new ApplicationUser { UserName = e.ApplicationUser.UserName }
                     }).ToArrayAsync();
         }
+        StateHasChanged();
     }
 
     private async Task approveResort(Resort resort)
@@ -119,7 +146,7 @@
             database.statusSheets.Add(sheet);
 
             dialogService.Open<_LoadingTaskDialog>(
-                "", new Dictionary<string, object> { { "displayMessage", local["Editing data..."] } },
+                "", new Dictionary<string, object> { { "displayMessage", "Editing data..." } },
                 new DialogOptions { CloseDialogOnEsc = false, ShowClose = false });
 
             try
@@ -142,6 +169,45 @@
                     Duration = 3000
                 };
             notificationService.Notify(notifMessage);
+
+            await updateData();
         }
+    }
+
+    private async Task denyResort(Resort resort)
+    {
+        bool error = false;
+        using (var database = contextFactory.CreateDbContext())
+        {
+            dialogService.Open<_LoadingTaskDialog>(
+                  "", new Dictionary<string, object>() { { "displayMessage", "Deleting data..." } },
+                      new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+            var permits = database.permits.Where(e => e.resortId == resort.id).ToArray();    
+            foreach(Permit permit in permits)
+            {
+                database.permits.Remove(permit);
+            }
+            database.resorts.Remove(resort);
+
+            try
+            {
+                await Task.Delay(2000);
+                await database.SaveChangesAsync();
+            }
+            catch
+            {
+                error = true;
+            }
+        }
+        dialogService.Close();
+
+        var notifMessage = new NotificationMessage
+            {
+                Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                Summary = !error ? local["Deleted data successfully!"] : local["There was an error while executing the request"],
+                Duration = 3000
+            };
+        await updateData();
     }
 }
