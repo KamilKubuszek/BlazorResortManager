@@ -1,82 +1,115 @@
 ﻿@page "/resort/status/add"
-
 @attribute [Authorize]
-
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
 @inject IStringLocalizer<AppLanguage> local
 
-<h3 class="text-3xl font-bold">@local["UpdateStatus"]</h3>
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+
 
 @if (statusSheetDto is not null)
 {
+    
+    <h3 class="text-3xl font-bold">@local["Update status"]</h3>
+    <br />
+    
     <RadzenTemplateForm Method="post" TItem="StatusSheet" Data="statusSheetDto" Submit="submitForm">
-        <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true" ColumnWidth="100px">
-            <Columns>
-                <RadzenDataGridColumn Title="@local["Name"]">
-                    <Template Context="tstatus">
-                        @tstatus.parentTrack.name
-                    </Template>
-                </RadzenDataGridColumn>
+        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+            <RadzenRow>
+                <RadzenColumn>
+                    <h2 class="text-2xl font-bold">@local["Tracks"]</h2>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                
+                <RadzenColumn>
+                    <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenDataGridColumn Title="@local["Name"]">
+                            <Template Context="tstatus">
+                                @tstatus.parentTrack.name
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["Opened"]">
-                    <Template Context="tstatus">
-                        <RadzenCheckBox @bind-Value=tstatus.opened />
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
+                            <Template Context="tstatus">
+                                <RadzenCheckBox @bind-Value=tstatus.opened />
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["SnowCover"]">
-                    <Template Context="tstatus">
-                        <RadzenNumeric @bind-Value=tstatus.snowCover />
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Snow cover"]">
+                            <Template Context="tstatus">
+                                <RadzenNumeric @bind-Value=tstatus.snowCover Style="min-width: 75px"/>
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["OpeningTime"]">
-                    <Template Context="tstatus">
-                        <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Opening time"]">
+                            <Template Context="tstatus">
+                                <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["ClosingTime"]">
-                    <Template Context="tstatus">
-                        <RadzenDatePicker @bind-Value=@tstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
+                        <RadzenDataGridColumn Title="@local["Closing time"]">
+                            <Template Context="tstatus">
+                                <RadzenDatePicker @bind-Value=@tstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <h2 class="text-2xl font-bold">@local["Lifts"]</h2>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn>
+                    <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenDataGridColumn Title="@local["Name"]">
+                            <Template Context="lstatus">
+                                @lstatus.parentLift.name
+                            </Template>
+                        </RadzenDataGridColumn>
 
-        <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true" ColumnWidth="100px">
-            <Columns>
-                <RadzenDataGridColumn Title="@local["Name"]">
-                    <Template Context="lstatus">
-                        @lstatus.parentLift.name
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
+                            <Template Context="lstatus">
+                                <RadzenCheckBox @bind-Value=lstatus.opened />
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["Opened"]">
-                    <Template Context="lstatus">
-                        <RadzenCheckBox @bind-Value=lstatus.opened />
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Opening time"]">
+                            <Template Context="lstatus">
+                                <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                            </Template>
+                        </RadzenDataGridColumn>
 
-                <RadzenDataGridColumn Title="@local["OpeningTime"]">
-                    <Template Context="lstatus">
-                        <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </Template>
-                </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="@local["Closing time"]">
+                            <Template Context="lstatus">
+                                 <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+                </RadzenColumn>
+            </RadzenRow>
+        
+            <RadzenRow>
+                <RadzenCheckBox Name="prVf" @bind-Value=statusSheetDto.productionVersion />
+                <RadzenLabel Component="prVf">@local["Activate status on submit"]</RadzenLabel>
+            </RadzenRow>
 
-                <RadzenDataGridColumn Title="@local["ClosingTime"]">
-                    <Template Context="lstatus">
-                        <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
+            <RadzenRow>
+                <RadzenButton Style="width: fit-content" ButtonType="ButtonType.Submit" Text="@local["Save"]" />
+            </RadzenRow>
 
-        <RadzenCheckBox Name="prVf" @bind-Value=statusSheetDto.productionVersion />
-        <RadzenLabel Component="prVf">@local["ActivateStatusOnSubmit"]</RadzenLabel>
-
-        <RadzenButton ButtonType="ButtonType.Submit" Text="@local["Save"]" />
+        </RadzenStack>
     </RadzenTemplateForm>
 }
 else
@@ -232,6 +265,7 @@ else
                                     .AsNoTracking()
                                     .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
             }
+            StateHasChanged();
         }
     }
 
