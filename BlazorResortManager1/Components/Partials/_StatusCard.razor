@@ -1,14 +1,20 @@
 ﻿@rendermode InteractiveServer
 @inject IStringLocalizer<AppLanguage> local
-<div class="h-[280px] block">
-    <h3>@($"{sheet.dateTime} {local["Status"]}")</h3>
-    <hr />
-    <div class="h-[350]">
-        <RadzenTabs>
+@inject IJSRuntime JSRuntime
+<div class="block h-full w-full" id="containerRef">
+    @if (displayInfo)
+    {
+        <h3>@($"{sheet.dateTime} {local["Status"]}")</h3>
+        <hr />
+    }
+
+    @* <div class="h-[350]"> *@
+        <RadzenTabs Change="resizeOnChange">
             <Tabs>
                 <RadzenTabsItem Text="@local["Tracks"]">
-                    <h2 class="text-2xl font-bold">@local["Tracks"]</h2>
-                    <RadzenDataGrid Data="sheet.trackStatuses.OrderByDescending(e => e.parentTrack.name)" TItem="TrackStatus" AllowVirtualization="true" Style="height: 250px">
+                    @* <h2 class="text-2xl font-bold">@local["Tracks"]</h2> *@
+                    <RadzenDataGrid id="res1" Data="sheet.trackStatuses.OrderByDescending(e => e.parentTrack.name)" 
+                        TItem="TrackStatus" AllowVirtualization="true" Style="height: 250px">
                         <Columns>
                             <RadzenDataGridColumn Title="@local["Name"]" TextAlign="TextAlign.Center">
                                 <Template Context="status">
@@ -40,8 +46,9 @@
                     </RadzenDataGrid>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="@local["Lifts"]">
-                    <h2 class="text-2xl font-bold">@local["Lifts"]</h2>
-                    <RadzenDataGrid Data="sheet.liftStatuses.OrderByDescending(e => e.parentLift.name)" TItem="LiftStatus">
+                    @* <h2 class="text-2xl font-bold">@local["Lifts"]</h2> *@
+                    <RadzenDataGrid id="res2" Data="sheet.liftStatuses.OrderByDescending(e => e.parentLift.name)" 
+                        TItem="LiftStatus" Style="height:250px">
                         <Columns>
                             <RadzenDataGridColumn Title="@local["Name"]" TextAlign="TextAlign.Center">
                                 <Template Context="status">
@@ -69,12 +76,17 @@
                 </RadzenTabsItem>
             </Tabs>
         </RadzenTabs>
-    </div>
+    @* </div> *@
 </div>
 
 @code {
     [Parameter]
+    public bool displayInfo { get; set; }
+
+    [Parameter]
     public StatusSheet? sheet { get; set; }
+
+    private int pageIndex = 0;
 
     protected override void OnInitialized()
     {
@@ -83,5 +95,30 @@
 
         // Console.WriteLine(JsonSerializer.Serialize(sheet, new JsonSerializerOptions { WriteIndented = true, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
 
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        //     await Task.Delay(100);
+        //     int bottom = await JSRuntime.InvokeAsync<int>("getBottomOffsetReference", "containerRef");
+        //     await JSRuntime.InvokeVoidAsync("sizeHeightToBottomOfParent", "res1", bottom);
+        // }
+    }
+    private async Task resizeOnChange()
+    {
+        // int bottom = await JSRuntime.InvokeAsync<int>("getBottomOffsetReference", "containerRef");
+        // switch (pageIndex)
+        // {
+        //     case 0:
+        //         await JSRuntime.InvokeVoidAsync("sizeHeightToBottomOfParent", "res1", bottom);
+        //         break;
+        //     case 1:
+        //         await JSRuntime.InvokeVoidAsync("sizeHeightToBottomOfParent", "res2", bottom);
+        //         break;
+        // }
+        // await Task.Delay(1000);
+
+        
     }
 }
