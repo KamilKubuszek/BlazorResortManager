@@ -1,0 +1,41 @@
+﻿<RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
+    @if(onAdd is not null)
+    {
+        @* <RadzenButton Style="width: 10%" Text="@local["Add"]" Click="addClick" /> *@
+    }
+    @if(onEdit is not null)
+    {
+        @* <RadzenButton Style="width: 10%" Text="@local["Edit"]" Click="editClick" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" /> *@
+    }
+    @if(onDelete is not null)
+    {
+        @* <RadzenButton Style="width: 10%" Text="@local["Delete"]" Click="deleteClick" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" /> *@
+    }
+</RadzenStack>
+
+@inject IStringLocalizer<AppLanguage> local
+@code {
+    [Parameter]
+    public EventCallback? onAdd { get; set; }
+
+    [Parameter]
+    public EventCallback? onEdit { get; set; }
+
+    [Parameter]
+    public EventCallback? onDelete { get; set; }
+
+    protected void addClick()
+    {
+
+    }
+
+    protected void editClick()
+    {
+        
+    }
+
+    protected void deleteClick()
+    {
+
+    }
+}
