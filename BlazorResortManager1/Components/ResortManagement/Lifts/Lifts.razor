@@ -6,19 +6,21 @@
 <RadzenStack Style="">
     @if (resortData is not null)
     {
-        <RadzenRow>
-            <RadzenColumn>
-                <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
+        <RadzenRow JustifyContent="JustifyContent.Right">
+            <RadzenColumn SizeMD="6" Size="12">
+                <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
+                    <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
+                        <RadzenButton Text="@local["Edit"]" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
+                        <RadzenButton Text="@local["Delete"]" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                    </RadzenStack>
+                </RadzenCard>
 
-                    <RadzenButton Style="width: 10%" Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/lift/add") )" />
-                    <RadzenButton Style="width: 10%" Text="@local["Edit"]" Click="editLift" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" />
-                    <RadzenButton Style="width: 10%" Text="@local["Delete"]" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedLifts?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
-                </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn Size="12">
-                <RadzenDataGrid Data="@resortData.lifts" TItem="Lift" AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true" ColumnWidth="100px"
+                <RadzenDataGrid id="toResize" Data="@resortData.lifts" TItem="Lift" AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true" ColumnWidth="100px"
                                 CellContextMenu="OnCellLiftContextMenu" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
                         <RadzenDataGridColumn TItem="Lift" Property="name" Title="@local["Name"]" Frozen="true">
@@ -46,7 +48,7 @@
     }
     else
     {
-        <p>@local["SelectResortFirst"]</p>
+        <p>@local["Select resort first"]</p>
     }
 </RadzenStack>
 
@@ -57,6 +59,7 @@
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
 @inject IStringLocalizer<AppLanguage> local
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 @code {
@@ -71,6 +74,14 @@
     {
         updateData();
         resortChangeManager.ResortChange += updateData;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+        }
     }
 
     private void OnCellLiftContextMenu(DataGridCellMouseEventArgs<Lift> args)
@@ -144,7 +155,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Success,
-                        Summary = @local["DeletedDataSuccess"],
+                        Summary = @local["Deleted data successfully!"],
                         Duration = 3000
                     };
             }
@@ -153,7 +164,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
-                        Summary = @local["ErrorWhileExecutingRequest"],
+                        Summary = @local["There was an error while executing the request"],
                         Duration = 3000
                     };
             }

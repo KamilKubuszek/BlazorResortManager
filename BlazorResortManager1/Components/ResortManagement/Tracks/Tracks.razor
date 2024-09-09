@@ -1,24 +1,27 @@
 ﻿@page "/resort/Track"
 @attribute [Authorize]
 @inject IStringLocalizer<AppLanguage> local
+@inject IJSRuntime JSRuntime
 
 <h3 class="text-3xl font-bold">@local["Tracks"]</h3>
 
 @if (resortData is not null)
 {
     <RadzenStack>
-        <RadzenRow>
-            <RadzenColumn>
-                <RadzenStack JustifyContent="JustifyContent.Right" Orientation="Orientation.Horizontal" Gap="0.5rem">
-                    <RadzenButton Style="width: 10%" Text="@local["Add new"]" Click="@(() => navigationManager.NavigateTo("/resort/track/add"))" />
-                    <RadzenButton Style="width: 10%" Text="@local["Edit"]" Click="editTrack" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" />
-                    <RadzenButton Style="width: 10%" Text="@local["Delete"]" Click="deleteTrack" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
-                </RadzenStack>
+        <RadzenRow JustifyContent="JustifyContent.Right">
+            <RadzenColumn SizeMD="6" Size="12">
+                <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
+                    <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/track/add"))" />
+                        <RadzenButton Text="@local["Edit"]" Click="editTrack" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" />
+                        <RadzenButton Text="@local["Delete"]" Click="deleteTrack" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedTracks?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                    </RadzenStack>
+                </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn>
-                <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+                <RadzenDataGrid id="toResize" TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
                                 @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
                         <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" />
@@ -73,6 +76,14 @@ else
     {
         updateData();
         resortChangeManager.ResortChange += updateData;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+        }
     }
 
     private async Task deleteTrack()
