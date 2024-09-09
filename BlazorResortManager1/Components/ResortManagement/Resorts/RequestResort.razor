@@ -135,6 +135,10 @@
             {
                 try
                 {
+                    dialogService.Open<_LoadingTaskDialog>(
+                        "", new Dictionary<string, object>() { { "displayMessage", "Adding data..." } },
+                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
                     var auth = await authenticationState;
                     var userId = auth.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                     if (userId is null)
@@ -160,9 +164,7 @@
                             resortId = resortDto.id
                         });
 
-                    dialogService.Open<_LoadingTaskDialog>(
-                        "", new Dictionary<string, object>() { { "displayMessage", local["Adding data..."] } },
-                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+                    
 
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);

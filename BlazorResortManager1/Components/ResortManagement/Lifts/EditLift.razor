@@ -115,7 +115,7 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", local["Editing data..."] } },
+                   "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
                 var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking();
@@ -242,6 +242,7 @@
             cameras = await database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArrayAsync();
             selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
         }
+        StateHasChanged();
     }
 
     public void Dispose()
