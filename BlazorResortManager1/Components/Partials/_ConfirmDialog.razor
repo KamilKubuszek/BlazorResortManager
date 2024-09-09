@@ -1,21 +1,23 @@
 ﻿<RadzenStack>
 	<RadzenRow>
 		<RadzenColumn>
-			Are you sure you want to perform this action?
+			<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+				<p>@local["Are you sure you want to perform this action?"]</p>
+			</RadzenStack>
 		</RadzenColumn>
 	</RadzenRow>
 	<RadzenRow JustifyContent="JustifyContent.Center">
 		<RadzenColumn>
-			<RadzenButton Text="Confirm" Click="() => takeAction(true)"/>
-		</RadzenColumn>
-
-		<RadzenColumn>
-			<RadzenButton Text="Cancel" Click="() => takeAction(false)" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined"/>
+			<RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal">
+				<RadzenButton Style="width: fit-content" Text=@local["Confirm"] Click="() => takeAction(true)" />
+				<RadzenButton Style="width: fit-content" Text=@local["Cancel"] Click="() => takeAction(false)" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Outlined" />
+			</RadzenStack>
 		</RadzenColumn>
 	</RadzenRow>
 </RadzenStack>
 
 @inject DialogService dialogService
+@inject IStringLocalizer<AppLanguage> local
 @code {
 	private void takeAction(bool confimation)
 	{
