@@ -177,8 +177,30 @@ else
 
     private async Task getWeather()
     {
-        var forecastModel = await forecastClient.GetWeather(11, 30);
-        forecastTableData = forecastClient.ParseForecastModelToTable(forecastModel);
+        using (var database = contextFactory.CreateDbContext())
+        {
+            try
+            {
+                var resort = await database.resorts
+                // .Select(e =>
+                // new Resort {
+                //     coordinatesX = e.coordinatesX,
+                //     coordinatesY = e.coordinatesY
+                // })
+                .FirstOrDefaultAsync(e => e.id == selectedResortId);
+                var cordX = forecastClient.convertToDecimalDegrees(resort.coordinatesX);
+                var cordY = forecastClient.convertToDecimalDegrees(resort.coordinatesY);
+
+                var forecastModel = await forecastClient.GetWeather(cordX, cordY);
+                forecastTableData = forecastClient.ParseForecastModelToTable(forecastModel);
+            }
+            catch
+            {
+                forecastTableData = Array.Empty<ForecastTableModel>();
+            }
+
+            //var coordinateX = forecastClient.convertToDecimalDegrees();
+        }
     }
 
     private async Task fetchData()
