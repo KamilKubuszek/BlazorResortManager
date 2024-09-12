@@ -253,6 +253,8 @@ else
         {
             using (var database = contextFactory.CreateDbContext())
             {
+                var trackGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => e.id).ToArrayAsync();
+                var liftGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => e.id).ToArrayAsync();
                 statusSheetDto = await database.statusSheets
                                     .OrderByDescending(e => e.dateTime)
                                     .Include(e => e.trackStatuses)
@@ -264,6 +266,32 @@ else
                                     .AsSplitQuery()
                                     .AsNoTracking()
                                     .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
+
+                foreach(var gat in trackGatherIds)
+                {
+                    if (!statusSheetDto.trackStatuses.Any(e => e.parentTrackId == gat))
+                    {
+                        statusSheetDto.trackStatuses.Add(
+                            new TrackStatus { 
+                                id = Guid.NewGuid(), 
+                                parentTrackId = gat, 
+                                statusSheetId = statusSheetDto.id 
+                            });
+                    }
+                }
+
+                foreach (var gat in liftGatherIds)
+                {
+                    if (!statusSheetDto.liftStatuses.Any(e => e.parentLiftId == gat))
+                    {
+                        statusSheetDto.liftStatuses.Add(
+                            new LiftStatus { 
+                                id = Guid.NewGuid(), 
+                                parentLiftId = gat, 
+                                statusSheetId = statusSheetDto.id 
+                            });
+                    }
+                }
             }
             StateHasChanged();
         }
