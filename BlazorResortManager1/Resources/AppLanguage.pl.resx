@@ -327,4 +327,19 @@
   <data name="Resorts Requests" xml:space="preserve">
     <value>Wnioski o utworzenie ośrodka narciarskiego</value>
   </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Potwierdź hasło</value>
+  </data>
+  <data name="Create a new account" xml:space="preserve">
+    <value>Utwórz nowe konto</value>
+  </data>
+  <data name="Go back to dashboard" xml:space="preserve">
+    <value>Wróć do panelu sterowania</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Zarejestruj</value>
+  </data>
 </root>
