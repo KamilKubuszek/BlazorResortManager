@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using System;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace BlazorResortManager1.Data.Models.yrnoWeatherForecast
 {
@@ -25,8 +27,12 @@ namespace BlazorResortManager1.Data.Models.yrnoWeatherForecast
 
         public async Task<ForecastModel?> GetWeather(double x, double y)
         {
+
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.NumberDecimalSeparator = ".";
+
             var client = _httpClientFactory.CreateClient("YrnoClient");
-            string apiUrl = $"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={x}&lon={y}";
+            string apiUrl = $"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={x.ToString(nfi)}&lon={y.ToString(nfi)}";
 
             await _semaphore.WaitAsync();
 
@@ -87,6 +93,32 @@ namespace BlazorResortManager1.Data.Models.yrnoWeatherForecast
             }).ToArray();
     
             return model1;
+        }
+
+        public double convertToDecimalDegrees(string value)
+        {
+            var match = Regex.Match(value, @"(\d+)°\s*(\d+)'?\s*([NSEW])");
+
+            if (!match.Success)
+            {
+                throw new ArgumentException("Nieprawidłowy format współrzędnych DMS.");
+            }
+
+            // Pobranie stopni, minut i kierunku
+            int degrees = int.Parse(match.Groups[1].Value);
+            int minutes = int.Parse(match.Groups[2].Value);
+            char direction = match.Groups[3].Value[0];
+
+            // Konwersja stopni i minut na wartość dziesiętną
+            double decimalDegrees = degrees + (minutes / 60.0);
+
+            // Jeśli kierunek to 'S' lub 'W', wynik będzie ujemny
+            if (direction == 'S' || direction == 'W')
+            {
+                decimalDegrees *= -1;
+            }
+
+            return decimalDegrees;
         }
     }
 }
