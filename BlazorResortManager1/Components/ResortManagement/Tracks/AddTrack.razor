@@ -54,7 +54,7 @@
                                 </RadzenColumn>
                                 <RadzenColumn Size="12" SizeMD="8">
                                     <RadzenNumeric Name="inclination" @bind-Value="trackDto.inclination" Style="width: 100%;" />
-                                    <RadzenDataAnnotationValidator Component="inclination" />
+                                    @* <RadzenDataAnnotationValidator Component="inclination" /> *@
                                 </RadzenColumn>
                             </RadzenRow>
 
@@ -64,7 +64,7 @@
                                 </RadzenColumn>
                                 <RadzenColumn Size="12" SizeMD="8">
                                     <RadzenNumeric Name="lengthMeters" @bind-Value="trackDto.lengthMeters" Style="width: 100%;" />
-                                    <RadzenDataAnnotationValidator Component="lengthMeters" />
+                                    @* <RadzenDataAnnotationValidator Component="lengthMeters" /> *@
                                 </RadzenColumn>
                             </RadzenRow>
                         </RadzenStack>
@@ -232,7 +232,7 @@
 
                 try
                 {
-                    //await database.SaveChangesAsync();
+                    await database.SaveChangesAsync();
                     await Task.Delay(2000); 
                     dialogService.Close();
                     
@@ -252,7 +252,7 @@
         var notifMessage = new NotificationMessage
             {
                 Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
-                Summary = !error ? "YES" : "no ",
+                Summary = !error ? local["Added data successfully!"] : local["There was an error while executing the request"],
                 Duration = 3000
             };
         notificationService.Notify(notifMessage);
