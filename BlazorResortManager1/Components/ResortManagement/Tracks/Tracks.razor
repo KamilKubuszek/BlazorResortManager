@@ -24,9 +24,9 @@
                 <RadzenDataGrid id="toResize" TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
                                 @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single">
                     <Columns>
-                        <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" />
+                        @* <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" /> *@
 
-                        <RadzenDataGridColumn TItem="Track" Property="name" Title="@local["Name"]" Width="100px" />
+                        <RadzenDataGridColumn TItem="Track" Property="name" Title="@local["Name"]" Width="100px" Frozen="true" />
 
                         <RadzenDataGridColumn TItem="Track" Property="marking" Title="@local["Marking"]" Width="100px" />
 
