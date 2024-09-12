@@ -1,4 +1,5 @@
-﻿@* @page "/Account/Register" *@
+﻿@page "/Account/Register"
+@inject IStringLocalizer<AppLanguage> local
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -15,49 +16,66 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>@local["Register"]</PageTitle>
 
-<h1>Register</h1>
-
-<div class="row">
-    <div class="col-md-4">
+<RadzenRow Style="width: 100%; height: 100%">
+    <RadzenColumn>
+        <RadzenCard class="rz-background-color-primary" Style="width: 100%; height: 100%; align-items: center; color: white;">
+            <h1 class="text-5xl font-bold">@local["Create a new account"]</h1>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn>
         <StatusMessage Message="@Message" />
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
-            <h2>Create a new account.</h2>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText type="" @bind-Value="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="username" />
-                <label for="confirm-password">Username</label>
-                <ValidationMessage For="() => Input.UserName" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
-                <label for="email">Email</label>
-                <ValidationMessage For="() => Input.Email" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="password">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="confirm-password">Confirm Password</label>
-                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <RadzenStack JustifyContent="JustifyContent.Center" Style="width: 100%">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+
+                <RadzenStack JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%" Gap="1rem">
+                    <label for="username" class="w-1/4">@local["Username"]</label>
+                    <div class="relative w-3/4">
+                        <InputText @bind-Value="Input.UserName" class="rz-textbox w-full rounded-md" autocomplete="username" aria-required="true" placeholder=@local["username"] />
+                        <ValidationMessage For="() => Input.UserName" class="w-full text-red-500 absolute -bottom-4 right-0.5 text-xs" />
+                    </div>
+                </RadzenStack>
+
+                <RadzenStack JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%" Gap="1rem">
+                    <label for="email" class="w-1/4">Email</label>
+                    <div class="relative w-3/4">
+                        <InputText @bind-Value="Input.Email" class="rz-textbox w-full rounded-md" aria-required="true" placeholder="name@example.com" />
+                        <ValidationMessage For="() => Input.Email" class="w-full text-red-500 absolute -bottom-4 right-0.5 text-xs" />
+                    </div>
+                </RadzenStack>
+
+                <RadzenStack JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%" Gap="1rem">
+                    <label for="password" class="w-1/4">@local["Password"]</label>
+                    <div class="relative w-3/4">
+                        <InputText type="password" @bind-Value="Input.Password" class="rz-textbox w-full rounded-md" autocomplete="new-password" aria-required="true" placeholder=@local["Password"]/>
+                    </div>
+                </RadzenStack>
+
+                <RadzenStack JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%" Gap="1rem">
+                    <label for="confirm-password" class="w-1/4">@local["Confirm password"]</label>
+                    <div class="relative w-3/4">
+                        <InputText type="password" @bind-Value="Input.ConfirmPassword" class="rz-textbox w-full rounded-md" autocomplete="new-password" aria-required="true" placeholder=@local["Password"] />
+                        <ValidationMessage For="() => Input.ConfirmPassword" class="w-full text-red-500 absolute -bottom-4 right-0.5 text-xs" />
+                    </div>
+                </RadzenStack>
+
+                <RadzenStack Style="width: 100%" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <button type="submit" class="rz-background-color-primary rz-ripple min-h-8 w-1/2 rounded-md text-white hover:bg-rz-bg-dark">@local["Register"]</button>
+                    <a href=@(ReturnUrl ?? "/resort") class="leading-8 min-h-8 w-1/2 text-center text-xs hover:underline">@local["Go back to dashboard"]</a>
+                </RadzenStack>
+            </RadzenStack>
         </EditForm>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
+
+        @* <section>
             <h3>Use another service to register.</h3>
             <hr />
             <ExternalLoginPicker />
-        </section>
-    </div>
-</div>
+        </section> *@
+    </RadzenColumn>
+</RadzenRow>
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
@@ -99,13 +117,13 @@
 
         if (UserManager.Options.SignIn.RequireConfirmedAccount)
         {
-            RedirectManager.RedirectTo(
-                "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            // RedirectManager.RedirectTo(
+            //     "Account/RegisterConfirmation",
+            //     new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
         }
 
-        await SignInManager.SignInAsync(user, isPersistent: false);
-        RedirectManager.RedirectTo(ReturnUrl);
+        //await SignInManager.SignInAsync(user, isPersistent: false);
+        RedirectManager.RedirectTo(ReturnUrl ?? "/resort");
     }
 
     private ApplicationUser CreateUser()
