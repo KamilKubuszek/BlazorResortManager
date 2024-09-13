@@ -130,9 +130,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    private Resort? resortData { get; set; } = null;
-
-    private StatusSheet? statusSheetDto { get; set; }
+    private StatusSheet? statusSheetDto = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -166,7 +164,8 @@ else
                             statusSheetId = statusSheetDto.id,
                             parentResortId = statusSheetDto.resortId
                         };
-
+                    rstatus.id = Guid.NewGuid();
+                    rstatus.parentResort = null;
                     var tstatuses = new List<TrackStatus>();
                     var lstatuses = new List<LiftStatus>();
                     foreach (var tstatus in statusSheetDto.trackStatuses)
@@ -253,8 +252,8 @@ else
         {
             using (var database = contextFactory.CreateDbContext())
             {
-                var trackGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => e.id).ToArrayAsync();
-                var liftGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => e.id).ToArrayAsync();
+                var trackGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => new Track { id = e.id, name = e.name }).ToArrayAsync();
+                var liftGatherIds = await database.lifts.Where(e => e.resortId == selectedResort.id).Select(e => new Lift { id = e.id, name = e.name }).ToArrayAsync();
                 statusSheetDto = await database.statusSheets
                                     .OrderByDescending(e => e.dateTime)
                                     .Include(e => e.trackStatuses)
@@ -266,33 +265,55 @@ else
                                     .AsSplitQuery()
                                     .AsNoTracking()
                                     .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
-
-                foreach(var gat in trackGatherIds)
+                if (trackGatherIds is not null)
                 {
-                    if (!statusSheetDto.trackStatuses.Any(e => e.parentTrackId == gat))
+                    foreach (var track in trackGatherIds)
                     {
-                        statusSheetDto.trackStatuses.Add(
-                            new TrackStatus { 
-                                id = Guid.NewGuid(), 
-                                parentTrackId = gat, 
-                                statusSheetId = statusSheetDto.id 
-                            });
+                        if (statusSheetDto.trackStatuses.Any(e => e.parentTrackId == track.id) != true)
+                        {
+                            statusSheetDto.trackStatuses.Add(new TrackStatus
+                                {
+                                    id = Guid.NewGuid(),
+                                    parentTrackId = track.id,
+                                    statusSheetId = statusSheetDto.id,
+                                    parentTrack = new Track()
+                                    {
+                                        id = track.id,
+                                        name = track.name
+                                    }
+                                });
+                            //Console.WriteLine($"Missing one track id: {gat.id}");
+                        }
                     }
                 }
 
-                foreach (var gat in liftGatherIds)
+                if(liftGatherIds is not null)
                 {
-                    if (!statusSheetDto.liftStatuses.Any(e => e.parentLiftId == gat))
+                    foreach (var lift in liftGatherIds)
                     {
-                        statusSheetDto.liftStatuses.Add(
-                            new LiftStatus { 
-                                id = Guid.NewGuid(), 
-                                parentLiftId = gat, 
-                                statusSheetId = statusSheetDto.id 
-                            });
+                        if (!statusSheetDto.liftStatuses.Any(e => e.parentLiftId == lift.id) )
+                        {
+                            statusSheetDto.liftStatuses.Add(new LiftStatus
+                                    {
+                                        id = Guid.NewGuid(),
+                                        parentLiftId = lift.id,
+                                        statusSheetId = statusSheetDto.id,
+                                        parentLift = new Lift()
+                                        {
+                                            id = lift.id,
+                                            name = lift.name
+                                        }
+                                    });
+                        }
                     }
                 }
+
             }
+
+            // using (var database = contextFactory.CreateDbContext())
+            // {
+                
+            // }
             StateHasChanged();
         }
     }
