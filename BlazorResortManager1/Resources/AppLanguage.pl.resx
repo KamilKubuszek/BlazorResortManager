@@ -342,4 +342,28 @@
   <data name="Register" xml:space="preserve">
     <value>Zarejestruj</value>
   </data>
+  <data name="Bind cameras" xml:space="preserve">
+    <value>Powiąż kamery</value>
+  </data>
+  <data name="East" xml:space="preserve">
+    <value>Wschód</value>
+  </data>
+  <data name="Make a request for one here" xml:space="preserve">
+    <value>Wyślij zapytanie o jeden tutaj</value>
+  </data>
+  <data name="North" xml:space="preserve">
+    <value>Północ</value>
+  </data>
+  <data name="South" xml:space="preserve">
+    <value>Południe</value>
+  </data>
+  <data name="West" xml:space="preserve">
+    <value>Zachód</value>
+  </data>
+  <data name="You already sent the max limit of resort requests (3 out of 3)" xml:space="preserve">
+    <value>Już wysłałeś maksymalny limit próśb(3 z 3), poczekaj aż zostaną rozpatrzone </value>
+  </data>
+  <data name="You have no resorts avaiable" xml:space="preserve">
+    <value>Nie masz dostępnych ośrodków</value>
+  </data>
 </root>
