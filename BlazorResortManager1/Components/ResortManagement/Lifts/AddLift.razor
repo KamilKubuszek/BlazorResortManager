@@ -156,7 +156,7 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", local["Editing data..."] } },
+                   "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
                 // Prepare cameras bindings
