@@ -1,5 +1,4 @@
-﻿@inject IDbContextFactory<ApplicationDbContext> contextFactory
-
+﻿@inject IStringLocalizer<AppLanguage> local
 
 <RadzenStack Orientation="Radzen.Orientation.Vertical" Style="width: 100%">
     <RadzenRow AlignItems="AlignItems.Center">
@@ -7,9 +6,9 @@
     </RadzenRow>
     @if(displayMessage is not null)
     {
-        <RadzenRow>
-            <RadzenColumn>@displayMessage</RadzenColumn>
-        </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>@local[displayMessage]</RadzenColumn>
+    </RadzenRow>
     }
     <RadzenRow>
         <RadzenColumn>
