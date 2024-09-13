@@ -14,12 +14,12 @@
 
 <h3 class="text-3xl font-bold">Resorts</h3>
 
+<RadzenButton Text="create resort" Click="@(() => navigationManager.NavigateTo("resort/request/add"))" />
 
 @if(resortData is not null)
 {
     @resortData.tracks.Count()
     @resortData.lifts.Count()
-    <RadzenButton Text="create resort" Click="@(() => navigationManager.NavigateTo("resort/request/add"))"/>
     <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
                     CellClick="@(args => cellClick(args))" CellContextMenu="OnCellTrackContextMenu">
      @* RowUpdate="@(args => updateRow(args))" *@
