@@ -1,13 +1,38 @@
-﻿
+﻿@inject IStringLocalizer<AppLanguage> local
+@switch (resorts.Count())
+{
+    case > 1:
+        <RadzenDropDown Style="width: 100%; text-align: center; margin-top: 1rem; margin-bottom: 1rem;"
+                        Change="setResort"
+                        @bind-Value=@selectedResortId
+                        Data=@resorts
+                        TValue="Guid"
+                        TextProperty="name"
+                        ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
+        </RadzenDropDown>
+        break;
+    case 1:
+        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" 
+                    Style="width: 100%; margin-top: 1rem; margin-bottom: 1rem;" >
 
-<RadzenDropDown Style="width: 100%; text-align: center; margin-top: 1rem; margin-bottom: 1rem;"
-                Change="setResort"
-                @bind-Value=@selectedResortId
-                Data=@resorts
-                TValue="Guid"
-                TextProperty="name"
-                ValueProperty="id" AllowFiltering="true" Name="DropDownResorts">
-</RadzenDropDown>
+            <p class="text-2xl">@selectedResort.name</p>
+        </RadzenStack>  
+        break;
+    case 0:
+        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center"            
+                     Style="width: 100%; margin-top: 1rem; margin-bottom: 1rem;">
+
+            <div class="rz-border-base-500 rz-border-radius-1 p-3">
+                <p>@local["You have no resorts avaiable"] </p>
+                <a href="/resort/request/add" class="text-blue-500 hover:underline">@local["Make a request for one here"]</a>
+            </div>
+        </RadzenStack>
+        break;
+}
+
+    
+
+
 
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 @code {
