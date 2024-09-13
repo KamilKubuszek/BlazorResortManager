@@ -12,13 +12,14 @@ namespace BlazorResortManager1.Data.Models.status
         public Guid id { get; set; }
 
         [Required]
-        public bool opened { get; set; }
+        public bool opened { get; set; } = false;
 
         [Required]
-        public TimeOnly openingTime { get; set; }
+        public TimeOnly openingTime { get; set; } = TimeOnly.Parse("8:00");
 
         [Required]
-        public TimeOnly closingTime { get; set; }
+        public TimeOnly closingTime { get; set; } = TimeOnly.Parse("20:00");
+
 
         [Required]
         public Guid parentLiftId { get; set; }
