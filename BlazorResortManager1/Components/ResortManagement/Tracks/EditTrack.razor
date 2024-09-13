@@ -76,7 +76,7 @@
 
                                 <RadzenRow AlignItems="AlignItems.Center">
                                     <RadzenColumn Size="12" SizeMD="4">
-                                        <RadzenLabel Text="@local["Snowgroomed"]" Component="sg" />
+                                        <RadzenLabel Text="@local["Snow groomed"]" Component="sg" />
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenCheckBox Name="sg" @bind-Value="trackDto.snowGroomed" />
@@ -89,12 +89,14 @@
                     </RadzenStack>
                 </RadzenColumn>
             </RadzenRow>
-
-            <RadzenColumn Size="12" SizeMD="6">
-                <RadzenFieldset Text="Bind cameras">
-                    <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
-                </RadzenFieldset>
-            </RadzenColumn>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFieldset Text="Bind cameras">
+                        <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
+                    </RadzenFieldset>
+                </RadzenColumn>
+            </RadzenRow>
+            
             <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
         </RadzenStack>
     </RadzenTemplateForm>
@@ -143,7 +145,7 @@
         if (isValid)
         {
             dialogService.Open<_LoadingTaskDialog>(
-                "", new Dictionary<string, object>() { { "displayMessage", "editing data..." } },
+                "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
                     new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
             using (var database = contextFactory.CreateDbContext())
@@ -210,7 +212,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = "Edited data successfully!",
+                    Summary = local["Edited data successfully!"],
                     Duration = 3000
                 };
         }
@@ -219,7 +221,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "There was an error while executing the request",
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
