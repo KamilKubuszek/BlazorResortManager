@@ -154,6 +154,9 @@
                         throw new Exception();
                     }
 
+                    //add direction to coordinates
+                    resortDto.coordinatesX += SelectedX == 1 ? "E" : "W";
+                    resortDto.coordinatesY += SelectedY == 1 ? "N" : "S";
                     //requestDto.userId = userId;
 
                     database.resorts.Add(resortDto);
