@@ -28,39 +28,42 @@
             <RadzenRow>
                 
                 <RadzenColumn>
-                    <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true">
-                    <Columns>
-                        <RadzenDataGridColumn Title="@local["Name"]">
-                            <Template Context="tstatus">
-                                @tstatus.parentTrack.name
-                            </Template>
-                        </RadzenDataGridColumn>
+                    <RadzenCard>
+                        <RadzenDataGrid Data="statusSheetDto.trackStatuses" TItem="TrackStatus" AllowColumnResize="true">
+                            <Columns>
+                                <RadzenDataGridColumn Title="@local["Name"]">
+                                    <Template Context="tstatus">
+                                        @tstatus.parentTrack.name
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
-                            <Template Context="tstatus">
-                                <RadzenCheckBox @bind-Value=tstatus.opened />
-                            </Template>
-                        </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
+                                    <Template Context="tstatus">
+                                        <RadzenCheckBox @bind-Value=tstatus.opened />
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Snow cover"]">
-                            <Template Context="tstatus">
-                                <RadzenNumeric @bind-Value=tstatus.snowCover Style="min-width: 75px"/>
-                            </Template>
-                        </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@local["Snow cover"]">
+                                    <Template Context="tstatus">
+                                        <RadzenNumeric @bind-Value=tstatus.snowCover Style="min-width: 75px" />
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Opening time"]">
-                            <Template Context="tstatus">
-                                <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
-                            </Template>
-                        </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@local["Opening time"]">
+                                    <Template Context="tstatus">
+                                        <RadzenDatePicker @bind-Value=@tstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Closing time"]">
-                            <Template Context="tstatus">
-                                <RadzenDatePicker @bind-Value=@tstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
+                                <RadzenDataGridColumn Title="@local["Closing time"]">
+                                    <Template Context="tstatus">
+                                        <RadzenDatePicker @bind-Value=@tstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+
+                    </RadzenCard>
                 </RadzenColumn>
             </RadzenRow>
             <RadzenRow>
@@ -70,33 +73,36 @@
             </RadzenRow>
             <RadzenRow>
                 <RadzenColumn>
-                    <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true">
-                    <Columns>
-                        <RadzenDataGridColumn Title="@local["Name"]">
-                            <Template Context="lstatus">
-                                @lstatus.parentLift.name
-                            </Template>
-                        </RadzenDataGridColumn>
+                    <RadzenCard>
+                        <RadzenDataGrid Data="statusSheetDto.liftStatuses" TItem="LiftStatus" AllowColumnResize="true">
+                            <Columns>
+                                <RadzenDataGridColumn Title="@local["Name"]">
+                                    <Template Context="lstatus">
+                                        @lstatus.parentLift.name
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
-                            <Template Context="lstatus">
-                                <RadzenCheckBox @bind-Value=lstatus.opened />
-                            </Template>
-                        </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@local["Opened"]" TextAlign="TextAlign.Center">
+                                    <Template Context="lstatus">
+                                        <RadzenCheckBox @bind-Value=lstatus.opened />
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Opening time"]">
-                            <Template Context="lstatus">
-                                <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
-                            </Template>
-                        </RadzenDataGridColumn>
+                                <RadzenDataGridColumn Title="@local["Opening time"]">
+                                    <Template Context="lstatus">
+                                        <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Title="@local["Closing time"]">
-                            <Template Context="lstatus">
-                                 <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
+                                <RadzenDataGridColumn Title="@local["Closing time"]">
+                                    <Template Context="lstatus">
+                                        <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+
+                    </RadzenCard>
                 </RadzenColumn>
             </RadzenRow>
         
@@ -114,7 +120,7 @@
 }
 else
 {
-    <p>@local["SelectResortFirst"]</p>
+    <p>@local["Select resort first"]</p>
 }
 
 @inject ResortChangeManager resortChangeManager
@@ -150,7 +156,7 @@ else
             using (var database = contextFactory.CreateDbContext())
             {
                 dialogService.Open<_LoadingTaskDialog>(
-                   "", new Dictionary<string, object>() { { "displayMessage", local["EditingData"] } },
+                   "", new Dictionary<string, object>() { { "displayMessage", "EditingData" } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
 
                 try
@@ -166,6 +172,8 @@ else
                         };
                     rstatus.id = Guid.NewGuid();
                     rstatus.parentResort = null;
+                    
+
                     var tstatuses = new List<TrackStatus>();
                     var lstatuses = new List<LiftStatus>();
                     foreach (var tstatus in statusSheetDto.trackStatuses)
@@ -229,7 +237,7 @@ else
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
-                    Summary = local["UpdatedDataSuccessfully"],
+                    Summary = local["Updated data successfully"],
                     Duration = 3000
                 };
         }
@@ -238,7 +246,7 @@ else
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = local["ErrorWhileExecutingRequest"],
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
@@ -252,68 +260,65 @@ else
         {
             using (var database = contextFactory.CreateDbContext())
             {
-                var trackGatherIds = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => new Track { id = e.id, name = e.name }).ToArrayAsync();
-                var liftGatherIds = await database.lifts.Where(e => e.resortId == selectedResort.id).Select(e => new Lift { id = e.id, name = e.name }).ToArrayAsync();
-                statusSheetDto = await database.statusSheets
-                                    .OrderByDescending(e => e.dateTime)
-                                    .Include(e => e.trackStatuses)
-                                    .ThenInclude(e => e.parentTrack)
-                                    .Include(e => e.liftStatuses)
-                                    .ThenInclude(e => e.parentLift)
-                                    .Include(e => e.resortStatus)
-                                    .ThenInclude(e => e.parentResort)
-                                    .AsSplitQuery()
-                                    .AsNoTracking()
-                                    .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true);
-                if (trackGatherIds is not null)
+                var trackGatherIdsAndNames = await database.tracks.Where(e => e.resortId == selectedResort.id).Select(e => new Track { id = e.id, name = e.name }).ToArrayAsync();
+                var liftGatherIdsAndNames = await database.lifts.Where(e => e.resortId == selectedResort.id).Select(e => new Lift { id = e.id, name = e.name }).ToArrayAsync();
+                statusSheetDto = await database.statusSheets.OrderByDescending(e => e.dateTime)
+                                    .Include(e => e.trackStatuses).ThenInclude(e => e.parentTrack)
+                                    .Include(e => e.liftStatuses).ThenInclude(e => e.parentLift)
+                                    .Include(e => e.resortStatus).ThenInclude(e => e.parentResort)
+                                    .AsSplitQuery().AsNoTracking()
+                                    .FirstOrDefaultAsync(e => e.resortId == selectedResort.id && e.productionVersion == true)
+                                    ?? new StatusSheet()
+                                    {
+                                        productionVersion = false,
+                                        resortId = selectedResort.id,
+                                        liftStatuses = [],
+                                        trackStatuses = []
+                                    };
+                //get list of tracks, check with statuses of tracks. If there is track without own status in sheet make a new one
+                if (trackGatherIdsAndNames is not null)
                 {
-                    foreach (var track in trackGatherIds)
+                    foreach (var track in trackGatherIdsAndNames)
                     {
                         if (statusSheetDto.trackStatuses.Any(e => e.parentTrackId == track.id) != true)
                         {
                             statusSheetDto.trackStatuses.Add(new TrackStatus
+                            {
+                                id = Guid.NewGuid(),
+                                parentTrackId = track.id,
+                                statusSheetId = statusSheetDto.id,
+                                parentTrack = new Track()
                                 {
-                                    id = Guid.NewGuid(),
-                                    parentTrackId = track.id,
-                                    statusSheetId = statusSheetDto.id,
-                                    parentTrack = new Track()
-                                    {
-                                        id = track.id,
-                                        name = track.name
-                                    }
-                                });
-                            //Console.WriteLine($"Missing one track id: {gat.id}");
+                                    id = track.id,
+                                    name = track.name
+                                }
+                            });
                         }
                     }
                 }
 
-                if(liftGatherIds is not null)
+                //same with lifts as tracks
+                if(liftGatherIdsAndNames is not null)
                 {
-                    foreach (var lift in liftGatherIds)
+                    foreach (var lift in liftGatherIdsAndNames)
                     {
                         if (!statusSheetDto.liftStatuses.Any(e => e.parentLiftId == lift.id) )
                         {
                             statusSheetDto.liftStatuses.Add(new LiftStatus
-                                    {
-                                        id = Guid.NewGuid(),
-                                        parentLiftId = lift.id,
-                                        statusSheetId = statusSheetDto.id,
-                                        parentLift = new Lift()
-                                        {
-                                            id = lift.id,
-                                            name = lift.name
-                                        }
-                                    });
+                            {
+                                id = Guid.NewGuid(),
+                                parentLiftId = lift.id,
+                                statusSheetId = statusSheetDto.id,
+                                parentLift = new Lift()
+                                {
+                                    id = lift.id,
+                                    name = lift.name
+                                }
+                            });
                         }
                     }
                 }
-
             }
-
-            // using (var database = contextFactory.CreateDbContext())
-            // {
-                
-            // }
             StateHasChanged();
         }
     }

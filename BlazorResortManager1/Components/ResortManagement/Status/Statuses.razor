@@ -15,11 +15,6 @@
 <h3 class="text-3xl font-bold">@local["Statuses"]</h3>
 @if (resortData is not null)
 {
-@*     <RadzenRow JustifyContent="JustifyContent.Right" Gap="0.5rem">
-        <RadzenColumn Size="3"></RadzenColumn>
-        <RadzenColumn Size="3"></RadzenColumn>
-        <RadzenColumn Size="3"></RadzenColumn>
-    </RadzenRow> *@
     <RadzenStack>
         <RadzenRow JustifyContent="JustifyContent.Right">
             <RadzenColumn SizeMD="6" Size="12">
@@ -51,28 +46,32 @@
                 </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
-        <RadzenRow JustifyContent="JustifyContent.SpaceEvenly">
-            <RadzenColumn Size="12" SizeMD="3" >
-                <RadzenDataGrid id="toResize" Style="height: 40vh" Data="resortData.statusSheets" TItem="StatusSheet"
-                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid" RowClick="(args) => fetchDataForSheet(args)">
-                    <Columns>
-                        <RadzenDataGridColumn Property="productionVersion" Title="@local["Active"]" TextAlign="TextAlign.Center">
-                            <Template Context="sheet">
-                                <RadzenIcon Icon="@(sheet.productionVersion ? "Check_Circle" : "Cancel")" IconColor="@(sheet.productionVersion ? Colors.Success : Colors.Danger)" />
-                            </Template>
-                        </RadzenDataGridColumn>
+        <RadzenRow JustifyContent="JustifyContent.SpaceEvenly" Style="position: relative;">
+            <RadzenColumn Size="12" SizeMD="3">
+                <RadzenCard id="toResize">
+                    @* id="toResize" *@
+                    <RadzenDataGrid Data="resortData.statusSheets" TItem="StatusSheet"
+                                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedSheets IsLoading="loadingGrid" RowClick="(args) => fetchDataForSheet(args)">
+                        <Columns>
+                            <RadzenDataGridColumn Property="productionVersion" Title="@local["Active"]" TextAlign="TextAlign.Center">
+                                <Template Context="sheet">
+                                    <RadzenIcon Icon="@(sheet.productionVersion ? "Check_Circle" : "Cancel")" IconColor="@(sheet.productionVersion ? Colors.Success : Colors.Danger)" />
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn Property="datetime" Title="@local["Date and time"]" TextAlign="TextAlign.Center">
-                            <Template Context="sheet">
-                                @(sheet.dateTime.ToShortDateString()) <br />
-                                @(sheet.dateTime.ToShortTimeString())
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
+                            <RadzenDataGridColumn Property="datetime" Title="@local["Date and time"]" TextAlign="TextAlign.Center">
+                                <Template Context="sheet">
+                                    @(sheet.dateTime.ToShortDateString()) <br />
+                                    @(sheet.dateTime.ToShortTimeString())
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid> 
+
+                </RadzenCard>
             </RadzenColumn>
 
-            <RadzenColumn Size="12" SizeMD="9" >
+            <RadzenColumn Size="12" SizeMD="9">
                 <RadzenCard Style="width: 100%; height: fit-content; overflow: auto;" id="toResize2" class="rz-shadow-6">
                     @if (selectedSheet is not null)
                     {
@@ -94,8 +93,8 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
-            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize2");
+            await JSRuntime.InvokeVoidAsync("setMaxHeightToBottom", "toResize", 16, 4);
+            await JSRuntime.InvokeVoidAsync("setMaxHeightToBottom", "toResize2", 16, 4);
         }
     }
 
