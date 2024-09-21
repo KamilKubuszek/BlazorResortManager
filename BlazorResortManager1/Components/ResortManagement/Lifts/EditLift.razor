@@ -1,5 +1,5 @@
 ﻿@implements IDisposable
-@page "/resort/lift/edit/{selectedLiftId:guid?}"
+@page "/resort/lift/edit/{selectedLiftId:guid}"
 @attribute [Authorize]
 @using System.ComponentModel.DataAnnotations
 
@@ -10,72 +10,94 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 
-<h3 class="text-3xl font-bold">@local["Edit Lift"]</h3>
-@(selectedLiftId?.ToString() ?? local["No lift selected"])
+<h3 class="text-3xl font-bold">@local["Edit lift"]</h3>
 
 @if (liftDto is not null)
 {
     <RadzenTemplateForm Data="liftDto" TItem="Lift" Submit="submitForm">
-        <RadzenStack Style="width: 100%">
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["Name"]">
-                        <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn>
-                    <RadzenDataAnnotationValidator Component="name" />
-                </RadzenColumn>
-            </RadzenRow>
+        <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack>
+                    <RadzenCard>
+                        <RadzenFieldset Text="@local["Data"]">
+                            <RadzenStack Gap="1rem">
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="name" Text="@local["Name"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextBox Name="name" @bind-Value="liftDto.name" Style="width: 100%;" />
+                                        <RadzenDataAnnotationValidator Component="name" />
+                                    </RadzenColumn>
+                                </RadzenRow>
 
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["Type"]">
-                        <RadzenTextBox Name="type" @bind-Value="liftDto.type" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn>
-                    <RadzenDataAnnotationValidator Component="type" />
-                </RadzenColumn>
-            </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="type" Text="@local["Type"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenDropDown Data="liftTypes" @bind-Value="liftDto.liftTypeId" TValue="Guid" TextProperty="name" ValueProperty="id" Style="width: 100%;">
+                                            <Template Context="liftType">
+                                                @(liftType.name+"asjdnkj")
+                                            </Template>
+                                        </RadzenDropDown>
+                                    </RadzenColumn>
+                                </RadzenRow>
 
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["Length"]">
-                        <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="length" Text="@local["Length meters"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenNumeric Name="length" @bind-Value="liftDto.lengthMeters" Style="width: 100%;" />
+                                    </RadzenColumn>
+                                </RadzenRow>
 
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["Capacity Per Unit"]">
-                        <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="capacity" Text="@local["Capacity per seat"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" />
+                                    </RadzenColumn>
+                                </RadzenRow>
 
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["People Per Hour"]">
-                        <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="peoplePerHour" Text="@local["People per hour"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenNumeric Name="peoplePerHour" @bind-Value="liftDto.peoplePerHour" Style="width: 100%;" />
+                                    </RadzenColumn>
+                                </RadzenRow>
 
-            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                <RadzenColumn>
-                    <RadzenFormField Text="@local["Average Duration Time"]">
-                        <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" />
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="duration" Text="@local["Estimated duration time minutes"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenFieldset>
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenColumn>
 
-            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds"
-                            Multiple="true" TextProperty="name" ValueProperty="id"
-                            Placeholder="@local["Select Cameras"]" />
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack>
+                    <RadzenCard>
+                        <RadzenFieldset Text="@local["Bind cameras"]">
+                            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select Cameras"]" Style="width: 100%;" />
+                        </RadzenFieldset>
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
 
-            <RadzenButton Text="@local["Submit Changes"]" ButtonType="ButtonType.Submit" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="@local["Submit changes"]" />
         </RadzenStack>
     </RadzenTemplateForm>
 }
@@ -90,6 +112,8 @@
     private Lift? liftDto { get; set; }
     private Camera[] cameras { get; set; } = [];
     private IEnumerable<Guid> selectedCamerasIds { get; set; }
+
+    private LiftType[] liftTypes = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -241,6 +265,7 @@
             liftDto = await database.lifts.FirstOrDefaultAsync(e => e.id == selectedLiftId);
             cameras = await database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArrayAsync();
             selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
+            liftTypes = await database.liftTypes.OrderByDescending(e => e.name).ToArrayAsync();
         }
         StateHasChanged();
     }

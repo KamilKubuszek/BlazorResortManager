@@ -3,7 +3,7 @@
 
 <h3 class="text-3xl font-bold">@local["Lifts"]</h3>
 
-<RadzenStack Style="">
+<RadzenStack>
     @if (resortData is not null)
     {
         <RadzenRow JustifyContent="JustifyContent.Right">
@@ -20,13 +20,17 @@
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn Size="12">
-                <RadzenDataGrid id="toResize" Data="@resortData.lifts" TItem="Lift" AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true" ColumnWidth="100px"
-                                CellContextMenu="OnCellLiftContextMenu" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single">
+                <RadzenCard id="toResize">
+                    <RadzenDataGrid id="toSetMHeight" Data="@resortData.lifts" TItem="Lift" @bind-Value=selectedLifts SelectionMode="DataGridSelectionMode.Single"
+                                 AllowColumnResize="true" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="@(resortData.lifts.Count > 7)" PageSize="7" AllowSorting="true" ColumnWidth="100px" CellContextMenu="OnCellLiftContextMenu">
                     <Columns>
                         <RadzenDataGridColumn TItem="Lift" Property="name" Title="@local["Name"]" Frozen="true">
                         </RadzenDataGridColumn>
 
                         <RadzenDataGridColumn TItem="Lift" Property="type" Title="@local["Type"]">
+                            <Template Context="Lift">
+                                @Lift.liftType.name
+                            </Template>
                         </RadzenDataGridColumn>
 
                         <RadzenDataGridColumn TItem="Lift" Property="lengthMeters" Title="@local["Length meters"]">
@@ -42,7 +46,7 @@
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
-
+                </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
     }
@@ -70,8 +74,11 @@
 
     private IList<Lift> selectedLifts { get; set; }
 
+    //private IJSObjectReference? jsModule;
+
     protected override async Task OnInitializedAsync()
     {
+        
         updateData();
         resortChangeManager.ResortChange += updateData;
     }
@@ -80,7 +87,10 @@
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+            //jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/");
+            // await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+            // await JSRuntime.InvokeVoidAsync("setMaxHeightToBottom", "toSetMHeight", 16, 2);
+            
         }
     }
 
@@ -109,7 +119,7 @@
     private async Task deleteLift()
     {
         var result = await dialogService.OpenAsync<_ConfirmDialog>(
-            local["ConfirmAction"], new Dictionary<string, object>() { },
+            "Confirm action", new Dictionary<string, object>() { },
             new DialogOptions() { ShowClose = false });
 
         if (result == true)
@@ -155,7 +165,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Success,
-                        Summary = @local["Deleted data successfully!"],
+                        Summary = local["Deleted data successfully!"],
                         Duration = 3000
                     };
             }
@@ -164,7 +174,7 @@
                 notifMessage = new NotificationMessage
                     {
                         Severity = NotificationSeverity.Error,
-                        Summary = @local["There was an error while executing the request"],
+                        Summary = local["There was an error while executing the request"],
                         Duration = 3000
                     };
             }
@@ -188,7 +198,8 @@
             using (var database = contextFactory.CreateDbContext())
             {
                 resortData = selectedResort;
-                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id).ToListAsync();
+                resortData.lifts = await database.lifts.Where(e => e.resortId == selectedResort.id).Include(e => e.liftType)
+                    .OrderByDescending(e => e.name).ToListAsync();
             }
             StateHasChanged();
         }
