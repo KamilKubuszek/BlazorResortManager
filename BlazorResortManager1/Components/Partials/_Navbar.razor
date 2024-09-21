@@ -7,6 +7,7 @@
     <RadzenMenuItem Path="resort/widget" Text="@local["Widget"]" />
     <RadzenMenuItem Path="resort/tutorial" Text="@local["Tutorial"]" />
     <RadzenMenuItem Path="resort/status/update" Text="@local["Update status"]" />
+    <RadzenMenuItem Click="@(() => NavigationManager.NavigateTo("account/login", true))" Text="@local["Logout"]" />
 
     <RadzenProfileMenu Style="float: right">
         <Template>
@@ -18,13 +19,18 @@
     <RadzenAppearanceToggle />
 </RadzenMenu>
 
-<form Model="model" action="Account/Logout" method="post">
+@* <form Model="model" action="Account/Logout" method="post">
     <AntiforgeryToken />
     <input type="hidden" name="ReturnUrl" value="@currentUrl" />
     <button type="submit" class="nav-link" id="logout_button">
         <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> @local["Logout"]
     </button>
-</form>
+</form> *@
+@* <form action="redirectstatic?Target=account/login" method="get">
+    <button type="submit" class="nav-link" id="logout_button">
+        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> @local["Logout"]
+    </button>
+</form> *@
 
 @code {
     private object model = new { };

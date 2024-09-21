@@ -39,7 +39,7 @@
 
                             </RadzenDataGridColumn>
 
-                            <RadzenDataGridColumn Property="@nameof(TrackStatus.openingTime)" Title="@local["Closing at"]" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(TrackStatus.closingTime)" Title="@local["Closing at"]" TextAlign="TextAlign.Center">
 
                             </RadzenDataGridColumn>
                         </Columns>
@@ -64,12 +64,24 @@
                                 </Template>
                             </RadzenDataGridColumn>
 
-                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="@local["Opening at"]" TextAlign="TextAlign.Center">
-
+                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" TextAlign="TextAlign.Center">
+                                <HeaderTemplate>
+                                    <RadzenStack Gap="0.25rem" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Style="width: fit-content;">
+                                        <p>@local["Opening at"]</p>
+                                    
+                                        <RadzenIcon Icon="Schedule" Style="font-size: 20px;" />
+                                    </RadzenStack>
+                                </HeaderTemplate>
                             </RadzenDataGridColumn>
 
-                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" Title="@local["Closing at"]" TextAlign="TextAlign.Center">
+                            <RadzenDataGridColumn Property="@nameof(LiftStatus.openingTime)" TextAlign="TextAlign.Center">
+                                <HeaderTemplate>
+                                    <RadzenStack Gap="0.25rem" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Style="width: fit-content;">
+                                        <p>@local["Closing at"]</p>
 
+                                        <RadzenIcon Icon="Schedule" Style="font-size: 20px;" />
+                                    </RadzenStack>
+                                </HeaderTemplate>
                             </RadzenDataGridColumn>
                         </Columns>
                     </RadzenDataGrid>

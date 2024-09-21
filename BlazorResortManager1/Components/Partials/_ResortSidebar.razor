@@ -14,7 +14,8 @@
         <hr />
         <RadzenPanelMenu Style="width: 100%;" Multiple="false">
             <RadzenPanelMenuItem Text="@local["Approve resorts"]" Path="resort/unapproved" Style="text-align: center" />
-            <RadzenPanelMenuItem Text="@local["Register users"]" Path="account/register" Style="text-align: center" />
+            <RadzenPanelMenuItem Text="@local["Register users"]" Click="@(() => NavigationManager.NavigateTo("account/register", true))" Style="text-align: center" />
+            <RadzenPanelMenuItem Text="@local["Websites allowed to use widget"]" Click="@(() => NavigationManager.NavigateTo("resort/whitelist/", true))" Style="text-align: center" />
         </RadzenPanelMenu>
     </Authorized>
 </AuthorizeView>
@@ -29,7 +30,7 @@
             new pageInfo { url = "resort/track", title = local["Tracks"] },
             new pageInfo { url = "resort/lift", title = local["Lifts"] },
             new pageInfo { url = "resort/status", title = local["Statuses"] },
-            new pageInfo { url = "/resort/camera", title = local["Cameras"] }
+            new pageInfo { url = "resort/camera", title = local["Cameras"] }
         };
         pageUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
     }
