@@ -60,8 +60,9 @@
 @code {
     private Resort? resortDto = new Resort();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        base.OnInitialized();
         resortDto.id = Guid.NewGuid();
     }
 

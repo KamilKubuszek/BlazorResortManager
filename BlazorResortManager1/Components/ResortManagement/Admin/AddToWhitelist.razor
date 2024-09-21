@@ -1,0 +1,85 @@
+﻿@page "/resort/whitelist/add"
+@using System.ComponentModel.DataAnnotations
+@attribute [Authorize(Roles = "Admin")]
+@inject IStringLocalizer<AppLanguage> local
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+
+<h3 class="text-3xl font-bold">@local["Register widget use"]</h3>
+
+<RadzenStack>
+    <RadzenTemplateForm Data="whitelistDto" TItem="WidgetWhitelistedUrl" Submit="submit">
+        <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenCard>
+                    <RadzenStack Gap="1rem">
+                        <RadzenFieldset Text="@local["Data"]">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="website" Text="@local["Website url"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Name="website" @bind-Value="whitelistDto.siteUrl" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="website" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenFieldset>
+                    </RadzenStack>
+                </RadzenCard>
+               
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="@local["Submit"]" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenStack>
+@code {
+    private WidgetWhitelistedUrl whitelistDto { get; set; } = new() { id = Guid.NewGuid() };
+
+    private async Task submit()
+    {
+        bool error = false;
+        ValidationContext context = new ValidationContext(whitelistDto);
+        ICollection<ValidationResult> results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(whitelistDto, context, results, true);
+        if (isValid)
+        {
+            dialogService.Open<_LoadingTaskDialog>(
+                   "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
+                       new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+            using (var database = contextFactory.CreateDbContext())
+            {
+                try
+                {
+                    database.widgetWhitelistedUrls.Add(whitelistDto);
+                    await database.SaveChangesAsync();
+                    await Task.Delay(2000);
+                    dialogService.Close();
+                    navigationManager.NavigateTo("/resort");
+                
+                }
+                catch
+                {
+                    dialogService.Close();
+                    error = true;
+                }
+
+            }
+        }
+        else
+            error = true;
+
+        var notifMessage = new NotificationMessage();
+        notifMessage = new NotificationMessage
+            {
+                Severity = !error ? NotificationSeverity.Success : NotificationSeverity.Error,
+                Summary = !error ? local["Added data successfully!"] : local["There was an error while executing the request"],
+                Duration = 3000
+            };
+        notificationService.Notify(notifMessage);
+
+    }
+}

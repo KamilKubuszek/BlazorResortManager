@@ -1,0 +1,119 @@
+﻿@page "/resort/whitelist"
+@attribute [Authorize(Roles = "Admin")]
+
+<h3 class="text-3xl font-bold">@local["Websites allowed to use widget"]</h3>
+
+<RadzenStack>
+    <RadzenRow JustifyContent="JustifyContent.Right">
+        <RadzenColumn SizeMD="6" Size="12">
+            <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Text="@local["Add"]" Click="@(() => navigationManager.NavigateTo("/resort/whitelist/add") )" />
+                    <RadzenButton Text="@local["Edit"]" Click="editUrl" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedUrl?.Any() == true ? false : true)" />
+                    <RadzenButton Text="@local["Delete"]" Click="deleteUrl" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedUrl?.Any() == true ? false : true)" ButtonStyle="ButtonStyle.Danger" />
+                </RadzenStack>
+            </RadzenCard>
+
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenDataGrid Data="whitelist" TItem="WidgetWhitelistedUrl" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedUrl>
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(WidgetWhitelistedUrl.siteUrl)" Title="@local["Website url"]">
+
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenRow>
+</RadzenStack>
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+@inject NavigationManager navigationManager
+@inject IStringLocalizer<AppLanguage> local
+
+@code {
+    private IList<WidgetWhitelistedUrl> selectedUrl;
+    private WidgetWhitelistedUrl[] whitelist = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await updateData();
+    }
+
+    private async Task updateData()
+    {
+        using (var database = contextFactory.CreateDbContext())
+        {
+            whitelist = await database.widgetWhitelistedUrls.ToArrayAsync();
+        }
+        StateHasChanged();
+    }
+    private void editUrl()
+    {
+        if (selectedUrl?.Any() == true)
+        {
+            navigationManager.NavigateTo("/resort/whitelist/edit/" + selectedUrl[0].id);
+        }
+    }
+
+    private async Task deleteUrl()
+    {
+        var result = await dialogService.OpenAsync<_ConfirmDialog>(
+            "Confirm action", new Dictionary<string, object>() { },
+            new DialogOptions() { ShowClose = false });
+
+        if (result == true)
+        {
+            bool error = false;
+            try
+            {
+                var url = selectedUrl[0];
+
+                if (selectedUrl?.Any() == true)
+                {
+                    selectedUrl.Clear();
+                }
+                else throw new Exception();
+
+                using (var database = contextFactory.CreateDbContext())
+                {
+
+                    database.Remove(url);
+
+                    database.SaveChanges();
+                }
+            }
+            catch
+            {
+                dialogService.Close();
+                error = true;
+            }
+
+            var notifMessage = new NotificationMessage();
+            if (!error)
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = local["Deleted data successfully!"],
+                        Duration = 3000
+                    };
+            }
+            else
+            {
+                notifMessage = new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = local["There was an error while executing the request"],
+                        Duration = 3000
+                    };
+            }
+            notificationService.Notify(notifMessage);
+            updateData();
+        }
+    }
+}
+
