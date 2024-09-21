@@ -28,22 +28,28 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenDataGrid Data="resortData.cameras" TItem="Camera"
-                            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedCameras>
-                <Columns>
-                    <RadzenDataGridColumn TItem="Camera" Property="name" Title="@local["Name"]" Width="100px">
-                    </RadzenDataGridColumn>
+            <RadzenCard>
+                <RadzenDataGrid Data="resortData.cameras" TItem="Camera"
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedCameras>
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Camera" Property="name" Title="@local["Name"]" Width="100px">
+                        </RadzenDataGridColumn>
 
-                    <RadzenDataGridColumn TItem="Camera" Property="link" Title="@local["URL"]" Width="100px">
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
+                        <RadzenDataGridColumn TItem="Camera" Property="link" Title="@local["URL"]" Width="100px">
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn TItem="Camera" Property="description" Title="@local["Description"]" Width="100px">
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+
+            </RadzenCard>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenCard Style="width: 100%; height: 40vh; padding: 0.5rem;">
                 @if (selectedCameras?.Any() == true)
                 {
-                        <iframe src="@selectedCameras[0].link" style="width: 100%; height: calc(40vh - 1rem);"></iframe>
+                    <iframe src="@selectedCameras[0].link" style="width: 100%; height: calc(40vh - 1rem);"></iframe>
                 }
                 else
                 {
@@ -54,70 +60,93 @@
     </RadzenRow>
 
     <RadzenRow>
-        <RadzenColumn>
+        <RadzenColumn><h3 class="text-3xl font-bold">@local["Binds"]</h3>
+            <p>@local["Here are objects and cameras from which they can be seen"]</p>
         </RadzenColumn>
     </RadzenRow>
-
-    @if (trackBinding is not null)
-    {
-        <RadzenStack Style="width: 100%; margin-bottom: 0.5rem; margin-top: 0.5rem;" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            @foreach (var group in trackBinding)
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6">
+            @if (trackBinding is not null)
             {
-                <RadzenCard Style="width: 20%; text-align:center">
-                    <p>@group.Key</p>
-                    <hr />
-                    <p>
-                        @{
-                            var count = 0;
-                        }
-                        @foreach (var bind in group)
-                        {
-                            @if (count == 0)
+                <h2 class="text-2xl font-bold">@local["Tracks"]</h2>
+                <RadzenDataList WrapItems="true" AllowPaging="true" PageSize="2" Data="trackBinding" TItem="IGrouping<string, CameraTrackBinding>">
+                    <Template Context="group">
+                        <RadzenCard Style="width: 25%; height: 20vh; text-align:center">
+                            <RadzenRow>
+                                <RadzenColumn>@group.Key <hr /></RadzenColumn>
+                                    
+                            </RadzenRow>
+                            @foreach (var bind in group)
                             {
-                                @(bind.camera.name)
+                                <RadzenRow>
+                                    <RadzenColumn>@bind.camera.name</RadzenColumn>
+                                </RadzenRow>
                             }
-                            else
-                            {
-                                @(", " + bind.camera.name)
-                            }
-                            count++;
-                        }
-                    </p>
-                </RadzenCard>
+                                
+                                
+                                @* @{
+                                    var count = 0;
+                                }
+                                @foreach (var bind in group)
+                                {
+                                    @if (count == 0)
+                                    {
+                                        @(bind.camera.name)
+                                    }
+                                    else
+                                    {
+                                        @(", " + bind.camera.name)
+                                    }
+                                    count++;
+                                } *@
+                                
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
             }
-        </RadzenStack>
-    }
+        </RadzenColumn>
 
-    @if (liftBinding is not null)
-    {
-        <RadzenStack Style="width: 100%; margin-bottom: 0.5rem" Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            @foreach (var group in liftBinding)
+        <RadzenColumn Size="12" SizeMD="6">
+            @if (liftBinding is not null)
             {
-                <RadzenCard Style="width: 20%; text-align:center">
-                    <p>@group.Key</p>
-                    <hr />
-                    <p>
-                        @{
-                            var count = 0;
-                        }
-                        @foreach (var bind in group)
-                        {
-                            @if (count == 0)
-                            {
-                                @(bind.camera.name)
-                            }
-                            else
-                            {
-                                @(", " + bind.camera.name)
-                            }
-                            count++;
-                        }
-                    </p>
-                </RadzenCard>
-            }
-        </RadzenStack>
-    }
+                <h2 class="text-2xl font-bold">@local["Lifts"]</h2>
+                <RadzenDataList WrapItems="true" AllowPaging="true" PageSize="2" Data="@liftBinding" TItem="IGrouping<string, CameraLiftBinding>">
+                    <Template Context="group">
+                        <RadzenCard Style="width: 25%; height: 20vh; text-align:center">
+                            <RadzenRow>
+                                <RadzenColumn>@group.Key <hr /></RadzenColumn>
 
+                            </RadzenRow>
+                            @foreach (var bind in group)
+                            {
+                                <RadzenRow>
+                                    <RadzenColumn>@bind.camera.name</RadzenColumn>
+                                </RadzenRow>
+                            }
+
+
+                            @* @{
+                    var count = 0;
+                    }
+                    @foreach (var bind in group)
+                    {
+                    @if (count == 0)
+                    {
+                    @(bind.camera.name)
+                    }
+                    else
+                    {
+                    @(", " + bind.camera.name)
+                    }
+                    count++;
+                    } *@
+
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>  
+            }
+        </RadzenColumn>
+    </RadzenRow>
     </RadzenStack>
 }
 
