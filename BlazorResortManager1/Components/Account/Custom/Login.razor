@@ -1,5 +1,5 @@
 ﻿@page "/log"
-
+@page "/Account/Login"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
@@ -10,6 +10,7 @@
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Log in</PageTitle>
 
@@ -106,10 +107,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if(HttpContext is null)
+        {
+            HttpContext = HttpContextAccessor.HttpContext;
+        }
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            await SignInManager.SignOutAsync();
         }
     }
 

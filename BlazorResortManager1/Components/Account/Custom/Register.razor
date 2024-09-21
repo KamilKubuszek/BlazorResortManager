@@ -1,5 +1,8 @@
 ﻿@page "/Account/Register"
+@attribute [Authorize]
 @inject IStringLocalizer<AppLanguage> local
+@inject IHttpContextAccessor HttpContextAccessor
+
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
