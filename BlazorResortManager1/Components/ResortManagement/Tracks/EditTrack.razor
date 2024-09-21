@@ -1,18 +1,23 @@
-﻿@implements IDisposable
-@page "/resort/track/edit/{selectedTrackId:guid?}"
+﻿@page "/resort/track/edit/{selectedTrackId:guid}"
 @attribute [Authorize]
+@implements IDisposable
 @using System.ComponentModel.DataAnnotations
 @inject IStringLocalizer<AppLanguage> local
-<h3 class="text-3xl font-bold">Edit Track</h3>
-@(selectedTrackId.ToString() ?? "no track")
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject ResortChangeManager resortChangeManager
+@inject NavigationManager navigationManager
+
+<h3 class="text-3xl font-bold">@local["Edit track"]</h3>
 
 @if (trackDto is not null)
 {
     <RadzenTemplateForm Data="trackDto" TItem="Track" Submit="submitForm">
-        <RadzenStack>
-            <RadzenRow>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenStack>
+        <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack>
+                    <RadzenCard>
                         <RadzenFieldset Text="Data">
                             <RadzenStack Gap="1rem">
                                 <RadzenRow AlignItems="AlignItems.Center">
@@ -40,8 +45,9 @@
                                         <RadzenLabel Text="@local["Difficulty"]" Component="difficulty" />
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
-                                        <RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" />
-                                        <RadzenDataAnnotationValidator Component="difficulty" />
+                                        <RadzenDropDown Data="difficulties" @bind-Value="trackDto.trackDifficultyId" TValue="int" TextProperty="name" ValueProperty="id">
+
+                                        </RadzenDropDown>
                                     </RadzenColumn>
                                 </RadzenRow>
 
@@ -51,7 +57,7 @@
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenNumeric Name="inclination" @bind-Value="trackDto.inclination" Style="width: 100%;" />
-                                        
+                                        @* <RadzenDataAnnotationValidator Component="inclination" /> *@
                                     </RadzenColumn>
                                 </RadzenRow>
 
@@ -61,78 +67,55 @@
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenNumeric Name="lengthMeters" @bind-Value="trackDto.lengthMeters" Style="width: 100%;" />
-                                       
-                                    </RadzenColumn>
-                                </RadzenRow>
-
-                                <RadzenRow AlignItems="AlignItems.Center">
-                                    <RadzenColumn Size="12" SizeMD="4">
-                                        <RadzenLabel Text="@local["Illuminated"]" Component="illuminated" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="8">
-                                        <RadzenCheckBox Name="illuminated" @bind-Value="trackDto.illuminated" />
-                                    </RadzenColumn>
-                                </RadzenRow>
-
-                                <RadzenRow AlignItems="AlignItems.Center">
-                                    <RadzenColumn Size="12" SizeMD="4">
-                                        <RadzenLabel Text="@local["Snow groomed"]" Component="sg" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="8">
-                                        <RadzenCheckBox Name="sg" @bind-Value="trackDto.snowGroomed" />
+                                        @* <RadzenDataAnnotationValidator Component="lengthMeters" /> *@
                                     </RadzenColumn>
                                 </RadzenRow>
                             </RadzenStack>
                         </RadzenFieldset>
+                    </RadzenCard>
+                </RadzenStack>
+            </RadzenColumn>
 
+            <RadzenColumn Size="12" SizeMD="6">
+                <RadzenStack>
+                    <RadzenCard>
+                        <RadzenFieldset Text="@local["Bind cameras"]">
+                            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
+                        </RadzenFieldset>
+                    </RadzenCard>
+                </RadzenStack>
 
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFieldset Text="Bind cameras">
-                        <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
-                    </RadzenFieldset>
-                </RadzenColumn>
-            </RadzenRow>
-            
-            <RadzenButton Text="Submit changes" ButtonType="ButtonType.Submit" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="@local["Submit changes"]" />
         </RadzenStack>
     </RadzenTemplateForm>
 }
 
-@inject ResortChangeManager resortChangeManager
-@inject NavigationManager navigationManager
-@inject IDbContextFactory<ApplicationDbContext> contextFactory
-@inject NotificationService notificationService
-@inject DialogService dialogService
 @code {
-    // [CascadingParameter]
-    // private Resort? selectedResort { get; set; }
+    [Parameter]
+    public Guid? selectedTrackId { get; set; }
+
+    private Track? trackDto { get; set; }
+    private Camera[] cameras { get; set; } = [];
+    private IEnumerable<Guid> selectedCamerasIds { get; set; }
+
+    private TrackDifficulty[] difficulties = [];
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    [Parameter]
-    public Guid? selectedTrackId { get; set; }
-
-    private Camera[] cameras { get; set; } = [];
-    private IEnumerable<Guid> selectedCamerasIds { get; set; }
-
-    private Track? trackDto { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
         await validateTrackOwnership();
-
         resortChangeManager.ResortChange += updateForm;
+
         if (selectedTrackId != null)
         {
-            Console.WriteLine("update form...");
             updateForm();
         }
-
     }
 
     private async Task submitForm()
@@ -144,24 +127,21 @@
 
         if (isValid)
         {
-            dialogService.Open<_LoadingTaskDialog>(
-                "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
-                    new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+            dialogService.Open<_LoadingTaskDialog>("",
+                new Dictionary<string, object> { { "displayMessage", "Editing data..." } },
+                new DialogOptions { CloseDialogOnEsc = false, ShowClose = false }
+            );
 
             using (var database = contextFactory.CreateDbContext())
             {
-                //prepare cameras to
                 var cameraBindings = database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking();
                 var bindingsToRemove = new List<CameraTrackBinding>();
                 var bindingsToAdd = new List<CameraTrackBinding>();
 
                 foreach (var cameraId in selectedCamerasIds)
                 {
-                    //check if there is already bind with that camera in database
                     var bindInDb = cameraBindings.FirstOrDefault(e => e.cameraId == cameraId);
 
-                    //if not found, add new bind
-                    //if not, there is no need to add second one
                     if (bindInDb is null)
                     {
                         var newBind = new CameraTrackBinding
@@ -174,12 +154,11 @@
                         database.cameraTrackBindings.Add(newBind);
                     }
                 }
+
                 foreach (var bindInDb in cameraBindings)
                 {
-                    //find bind from db that is not selected in dropdown
                     var neededBindId = selectedCamerasIds.FirstOrDefault(e => e == bindInDb.cameraId);
 
-                    //if bind was not found, add it to deletion list
                     if (neededBindId == Guid.Empty)
                     {
                         bindingsToRemove.Add(bindInDb);
@@ -189,7 +168,6 @@
 
                 database.Attach(trackDto);
                 database.Entry(trackDto).State = EntityState.Modified;
-
 
                 try
                 {
@@ -204,28 +182,26 @@
             }
         }
         else
-            error = true;
-
-        var notifMessage = new NotificationMessage();
-        if (!error)
         {
-            notifMessage = new NotificationMessage
+            error = true;
+        }
+
+        var notifMessage = error
+            ? new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = local["There was an error while executing the request"],
+                    Duration = 3000
+                }
+            : new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
                     Summary = local["Edited data successfully!"],
                     Duration = 3000
                 };
-        }
-        else
-        {
-            notifMessage = new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Error,
-                    Summary = local["There was an error while executing the request"],
-                    Duration = 3000
-                };
-        }
+
         notificationService.Notify(notifMessage);
+
         if (!error)
             navigationManager.NavigateTo("/resort/track");
     }
@@ -236,41 +212,30 @@
         {
             var auth = await authenticationState;
             var userId = auth.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId is null)
-            {
-                throw new Exception("user permit for tracks id was not found");
-            }
+
+            if (userId is null) throw new Exception("user permit for tracks id was not found");
 
             using (var database = contextFactory.CreateDbContext())
             {
                 var track = await database.tracks.FirstOrDefaultAsync(e => e.id == selectedTrackId);
-                if (track is null)
-                {
-                    throw new Exception("track was not found");
-                }
+
+                if (track is null) throw new Exception("track was not found");
 
                 var permit = await database.permits
                     .FirstOrDefaultAsync(e => e.userId == userId && e.resortId == track.resortId);
-                if (permit is null)
-                {
-                    throw new Exception("user permit for tracks id was not found");
-                }
+
+                if (permit is null) throw new Exception("user permit for tracks id was not found");
             }
         }
         catch (Exception e)
         {
-            var notifMessage = new NotificationMessage();
-
-            notifMessage = new NotificationMessage
+            notificationService.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = "you dont have permissions to do this or something went wrong",
+                    Summary = "You don't have permissions to do this or something went wrong",
                     Duration = 4000
-                };
-
-            notificationService.Notify(notifMessage);
+                });
             navigationManager.NavigateTo("/resort");
-
             Console.WriteLine(e.Message);
         }
     }
@@ -281,8 +246,14 @@
         {
             trackDto = await database.tracks.FirstOrDefaultAsync(e => e.id == selectedTrackId);
             cameras = await database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArrayAsync();
-            selectedCamerasIds = await database.cameraTrackBindings.Where(e => e.trackId == trackDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
+            selectedCamerasIds = await database.cameraTrackBindings
+                .Where(e => e.trackId == trackDto.id)
+                .AsNoTracking()
+                .Select(e => e.cameraId)
+                .ToArrayAsync();
+            difficulties = await database.trackDifficulties.OrderByDescending(e => e.id).ToArrayAsync();
         }
+
         StateHasChanged();
     }
 
@@ -291,5 +262,3 @@
         resortChangeManager.ResortChange -= updateForm;
     }
 }
-
-

@@ -8,7 +8,7 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 
-<h3 class="text-3xl font-bold">@local["Add Track"]</h3>
+<h3 class="text-3xl font-bold">@local["Add track"]</h3>
 
 @if (trackDto is not null)
 {
@@ -16,7 +16,8 @@
         <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack>
-                    <RadzenFieldset Text="Data">
+                    <RadzenCard>
+                        <RadzenFieldset Text="Data">
                         <RadzenStack Gap="1rem">
                             <RadzenRow AlignItems="AlignItems.Center">
                                 <RadzenColumn Size="12" SizeMD="4">
@@ -43,8 +44,11 @@
                                     <RadzenLabel Text="@local["Difficulty"]" Component="difficulty" />
                                 </RadzenColumn>
                                 <RadzenColumn Size="12" SizeMD="8">
-                                    <RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" />
-                                    <RadzenDataAnnotationValidator Component="difficulty" />
+                                    @* <RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="difficulty" /> *@
+                                    <RadzenDropDown Data="difficulties" @bind-Value="trackDto.trackDifficultyId" TValue="int" TextProperty="name" ValueProperty="id">
+
+                                    </RadzenDropDown>
                                 </RadzenColumn>
                             </RadzenRow>
 
@@ -69,14 +73,14 @@
                             </RadzenRow>
                         </RadzenStack>
                     </RadzenFieldset>
-
-                   
+                    </RadzenCard>
                 </RadzenStack>
             </RadzenColumn>
 
             <RadzenColumn Size="12" SizeMD="6">
                 <RadzenStack>
-                     <RadzenFieldset Text="Status">
+                    <RadzenCard>
+                        <RadzenFieldset Text="Status">
                         <RadzenStack Gap="1rem">
                             <RadzenRow AlignItems="AlignItems.Center">
                                 <RadzenColumn Size="12" SizeMD="4">
@@ -136,12 +140,26 @@
                             </RadzenRow>
                         </RadzenStack>
                     </RadzenFieldset>
+                    </RadzenCard>
+                    <RadzenCard>
+                        <RadzenFieldset Text="@local["Bind cameras"]">
+@*                             @if(selectedCamerasIds.Count() > 0){
+                                <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
+                            }
+                            else{
+                                <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center"
+                                             Style="width: 100%; margin-top: 1rem; margin-bottom: 1rem;">
 
-                    <RadzenFieldset Text="Bind cameras">
-                        <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
-
-                    </RadzenFieldset>
+                                    <div class="rz-border-base-500 rz-border-radius-1 p-3">
+                                        <p>@local["You have no cameras avaiable"] </p>
+                                    </div>
+                                </RadzenStack>
+                            } *@
+                            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
+                        </RadzenFieldset>
+                    </RadzenCard>
                 </RadzenStack>
+               
             </RadzenColumn>
         </RadzenRow>
 
@@ -163,12 +181,16 @@
 
     private Track? trackDto = new Track();
     private TrackStatus? statusDto = null;
+
     private Camera[] cameras { get; set; } = [];
     private IEnumerable<Guid> selectedCamerasIds { get; set; }
+
+    private TrackDifficulty[] difficulties = [];
 
     protected override async Task OnInitializedAsync()
     {
         trackDto.id = Guid.NewGuid();
+        trackDto.trackDifficultyId = 0;
         statusDto = new TrackStatus
             {
                 id = Guid.NewGuid(),
@@ -195,10 +217,10 @@
                     "", new Dictionary<string, object> { { "displayMessage", "Editing data..." } },
                     new DialogOptions { CloseDialogOnEsc = false, ShowClose = false });
 
-           
+
             using (var database = contextFactory.CreateDbContext())
             {
-                
+
 
                 var cameraEntries = selectedCamerasIds.Select(cameraId => new CameraTrackBinding
                     {
@@ -235,7 +257,7 @@
                     await database.SaveChangesAsync();
                     await Task.Delay(2000); 
                     dialogService.Close();
-                    
+
                 }
                 catch
                 {
@@ -260,20 +282,22 @@
             navigationManager.NavigateTo("/resort/track");
     }
 
-    private void updateData(ResortChangeEventArgs? eventArgs = null)
+    private async void updateData(ResortChangeEventArgs? eventArgs = null)
     {
         if (selectedResort is not null)
         {
             using (var database = contextFactory.CreateDbContext())
             {
                 trackDto.resortId = selectedResort.id;
-                cameras = database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArray();
-                selectedCamerasIds = database.cameraTrackBindings
+                cameras = await database.cameras.Where(e => e.resortId == trackDto.resortId).AsNoTracking().ToArrayAsync();
+                selectedCamerasIds = await database.cameraTrackBindings
                     .Where(e => e.trackId == trackDto.id)
                     .AsNoTracking()
                     .Select(e => e.cameraId)
-                    .ToArray();
+                    .ToArrayAsync();
+                difficulties = await database.trackDifficulties.OrderByDescending(e => e.id).ToArrayAsync();
             }
+            StateHasChanged();
         }
     }
 

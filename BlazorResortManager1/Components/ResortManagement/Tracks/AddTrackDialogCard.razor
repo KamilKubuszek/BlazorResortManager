@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 @attribute [Authorize]
 
-<RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" TItem="Track" Data="trackDto">
+@* <RadzenTemplateForm Submit="async(Track args) => await PostTrack(args)" TItem="Track" Data="trackDto">
     <RadzenFormField Text="Name" Variant="Variant.Flat">
         <RadzenTextBox @bind-Value="trackDto.name" Name="trackName" />
     </RadzenFormField>
@@ -31,13 +31,13 @@
     <RadzenButton ButtonType="ButtonType.Button" Text="add parameter" Click="addParameterField"/>
     <RadzenButton ButtonType="ButtonType.Submit" Text="save"/>
 
-@*     add antiforgery logic in other way, this wont work *@
+
     <AntiforgeryToken/>
 
 </RadzenTemplateForm>
 
-
-@code {
+ *@
+@* @code {
     [Parameter]
     public Guid ResortId { get; set; }
 
@@ -102,4 +102,4 @@
         trackDto.parameters.Add(new TrackParameter());
         StateHasChanged();
     }
-}
+} *@

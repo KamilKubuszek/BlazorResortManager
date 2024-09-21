@@ -4,11 +4,10 @@
 @inject IJSRuntime JSRuntime
 
 <h3 class="text-3xl font-bold">@local["Tracks"]</h3>
-
 @if (resortData is not null)
 {
     <RadzenStack>
-        <RadzenRow JustifyContent="JustifyContent.Right">
+        <RadzenRow JustifyContent="JustifyContent.Right" Style="position: sticky; top: 0; z-index: 3">
             <RadzenColumn SizeMD="6" Size="12">
                 <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
                     <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" Gap="0.5rem">
@@ -21,32 +20,38 @@
         </RadzenRow>
         <RadzenRow>
             <RadzenColumn>
-                <RadzenDataGrid id="toResize" TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
-                                @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single">
-                    <Columns>
-                        @* <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" /> *@
+                <RadzenCard id="toResize">
+                    <RadzenDataGrid Style="height: 100%" TItem="Track" Data=@resortData.tracks @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single" PageSize="7"
+                                    AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true">@* @(resortData.tracks.Count > 7) *@
+                        <Columns>
+                            @* <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" /> *@
 
-                        <RadzenDataGridColumn TItem="Track" Property="name" Title="@local["Name"]" Width="100px" Frozen="true" />
+                            <RadzenDataGridColumn TItem="Track" Property="name" Title="@local["Name"]" Width="100px" Frozen="true" />
 
-                        <RadzenDataGridColumn TItem="Track" Property="marking" Title="@local["Marking"]" Width="100px" />
+                            <RadzenDataGridColumn TItem="Track" Property="marking" Title="@local["Marking"]" Width="100px" />
 
-                        <RadzenDataGridColumn TItem="Track" Property="difficulty" Title="@local["Difficulty"]" Width="100px" />
+                            <RadzenDataGridColumn TItem="Track" Title="@local["Difficulty"]" Width="100px">
+                                <Template Context="Track">
+                                    @Track.trackDifficulty.name
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Track" Property="inclination" Title="@local["Inclination"]" Width="100px" TextAlign="TextAlign.Center"/>
+                            <RadzenDataGridColumn TItem="Track" Property="inclination" Title="@local["Inclination"]" Width="100px" TextAlign="TextAlign.Center"/>
 
-                        <RadzenDataGridColumn TItem="Track" Title="@local["Snow groomed"]" Width="100px" TextAlign="TextAlign.Center">
-                            <Template Context="track">
-                                <RadzenIcon Icon="@(track.snowGroomed ? "Check_Circle" : "Cancel")" IconColor="@(track.snowGroomed ? Colors.Success : Colors.Danger)" />
-                            </Template>
-                        </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Track" Title="@local["Snow groomed"]" Width="100px" TextAlign="TextAlign.Center">
+                                <Template Context="track">
+                                    <RadzenIcon Icon="@(track.snowGroomed ? "Check_Circle" : "Cancel")" IconColor="@(track.snowGroomed ? Colors.Success : Colors.Danger)" />
+                                </Template>
+                            </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Track" Title="@local["Illuminated"]" Width="100px" TextAlign="TextAlign.Center">
-                            <Template Context="track">
-                                <RadzenIcon Icon="@(track.illuminated ? "Check_Circle" : "Cancel")" IconColor="@(track.illuminated ? Colors.Success : Colors.Danger)" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
+                            <RadzenDataGridColumn TItem="Track" Title="@local["Illuminated"]" Width="100px" TextAlign="TextAlign.Center">
+                                <Template Context="track">
+                                    <RadzenIcon Icon="@(track.illuminated ? "Check_Circle" : "Cancel")" IconColor="@(track.illuminated ? Colors.Success : Colors.Danger)" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
     </RadzenStack>
@@ -158,7 +163,8 @@ else
             using (var database = contextFactory.CreateDbContext())
             {
                 resortData = selectedResort;
-                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id).ToListAsync();
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id).Include(e => e.trackDifficulty)
+                    .OrderByDescending(e => e.name).ToListAsync();
             }
             StateHasChanged();
         }
