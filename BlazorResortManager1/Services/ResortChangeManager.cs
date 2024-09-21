@@ -1,4 +1,4 @@
-﻿using BlazorResortManager1.Data.Models.main;
+﻿using BlazorResortManager1.Data.Models.Resorts;
 namespace BlazorResortManager1.Services
 {
     public class ResortChangeManager
