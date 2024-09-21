@@ -1,5 +1,6 @@
-﻿using BlazorResortManager1.Data.Models.cameras;
-using BlazorResortManager1.Data.Models.main;
+﻿using BlazorResortManager1.Data.Models.Lifts;
+using BlazorResortManager1.Data.Models.Resorts;
+using BlazorResortManager1.Data.Models.Tracks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,6 +14,8 @@ namespace BlazorResortManager1.Data.Models.cameras
 
         [Required]
         public string name { get; set; }
+
+        public string description { get; set; }
 
         [Required]
         public string link { get; set; }

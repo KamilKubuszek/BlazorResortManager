@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using BlazorResortManager1.Data.Models.cameras;
-using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Data.Models.status;
 
-namespace BlazorResortManager1.Data.Models.status
+namespace BlazorResortManager1.Data.Models.Tracks
 {
     [Table("trackStatus")]
     public class TrackStatus
@@ -22,7 +22,7 @@ namespace BlazorResortManager1.Data.Models.status
         public TimeOnly closingTime { get; set; } = TimeOnly.Parse("20:00");
 
         [Required]
-        public int snowCover {  get; set; }
+        public int snowCover { get; set; }
 
         [Required]
         public Guid parentTrackId { get; set; }
@@ -32,7 +32,7 @@ namespace BlazorResortManager1.Data.Models.status
         [Required(ErrorMessage = "'statusSheetId' jest wymagany")]
         public Guid statusSheetId { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public StatusSheet? statusSheet { get; set; } = null!;     
+        public StatusSheet? statusSheet { get; set; } = null!;
     }
 
 }

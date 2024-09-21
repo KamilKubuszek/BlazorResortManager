@@ -2,8 +2,10 @@
 using BlazorResortManager1.Data.Models.Admin;
 using BlazorResortManager1.Data.Models.cameras;
 using BlazorResortManager1.Data.Models.forecast;
-using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Data.Models.Lifts;
+using BlazorResortManager1.Data.Models.Resorts;
 using BlazorResortManager1.Data.Models.status;
+using BlazorResortManager1.Data.Models.Tracks;
 using BlazorResortManager1.user;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +18,14 @@ namespace BlazorResortManager1.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Permit> permits { get; set; }
-        public DbSet<ResortAdditionRequest> resortAdditionRequests { get; set; }
+        //public DbSet<ResortAdditionRequest> resortAdditionRequests { get; set; }
         public DbSet<TrackStatus> trackStatuses { get; set; }
         public DbSet<ResortStatus> resortStatuses { get; set; }
         public DbSet<LiftStatus> liftStatuses { get; set; }
         public DbSet<StatusSheet> statusSheets { get; set; }
+
+        public DbSet<TrackDifficulty> trackDifficulties { get; set; }
+        public DbSet<LiftType> liftTypes { get; set; }
 
         public DbSet<Resort> resorts { get; set; }
         public DbSet<Track> tracks { get; set; }

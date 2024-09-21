@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BlazorResortManager1.Data.Models.main
+namespace BlazorResortManager1.Data.Models.Resorts
 {
     [Table("resortParameter")]
     public class ResortParameter

@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BlazorResortManager1.Data.Models.main
+namespace BlazorResortManager1.Data.Models.Tracks
 {
-    [Table("liftParameter")]
-    public class LiftParameter
+    [Table("trackParameter")]
+    public class TrackParameter
     {
         [Key]
         public Guid id { get; set; }
@@ -15,7 +15,7 @@ namespace BlazorResortManager1.Data.Models.main
         [Required(ErrorMessage = "value is required")]
         public string value { get; set; }
 
-        public Guid liftId { get; set; }
-        public Lift lift { get; set; }
+        public Guid trackId { get; set; }
+        public Track track { get; set; }
     }
 }

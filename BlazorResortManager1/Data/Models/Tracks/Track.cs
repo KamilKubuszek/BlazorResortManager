@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlazorResortManager1.Data.Models.Resorts;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using BlazorResortManager1.Data.Models.cameras;
-using BlazorResortManager1.Data.Models.status;
 
-namespace BlazorResortManager1.Data.Models.main
+namespace BlazorResortManager1.Data.Models.Tracks
 {
     [Table("track")]
     public class Track
@@ -27,7 +26,7 @@ namespace BlazorResortManager1.Data.Models.main
         public bool illuminated { get; set; }
 
         [Required]
-        public bool snowGroomed {  get; set; }
+        public bool snowGroomed { get; set; }
 
         [Required]
         [MaxLength(16, ErrorMessage = "'marking' może mieć maksymalnie 16 znaków")]
@@ -36,8 +35,13 @@ namespace BlazorResortManager1.Data.Models.main
         [Required]
         public int lengthMeters { get; set; }
 
+        //[Required]
+        //public string difficulty { get; set; }
+
         [Required]
-        public string difficulty { get; set; }
+        public int trackDifficultyId { get; set; }
+        public TrackDifficulty trackDifficulty { get; set; }
+
         public ICollection<TrackParameter> parameters { get; set; } = new List<TrackParameter>();
         public ICollection<TrackStatus> statuses { get; set; } = new List<TrackStatus>();
         [ForeignKey("resort")]

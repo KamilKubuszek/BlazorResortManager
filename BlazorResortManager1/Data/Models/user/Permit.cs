@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using BlazorResortManager1.Data;
-using BlazorResortManager1.Data.Models.main;
+using BlazorResortManager1.Data.Models.Resorts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

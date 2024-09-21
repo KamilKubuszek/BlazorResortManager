@@ -8,7 +8,7 @@ namespace BlazorResortManager1.Data
     public class ApplicationUser : IdentityUser
     {
         public virtual ICollection<Permit> permits { get; set; } = new List<Permit>();
-        public virtual ICollection<ResortAdditionRequest> resortAddtionRequests { get; set; } = new List<ResortAdditionRequest>();
+        //public virtual ICollection<ResortAdditionRequest> resortAddtionRequests { get; set; } = new List<ResortAdditionRequest>();
     }
 
 }

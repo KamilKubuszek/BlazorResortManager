@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using BlazorResortManager1.Data.Models.main;
-using BlazorResortManager1.Data.Models.status;
+using BlazorResortManager1.Data.Models.Lifts;
+using BlazorResortManager1.Data.Models.Resorts;
+using BlazorResortManager1.Data.Models.Tracks;
 
 namespace BlazorResortManager1.Data.Models.status
 {
