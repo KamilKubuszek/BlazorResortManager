@@ -1,0 +1,142 @@
+﻿@using System.Text.Json
+@using System.Drawing
+@inherits LayoutComponentBase
+
+@if(serializedStyles is not null)
+{
+    <style>
+        :root {
+            --rz-white: @styleList[0];
+            --rz-base: @styleList[0];
+            --rz-base-50: @styleList[1];
+            --rz-base-200: @styleList[2];
+            --rz-base-300: @styleList[4];
+            --rz-base-800: @styleList[7];
+            --rz-base-900: @styleList[9];
+            --rz-primary: @styleList[5];
+            --rz-layout-body-background-color: @styleList[0];
+        }
+
+        .rz-body:last-child {
+            background-color: @styleList[0];
+        }
+@*         :root {
+            --rz-white: @serializedStyles.background;
+            --rz-base: @serializedStyles.main;
+            --rz-base-50: @serializedStyles.secondary;
+            --rz-base-200: @serializedStyles.lines;
+            --rz-base-300: @stylesClass.modifyHex(serializedStyles.lines, 1);
+            --rz-base-800: @serializedStyles.font;
+            --rz-base-900: @serializedStyles.font;
+            --rz-primary: @serializedStyles.main;
+            --rz-layout-body-background-color: @serializedStyles.background;
+            /* #1D201F; */
+        }
+        .rz-body:last-child{
+            background-color: @serializedStyles.background;
+        } *@
+
+
+    </style>
+}
+
+
+
+<RadzenLayout>
+    <RadzenBody>
+        @Body
+    </RadzenBody>
+</RadzenLayout>
+@code {
+    [SupplyParameterFromQuery]
+    public string styleSheet { get; set; } = string.Empty;
+
+    private stylesClass? serializedStyles { get; set; } = null;
+    private List<string> styleList = [];
+
+    private sealed class stylesClass
+    {
+        public string main { get; set; } = string.Empty;
+        public string secondary{ get; set; } = string.Empty;
+        public string font { get; set; } = string.Empty;
+        public string background { get; set; } = string.Empty;
+        public string lines { get; set; } = string.Empty;
+
+        public static string modifyHex(string colorHex, int intensivity)
+        {
+            Color color = ColorTranslator.FromHtml(colorHex);
+            var modifier = 1 + (intensivity / 10.0);
+
+            var red =(int)Math.Floor( color.R * modifier);
+            var green =(int)Math.Floor( color.G * modifier);
+            var blue =(int)Math.Floor( color.B * modifier);
+
+            if(red > 255){ red = 255; }
+            if(green > 255){ green = 255; }
+            if(blue > 255){ blue = 255; }
+
+            return "#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2");
+
+        }
+
+        public List<string> colors { get; set; } = new List<string>();
+
+        public List<string> hexArray()
+        {
+            List<string> newColors = new List<string>();
+            int j = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                if(i % 2 == 1)
+                {
+                    newColors.Add(colors[j]);
+                    j++;
+                }
+                else
+                {
+                    newColors.Add(modifyHex(colors[j], 1));
+                }
+            }
+            return newColors;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if(!string.IsNullOrEmpty(styleSheet))
+        {
+            byte[] styleSheetBytes = Convert.FromBase64String(styleSheet);
+            string decodedString = System.Text.Encoding.UTF8.GetString(styleSheetBytes);
+            serializedStyles = JsonSerializer.Deserialize<stylesClass>(decodedString);
+
+            styleList = serializedStyles.hexArray();
+            // string[] values = [];
+            // var darkenBy = 0.0;
+            // Color color = ColorTranslator.FromHtml(serializedStyles.main);
+            // for (int i = 0; i < 9; i++)
+            // {
+            //     var red = color.R * darkenBy;
+            //     var green = color.G * darkenBy;
+            //     var blue = color.B * darkenBy;
+
+            //     values.Append("#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2"));
+            //     darkenBy += 0.1;
+            // }
+            // styleList = values;
+        }
+
+        // var darkenBy = 0.1;
+        // Color color = ColorTranslator.FromHtml(serializedStyles.main);
+        // for (int i = 0; i < 10; i++)
+        // {
+        //     var red = (int)Math.Floor(color.R * darkenBy);
+        //     var green = (int)Math.Floor(color.G * darkenBy);
+        //     var blue = (int)Math.Floor(color.B * darkenBy);
+
+        //     styleList.Add("#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2"));
+        //     darkenBy += 0.1;
+        // }
+
+    }
+}
