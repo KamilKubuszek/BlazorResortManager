@@ -1,6 +1,6 @@
 ﻿@page "/widget/{selectedResortId:guid}"
-
-<div class="h-[400px] block w-full overflow-y-hidden">
+@layout WidgetLayout
+<div class="block h-[400px] w-full overflow-y-hidden">
     <_WidgetInteractiveWrapper selectedResortId="selectedResortId" />
 </div>
 

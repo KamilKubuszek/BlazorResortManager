@@ -1,29 +1,51 @@
 ﻿@using System.Text.Json
 @using System.Globalization
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 <style>
+/*     body{
+        overflow-y: hidden;
+        overflow-x: hidden;
+    } */
+    .rz-layout .rz-body{
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
     .rz-tabview-panels{
         overflow-y: hidden;
     }
+    .rz-tabview-panel{
+        padding: 0;
+        padding-top: 8px;
+    }
+    .rz-hover-secondary:hover{
+        background-color: var(--rz-base-50);
+    }
+    #camera-toolbar{
+        background-color: var(--rz-body-background-color);
+    }
 </style>
+
 @if (!loading)
 {
-    <RadzenTabs @bind-SelectedIndex=@pageIndex Change="tabChanged" Style="height: 100%; overflow-y: hidden">
-        <Tabs>
-            <RadzenTabsItem Text="@local["Status"]" Style="height:100%; overflow-y: hidden">
-                <_StatusCard displayInfo="false" sheet="sheet" />
-            </RadzenTabsItem>
 
-            <RadzenTabsItem Text="@local["Weather"]" Style="height:100%; overflow-y: hidden">
-                <div id="weatherContainer">
+    @if (selectedCamera is null)
+    {
+        <RadzenTabs @bind-SelectedIndex=@pageIndex Change="tabChanged" Style="height: 100%; overflow-y: hidden">
+            <Tabs>
+                <RadzenTabsItem Text="@local["Status"]" Style="height:100%; overflow-y: hidden">
+                    <_StatusCard displayInfo="false" sheet="sheet" />
+                </RadzenTabsItem>
+
+                <RadzenTabsItem Text="@local["Weather"]" Style="height:100%; overflow-y: hidden">
                     <RadzenDataGrid Data="forecastTableData" TItem="ForecastTableModel" Style="height: 300px;">
                         <Columns>
                             <RadzenDataGridColumn Title="@local["Day"]">
                                 <Template Context="timeserie">
-                                    @(timeserie.time.DayOfWeek + " "
-                                    + timeserie.time.Day + " "
-                                    + timeserie.time.ToString("MMM", CultureInfo.InvariantCulture)
-                                    + ".")
+                                    @* @(timeserie.time.ToString)
+                            @(timeserie.time.Day) *@
+                                    @(timeserie.time.ToString("ddd dMMM", CultureInfo.CurrentCulture))
+
                                 </Template>
                             </RadzenDataGridColumn>
                             <RadzenDataGridColumn Title="@local["00-12"]" Width="82px" TextAlign="TextAlign.Center">
@@ -51,20 +73,41 @@
                                     }
                                 </Template>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Title="@local["Max/min temp."]">
+                            <RadzenDataGridColumn>
+                                <HeaderTemplate>
+                                    <RadzenStack Gap="0.25rem" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Style="width: fit-content;">
+                                        <p>@local["Max/min temp."]</p>
+
+                                        <RadzenIcon Icon="Device_Thermostat" Style="font-size: 20px;" />
+                                    </RadzenStack>
+                                </HeaderTemplate>
                                 <Template Context="timeserie">
                                     @(timeserie.maxTemp + "/" + timeserie.minTemp)
                                 </Template>
                             </RadzenDataGridColumn>
 
-                            <RadzenDataGridColumn Title="@local["Precipitation"]">
+                            <RadzenDataGridColumn TextAlign="TextAlign.Center">
+                                <HeaderTemplate>
+                                    <RadzenStack Gap="0.25rem" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Style="width: fit-content;">
+                                        <p>@local["Precipitation"]</p>
+
+                                        <RadzenIcon Icon="Rainy" Style="font-size: 20px;" />
+                                    </RadzenStack>
+                                </HeaderTemplate>
                                 <Template Context="timeserie">
                                     @(timeserie.precipitation > 0 ? timeserie.precipitation : "")
                                 </Template>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Title="@local["Max/min wind speed"]">
+                            <RadzenDataGridColumn TextAlign="TextAlign.Center">
+                                <HeaderTemplate>
+                                    <RadzenStack Gap="0.25rem" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" Style="width: fit-content;">
+                                        <p>@local["Wind speed"]</p>
+
+                                        <RadzenIcon Icon="Air" Style="font-size: 20px;" />
+                                    </RadzenStack>
+                                </HeaderTemplate>
                                 <Template Context="timeserie">
-                                    @(timeserie.maxWind + "/" + timeserie.minWind + " m/s")
+                                    @(timeserie.minWind + "-" + timeserie.maxWind + " m/s")
                                 </Template>
                             </RadzenDataGridColumn>
                         </Columns>
@@ -72,41 +115,73 @@
                     <p>
                         @local["Powered by"] <a class="text-blue-500 hover:underline" href="https://www.yr.no">Norwegian Meteorological Institute and NRK</a>
                     </p>
-                </div>
-            </RadzenTabsItem>
 
-            <RadzenTabsItem Text="@local["Cameras"]">
-                @if (cameras.Any())
-                {
-                    <div class="relative h-[300px] w-full">
-                        <iframe class="h-full w-full" src="@cameras[currentCameraIndex].link"></iframe>
-                        @if (currentCameraIndex != 0)
-                        {
-                            <div @onclick=@(() => changeCamera(false))
-                                 class="cursor-pointer text-center absolute top-1/4 left-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
-                                @("<")
-                            </div>
+                </RadzenTabsItem>
 
-                        }
-                        @if (currentCameraIndex + 1 < cameras.Count())
-                        {
-                            <div @onclick=@(() => changeCamera(true))
-                                 class="cursor-pointer text-center absolute top-1/4 right-0 block h-[150px] w-[50px] text-3xl text-white leading-[150px] bg-gray-400 hover:bg-gray-300 opacity-50">
-                                @(">")
-                            </div>
-                        }
-
-                    </div>
+                <RadzenTabsItem Text="@local["Cameras"]">
+                    @if (cameras.Any())
+                    {
+                        <RadzenDataList Data="cameras" TItem="Camera" WrapItems="true" Style="width: 100%">
+                            <Template Context="camera">
+                                <div class="rz-hover-secondary box-border w-1/3 cursor-pointer hover:underline" @onclick=@( () => selectCamera(camera))>
+                                    @camera.name
+                                </div>
+                            </Template>
+                        </RadzenDataList>
+                    }
+                    else
+                    {
+                        <p>@local["There are no cameras available"]</p>
+                    }
 
 
-                }
-                else
-                {
-                    <p>@local["There are no cameras available"]</p>
-                }
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    }
+    else
+    {
+        <div class="group relative h-[300px] w-full">
+            <iframe class="h-[92vh] w-full" src="@cameras[currentCameraIndex].link"></iframe>
+            <div id="camera-toolbar" class="group-hover:block rz-variant-filled absolute top-0 hidden w-full">
+
+                <RadzenRow>
+                    <RadzenColumn Size="2">
+                        @* <RadzenIcon id="iconHov" class="rz-p-4 rz-hover-secondary cursor-pointer text-2xl" Icon="Undo" @onclick=@() /> *@
+                        @* <p>@local["Go back"]</p> *@
+                        <RadzenButton Icon="Undo" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Text="@local["Go back"]" Size="ButtonSize.Small" Click="@(() => selectedCamera = null)" />
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <p>
+                            @local["On the camera you can see objects: "]
+                            @foreach (var bind in cameras[currentCameraIndex].trackBindings)
+                            {
+                                @bind.track.name
+                                if (cameras[currentCameraIndex].trackBindings.Last() != bind)
+                                {
+                                    @(", ")
+                                }
+
+                            }
+
+                            @(cameras[currentCameraIndex].liftBindings.Any()
+                                && cameras[currentCameraIndex].trackBindings.Any() ? ", " : "")
+
+                            @foreach (var bind in cameras[currentCameraIndex].liftBindings)
+                            {
+                                @bind.lift.name
+                                if (cameras[currentCameraIndex].liftBindings.Last() != bind)
+                                {
+                                    @(", ")
+                                }
+                            }
+                        </p>
+
+                    </RadzenColumn>
+                </RadzenRow>
+            </div>
+        </div>
+    }
 }
 else
 {
@@ -123,6 +198,10 @@ else
 
     private Camera[] cameras = [];
     private int currentCameraIndex { get; set; } = 0;
+    private Camera? selectedCamera { get; set; }
+
+    private string[] visibleTrackNames = [];
+    private string[] visibleLiftNames = [];
 
     IEnumerable<ForecastTableModel> forecastTableData;
 
@@ -149,8 +228,32 @@ else
                                             .AsSplitQuery()
                                             .AsNoTracking()
                                             .FirstOrDefaultAsync(e => e.resortId == selectedResortId);
-                cameras = await database.cameras.Where(e => e.resortId == selectedResortId).ToArrayAsync();
+                cameras = await database.cameras.Where(e => e.resortId == selectedResortId)
+                    .Select(e => new Camera{
+                        id = e.id,
+                        name = e.name,
+                        liftBindings = e.liftBindings
+                            .Select(lb => new CameraLiftBinding
+                            {
+                                lift = new Lift
+                                {
+                                    name = lb.lift.name
+                                }
+                            }).ToArray(),
+                        trackBindings = e.trackBindings
+                            .Select(tb => new CameraTrackBinding
+                            {
+                                track = new Track
+                                {
+                                    name = tb.track.name
+                                }
+                            }).ToArray(),
+                        link = e.link
+
+                    })
+                    .ToArrayAsync();
             }
+            getList();
             await getWeather();
             loading = false;
             StateHasChanged();
@@ -166,14 +269,12 @@ else
 
                 break;
             case 1:
-                await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "weatherContainer");
+                //await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "weatherContainer");
                 break;
 
         }
-        
-    }
-   
 
+    }
 
     private async Task getWeather()
     {
@@ -225,6 +326,7 @@ else
             if (cameras.Count() > currentCameraIndex + 1)
             {
                 currentCameraIndex++;
+                getList();
             }
         }
         else
@@ -232,7 +334,26 @@ else
             if (currentCameraIndex > 0)
             {
                 currentCameraIndex--;
+                getList();
             }
         }
+
+
+    }
+
+    private void selectCamera(Camera camera){
+        currentCameraIndex = Array.IndexOf(cameras, camera);
+        selectedCamera = camera;
+    }
+    private void getList()
+    {
+        Console.Write(JsonSerializer.Serialize(cameras[0], new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        }));
+        visibleLiftNames = cameras[currentCameraIndex].liftBindings.Select(e => e.lift.name) as string[] ?? [];
+        visibleTrackNames = cameras[currentCameraIndex].trackBindings.Select(e => e.track.name) as string[] ?? [];
+        StateHasChanged();
     }
 }
