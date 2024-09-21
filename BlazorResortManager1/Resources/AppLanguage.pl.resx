@@ -366,4 +366,67 @@
   <data name="You have no resorts avaiable" xml:space="preserve">
     <value>Nie masz dostępnych ośrodków</value>
   </data>
+  <data name="Binds" xml:space="preserve">
+    <value>Powiązania</value>
+  </data>
+  <data name="Here are objects and cameras from which they can be seen" xml:space="preserve">
+    <value>Tutaj możesz sprawdzić obiekty oraz z których kamer są widoczne</value>
+  </data>
+  <data name="Updated data successfully!" xml:space="preserve">
+    <value>Zaaktualizowano dane pomyślnie!</value>
+  </data>
+  <data name="Add lift" xml:space="preserve">
+    <value>Dodaj wyciąg</value>
+  </data>
+  <data name="Add track" xml:space="preserve">
+    <value>Dodaj trasę</value>
+  </data>
+  <data name="Edit lift" xml:space="preserve">
+    <value>Edytuj wyciąg</value>
+  </data>
+  <data name="Edit track" xml:space="preserve">
+    <value>Edytuj trasę</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Strona główna</value>
+  </data>
+  <data name="Closing at" xml:space="preserve">
+    <value>Zamknięcie</value>
+  </data>
+  <data name="Opening at" xml:space="preserve">
+    <value>Otwarcie</value>
+  </data>
+  <data name="Weather" xml:space="preserve">
+    <value>Pogoda</value>
+  </data>
+  <data name="You have no cameras avaiable" xml:space="preserve">
+    <value>NIe masz dostępnych kamer</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Dzień</value>
+  </data>
+  <data name="Precipitation" xml:space="preserve">
+    <value>Opady</value>
+  </data>
+  <data name="Wind speed" xml:space="preserve">
+    <value>Szykość wiatru</value>
+  </data>
+  <data name="Data" xml:space="preserve">
+    <value>Dane</value>
+  </data>
+  <data name="Register widget use" xml:space="preserve">
+    <value>Zarejestruj stronę dla widget'u</value>
+  </data>
+  <data name="Website url" xml:space="preserve">
+    <value>Adres strony internetowej</value>
+  </data>
+  <data name="Go back" xml:space="preserve">
+    <value>Powrót</value>
+  </data>
+  <data name="Edit website url" xml:space="preserve">
+    <value>Edytuj adres strony internetowej</value>
+  </data>
+  <data name="Websites allowed to use widget" xml:space="preserve">
+    <value>Strony upoważnione do używania widgetu</value>
+  </data>
 </root>

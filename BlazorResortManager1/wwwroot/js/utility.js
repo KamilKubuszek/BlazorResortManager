@@ -6,22 +6,20 @@
     //console.log(windowHeight);
     var contHoffset = targetElement.offsetTop;
     //console.log(contHoffset);
-    targetElement.style.height = (windowHeight - contHoffset - 88) + "px";
+    targetElement.style.height = (windowHeight - contHoffset - 16) + "px";
 }
+function setMaxHeightToBottom(elementId, margin, marginMultiplier) {
 
-function getBottomOffsetReference(elementId) {
-    var targetElement = document.getElementById(elementId);
-    return targetElement.offsetTop + targetElement.offsetHeight;
-}
-function sizeHeightToBottomOfParent(elementId, bottomOffset) {
     //get the element
     var targetElement = document.getElementById(elementId);
-    //console.log(windowHeight);
-    var contHoffset = targetElement.offsetTop;
-    //console.log(contHoffset);
-    targetElement.style.height = (bottomOffset - contHoffset) + "px";
-}
 
+    var windowHeight = window.innerHeight;
+
+    var contHoffset = targetElement.offsetTop;
+
+    targetElement.style.maxHeight = (windowHeight - contHoffset - margin * marginMultiplier) + "px";
+    
+}
 function alertThing() {
     alert("alerting test");
 }

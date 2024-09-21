@@ -24,6 +24,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddRadzenComponents();
 
+builder.Services.AddHttpContextAccessor();
+
 #region Custom Implementation
 //Utility service
 builder.Services.AddScoped<ResortChangeManager>();
@@ -119,7 +121,6 @@ app.UseMiddleware<AllowedDomainsMiddleware>();
 
 //});
 #endregion
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

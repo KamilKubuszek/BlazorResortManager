@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Components\Partials\_ButtonGroup.razor" />
+    <Content Remove="Components\Widget\_Imports.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,7 @@
 
   <ItemGroup>
     <None Include="Components\Partials\_ButtonGroup.razor" />
+    <None Include="Components\Widget\_Imports.razor" />
     <None Include="Components\Widget\_WidgetInteractiveWrapper.razor" />
     <None Include="wwwroot\Resources\slopeBg.png" />
   </ItemGroup>
@@ -42,6 +44,7 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Partials\_ButtonGroup.razor" />
+    <_ContentIncludedByDefault Remove="Components\Widget\_Imports.razor" />
     <_ContentIncludedByDefault Remove="Components\Widget\_WidgetInteractiveWrapper.razor" />
   </ItemGroup>
 
@@ -68,9 +71,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Components\Account\Custom\ForgotPassword.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Update="Components\Account\Custom\Register.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Widget\_Imports.razor" />
   </ItemGroup>
 
 </Project>
