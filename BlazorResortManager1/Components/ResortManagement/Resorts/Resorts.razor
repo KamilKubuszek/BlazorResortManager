@@ -3,26 +3,94 @@
 @inject ContextMenuService contextMenuService
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
-@attribute [Authorize]
-@implements IDisposable
-
+@inject IStringLocalizer<AppLanguage> local
 @using Radzen.Blazor.Rendering
+@implements IDisposable
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @page "/resort"
+@attribute [Authorize]
 
-<h3 class="text-3xl font-bold">Resorts</h3>
+<h3 class="text-3xl font-bold">@local["Resorts"]</h3>
 
-<RadzenButton Text="create resort" Click="@(() => navigationManager.NavigateTo("resort/request/add"))" />
+<RadzenStack>
+    <RadzenRow JustifyContent="JustifyContent.Right">
+        <RadzenColumn SizeMD="6" Size="12">
+            <RadzenCard Style="width: 100%; height: fit-content; padding: 0.5rem;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Text="@local["Request resort"]" Click="@(() => navigationManager.NavigateTo("/resort/request/add") )" />
+                    <RadzenButton Text="@local["Edit"]" Click="@(() => navigationManager.NavigateTo("/resort/edit") )" Icon="Edit_Note" Variant="Variant.Outlined" Disabled="@(selectedResort is null)" />
+                    @* <RadzenButton Text="@local["Delete"]" Click="deleteLift" Icon="Delete" Variant="Variant.Outlined" Disabled="@(selectedResort is null)" ButtonStyle="ButtonStyle.Danger" /> *@
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    
+
 
 @if(resortData is not null)
 {
-    @resortData.tracks.Count()
-    @resortData.lifts.Count()
-    <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
+
+    <RadzenCard>
+        <RadzenStack>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Name"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.name</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Description"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.description</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Address"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.address</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Phone Number"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.phoneNumber</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Email"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.email</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Webpage"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.webpage</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Approved"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.approved</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Coordinates X"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.coordinatesX</p></RadzenColumn>
+            </RadzenRow>
+            <hr />
+
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="4"><p class="font-bold">@local["Coordinates Y"]</p></RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8"><p>@selectedResort.coordinatesY</p></RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenCard>
+
+    @* <RadzenDataGrid TItem="Track" Data=@resortData.tracks CellEditMode="Cell" AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true"
                     CellClick="@(args => cellClick(args))" CellContextMenu="OnCellTrackContextMenu">
-     @* RowUpdate="@(args => updateRow(args))" *@
+     RowUpdate="@(args => updateRow(args))"
         <Columns>
             <RadzenDataGridColumn TItem="Track" Property="id" Title="ID" Width="100px" Frozen="true" />
 
@@ -89,12 +157,13 @@
 
             </RadzenDataGridColumn>
         </Columns>
-    </RadzenDataGrid>
+    </RadzenDataGrid> *@
 }
 else
 {
-    <p>select resort first</p>
+    <p>@local["Select resort first"]</p>
 }
+</RadzenStack>
 @code {
 
     //private Resort? re = null;
@@ -164,11 +233,6 @@ else
         }
     }
 }
-@if(selectedResort is not null)
-{
-    @selectedResort.id
-}
-
 
 @code {
     [CascadingParameter]

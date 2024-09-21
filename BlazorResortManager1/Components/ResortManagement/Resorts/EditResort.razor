@@ -88,7 +88,7 @@
                 database.Entry(resortDto).State = EntityState.Modified;
 
                 dialogService.Open<_LoadingTaskDialog>(
-                    "", new Dictionary<string, object>() { { "displayMessage", local["Editing Data..."] } },
+                    "", new Dictionary<string, object>() { { "displayMessage", "Editing Data..." } },
                     new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
                 try
                 {
@@ -121,7 +121,7 @@
             notifMessage = new NotificationMessage
                 {
                     Severity = NotificationSeverity.Error,
-                    Summary = local["There Was an Error While Executing the Request"],
+                    Summary = local["There was an error while executing the request"],
                     Duration = 3000
                 };
         }
