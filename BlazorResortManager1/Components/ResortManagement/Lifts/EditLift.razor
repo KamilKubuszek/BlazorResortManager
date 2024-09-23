@@ -38,7 +38,8 @@
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenDropDown Data="liftTypes" @bind-Value="liftDto.liftTypeId" TValue="Guid" TextProperty="name" ValueProperty="id" Style="width: 100%;">
                                             <Template Context="liftType">
-                                                @(liftType.name+"asjdnkj")
+                                                @(liftType.name)
+                                                @* add icon *@
                                             </Template>
                                         </RadzenDropDown>
                                     </RadzenColumn>

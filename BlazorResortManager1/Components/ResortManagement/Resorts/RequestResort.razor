@@ -8,109 +8,135 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 
-<h3 class="text-3xl font-bold">@local["Send Request to Create Resort"]</h3>
+<h3 class="text-3xl font-bold">@local["Send request to create resort"]</h3>
 
 <br />
-<p>@local["Input coordinates of your resort (you can find them using Google Earth)."]</p>
 
 <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit="addResort">
-    <RadzenStack Style="width: 100%" Gap="1rem">
-        <div>
-            <RadzenLabel Component="name" Text="@local["Name"]" />
-        </div>
-        <div class="w-fit">
-            <RadzenTextBox Name="name" @bind-Value="resortDto.name" Style="width: 100%;" />
-            <RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
-        </div>
+    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+        <!-- Left Column -->
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack>
+                <RadzenCard>
+                    <RadzenFieldset Text="@local["Data"]">
+                        <RadzenStack Gap="1rem">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="name" Text="@local["Name"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Name="name" @bind-Value="resortDto.name" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="name" />
+                                </RadzenColumn>
+                            </RadzenRow>
 
-        <div>
-            <RadzenLabel Component="description" Text="@local["Description"]" />
-        </div>
-        <div class="w-fit">
-            <RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" />
-            <RadzenDataAnnotationValidator Component="description" Style="position: absolute;" />
-        </div>
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="description" Text="@local["Description"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextArea Name="description" Rows="9" @bind-Value="resortDto.description" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="description" />
+                                </RadzenColumn>
+                            </RadzenRow>
 
-        <div>
-            <RadzenLabel Component="webpage" Text="@local["Webpage"]" />
-        </div>
-        <div class="w-fit">
-            <RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" />
-            <RadzenDataAnnotationValidator Component="webpage" Style="position: absolute;" />
-        </div>
-
-        <RadzenFieldset Text="@local["Contact"]">
-            <div>
-                <RadzenLabel Component="email" Text="@local["Email"]" />
-            </div>
-            <div class="w-fit">
-                <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
-                <RadzenDataAnnotationValidator Component="email" Style="position: absolute;" />
-            </div>
-
-            <div>
-                <RadzenLabel Component="phone" Text="@local["Phone Number"]" />
-            </div>
-            <div class="w-fit">
-                <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
-                <RadzenDataAnnotationValidator Component="phone" Style="position: absolute;" />
-            </div>
-        </RadzenFieldset>
-
-        <RadzenFieldset Text="@local["Location"]">
-            <div>
-                <RadzenLabel Component="address" Text="@local["Address"]" />
-            </div>
-            <div class="w-fit">
-                <RadzenTextBox Name="address" @bind-Value="resortDto.address" Style="width: 100%;" />
-                <RadzenDataAnnotationValidator Component="address" Style="position: absolute;" />
-            </div>
-
-            <RadzenStack Gap="1rem">
-                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
-                    <div>
-                        <RadzenLabel Component="cordX" Text="@local["X Axis"]" />
-                    </div>
-                    <div class="w-fit">
-                        <RadzenMask Mask="**° **'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" />
-                        <RadzenDataAnnotationValidator Component="cordX" Style="position: absolute;" />
-                    </div>
-                    <div>
-                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedX">
-                            <Items>
-                                <RadzenSelectBarItem Value="1" Text="@local["East"]" />
-                                <RadzenSelectBarItem Value="2" Text="@local["West"]" />
-                            </Items>
-                        </RadzenSelectBar>
-                    </div>
-                </RadzenStack>
-
-                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Orientation="Orientation.Horizontal" Style="width: 100%">
-                    <div>
-                        <RadzenLabel Component="cordY" Text="@local["Y Axis"]" />
-                    </div>
-                    <div class="w-fit">
-                        <RadzenMask Mask="**° **'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 33%;" />
-                        <RadzenDataAnnotationValidator Component="cordY" Style="position: absolute;" />
-                    </div>
-                    <div>
-                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedY">
-                            <Items>
-                                <RadzenSelectBarItem Value="1" Text="@local["North"]" />
-                                <RadzenSelectBarItem Value="2" Text="@local["South"]" />
-                            </Items>
-                        </RadzenSelectBar>
-                    </div>
-                </RadzenStack>
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="webpage" Text="@local["Webpage"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Name="webpage" @bind-Value="resortDto.webpage" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="webpage" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenFieldset>
+                </RadzenCard>
             </RadzenStack>
-        </RadzenFieldset>
+        </RadzenColumn>
 
-        <RadzenButton ButtonType="ButtonType.Submit" Text="@local["Submit"]" Style="width: fit-content" />
+        <!-- Right Column -->
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack>
+                <RadzenCard>
+                    <RadzenFieldset Text="@local["Contact"]">
+                        <RadzenStack Gap="1rem">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="email" Text="@local["Email"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Name="email" @bind-Value="resortDto.email" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="email" />
+                                </RadzenColumn>
+                            </RadzenRow>
 
-        <hr />
-        <p>@local["After your request is sent, it is added to queue. You will receive a message via email about the status of your request."]</p>
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="phone" Text="@local["Phone Number"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenMask Mask="+** *** *** ***" Name="phone" @bind-Value="resortDto.phoneNumber" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="phone" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenFieldset>
+                </RadzenCard>
+
+                <RadzenCard>
+                    <RadzenFieldset Text="@local["Location"]">
+                        <RadzenStack Gap="1rem">
+                            <p>@local["Input coordinates of your resort (you can find them using Google Earth)."]</p>
+
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12" SizeMD="4">
+                                    <RadzenLabel Component="address" Text="@local["Address"]" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeMD="8">
+                                    <RadzenTextBox Name="address" @bind-Value="resortDto.address" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="address" />
+                                </RadzenColumn>
+                            </RadzenRow>
+
+                            <RadzenRow>
+                                <RadzenColumn Size="12" SizeMD="6">
+                                    <RadzenLabel Component="cordX" Text="@local["X Axis"]" />
+                                    <RadzenMask Mask="**° **'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" Style="width: 100%;" />
+                                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedX">
+                                        <Items>
+                                            <RadzenSelectBarItem Value="1" Text="@local["East"]" />
+                                            <RadzenSelectBarItem Value="2" Text="@local["West"]" />
+                                        </Items>
+                                    </RadzenSelectBar>
+                                </RadzenColumn>
+
+                                <RadzenColumn Size="12" SizeMD="6">
+                                    <RadzenLabel Component="cordY" Text="@local["Y Axis"]" />
+                                    <RadzenMask Mask="**° **'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 100%;" />
+                                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedY">
+                                        <Items>
+                                            <RadzenSelectBarItem Value="1" Text="@local["North"]" />
+                                            <RadzenSelectBarItem Value="2" Text="@local["South"]" />
+                                        </Items>
+                                    </RadzenSelectBar>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenFieldset>
+                </RadzenCard>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="@local["Submit"]" />
     </RadzenStack>
+
+    <hr />
+    <p>@local["After your request is sent, it is added to queue. You will receive a message via email about the status of your request."]</p>
 </RadzenTemplateForm>
+
 
 @code {
     private int SelectedX { get; set; }

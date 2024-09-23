@@ -6,29 +6,44 @@
 
 @if(selectedCameraId is not null)
 {
-	<RadzenTemplateForm Data="cameraDto" TItem="Camera">
-		<RadzenRow>
-			<RadzenColumn>
-				<RadzenLabel Component="name" Text="@local["Name"]" />
-			</RadzenColumn>
-			<RadzenColumn>
-				<RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="display: block; width: 100%" />
-				<RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+	<RadzenTemplateForm Data="cameraDto" TItem="Camera" Submit="editCamera">
+		<RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+			<RadzenColumn Size="12" SizeMD="6">
+				<RadzenStack>
+					<RadzenCard>
+						<RadzenFieldset Text="@local["Data"]">
+							<RadzenStack Gap="1rem">
+								<RadzenRow AlignItems="AlignItems.Center">
+									<RadzenColumn Size="12" SizeMD="4">
+										<RadzenLabel Component="name" Text="@local["Name"]" />
+									</RadzenColumn>
+									<RadzenColumn Size="12" SizeMD="8">
+										<RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="display: block; width: 100%;" />
+										<RadzenDataAnnotationValidator Component="name" Style="position: absolute;" />
+									</RadzenColumn>
+								</RadzenRow>
+								<RadzenRow AlignItems="AlignItems.Center">
+									<RadzenColumn Size="12" SizeMD="4">
+										<RadzenLabel Component="link" Text="@local["Url"]" />
+									</RadzenColumn>
+									<RadzenColumn Size="12" SizeMD="8">
+										<RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="display: block; width: 100%;" />
+										<RadzenDataAnnotationValidator Component="link" Style="position: absolute;" />
+									</RadzenColumn>
+								</RadzenRow>
+
+							</RadzenStack>
+						</RadzenFieldset>
+					</RadzenCard>
+				</RadzenStack>
 			</RadzenColumn>
 		</RadzenRow>
-		<RadzenRow>
-			<RadzenColumn>
-				<RadzenLabel Component="link" Text="@local["Url"]" />
-			</RadzenColumn>
-			<RadzenColumn>
-				<RadzenTextBox Name="link" @bind-Value="cameraDto.link" Style="display: block; width: 100%" />
-				<RadzenDataAnnotationValidator Component="link" Style="position: absolute;" />
-			</RadzenColumn>
-		</RadzenRow>
-		<RadzenRow>
-			<RadzenButton Click="editCamera" Style="width: fit-content" ButtonType="ButtonType.Submit" Text="@local["Submit changes"]"/>
-		</RadzenRow>
+
+		<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem">
+			<RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Style="width: fit-content" Text="@local["Submit changes"]" />
+		</RadzenStack>
 	</RadzenTemplateForm>
+
 }
 else
 {

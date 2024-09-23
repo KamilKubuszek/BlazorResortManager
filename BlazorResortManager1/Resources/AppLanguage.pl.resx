@@ -429,4 +429,19 @@
   <data name="Websites allowed to use widget" xml:space="preserve">
     <value>Strony upoważnione do używania widgetu</value>
   </data>
+  <data name="After your request is sent, it is added to queue. You will receive a message via email about the status of your request." xml:space="preserve">
+    <value>Po wysłaniu wniosku jest on dodany do kolejki. Zostaniesz poinformowany przez email o decyzji w sprawie twojego wniosku</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Kontakt</value>
+  </data>
+  <data name="Input coordinates of your resort (you can find them using Google Earth)." xml:space="preserve">
+    <value>Wprowadź współrzędne twojego ośrodka(możesz je znaleść za pomocą Google Earth).</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Lokalizacja</value>
+  </data>
+  <data name="Send request to create resort" xml:space="preserve">
+    <value>Wyślij prośbę o utworzenie ośrodka</value>
+  </data>
 </root>

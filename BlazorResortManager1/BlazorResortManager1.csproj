@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interface\**" />
+    <Content Remove="Interface\**" />
+    <EmbeddedResource Remove="Interface\**" />
+    <None Remove="Interface\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Components\Partials\_ButtonGroup.razor" />
     <Content Remove="Components\Widget\_Imports.razor" />
   </ItemGroup>
@@ -27,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interface\" />
     <Folder Include="wwwroot\Resources\WeatherIcons\" />
   </ItemGroup>
 

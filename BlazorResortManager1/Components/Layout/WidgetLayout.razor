@@ -8,6 +8,7 @@
         :root {
             --rz-white: @styleList[0];
             --rz-base: @styleList[0];
+            --rz-base-lighter: @(modifyHex(styleList[0], -1));
             --rz-base-50: @styleList[1];
             --rz-base-200: @styleList[2];
             --rz-base-300: @styleList[4];
@@ -39,8 +40,14 @@
 
     </style>
 }
-
-
+@if (!string.IsNullOrEmpty(primaryColor))
+{
+    <style>
+        :root {
+            --rz-primary: @primaryColor;
+        }
+    </style>
+}
 
 <RadzenLayout>
     <RadzenBody>
@@ -51,9 +58,31 @@
     [SupplyParameterFromQuery]
     public string styleSheet { get; set; } = string.Empty;
 
+    [SupplyParameterFromQuery]
+    public string primaryColor { get; set; } = string.Empty;
+    public string primaryColorDark { get; set; } = string.Empty;
+    public string primaryColorDarker { get; set; } = string.Empty;
+
+
     private stylesClass? serializedStyles { get; set; } = null;
     private List<string> styleList = [];
 
+    public static string modifyHex(string colorHex, int intensivity)
+    {
+        Color color = ColorTranslator.FromHtml(colorHex);
+        var modifier = 1 + (intensivity / 10.0);
+
+        var red =(int)Math.Floor( color.R * modifier);
+        var green =(int)Math.Floor( color.G * modifier);
+        var blue =(int)Math.Floor( color.B * modifier);
+
+        if(red > 255){ red = 255; }
+        if(green > 255){ green = 255; }
+        if(blue > 255){ blue = 255; }
+
+        return "#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2");
+
+    }
     private sealed class stylesClass
     {
         public string main { get; set; } = string.Empty;
@@ -61,23 +90,6 @@
         public string font { get; set; } = string.Empty;
         public string background { get; set; } = string.Empty;
         public string lines { get; set; } = string.Empty;
-
-        public static string modifyHex(string colorHex, int intensivity)
-        {
-            Color color = ColorTranslator.FromHtml(colorHex);
-            var modifier = 1 + (intensivity / 10.0);
-
-            var red =(int)Math.Floor( color.R * modifier);
-            var green =(int)Math.Floor( color.G * modifier);
-            var blue =(int)Math.Floor( color.B * modifier);
-
-            if(red > 255){ red = 255; }
-            if(green > 255){ green = 255; }
-            if(blue > 255){ blue = 255; }
-
-            return "#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2");
-
-        }
 
         public List<string> colors { get; set; } = new List<string>();
 
@@ -126,17 +138,11 @@
             // styleList = values;
         }
 
-        // var darkenBy = 0.1;
-        // Color color = ColorTranslator.FromHtml(serializedStyles.main);
-        // for (int i = 0; i < 10; i++)
-        // {
-        //     var red = (int)Math.Floor(color.R * darkenBy);
-        //     var green = (int)Math.Floor(color.G * darkenBy);
-        //     var blue = (int)Math.Floor(color.B * darkenBy);
-
-        //     styleList.Add("#" + red.ToString("X2") + green.ToString("X2") + blue.ToString("X2"));
-        //     darkenBy += 0.1;
-        // }
+        if (!string.IsNullOrEmpty(primaryColor))
+        {
+            primaryColor = "#" + primaryColor;
+            primaryColorDarker = modifyHex(primaryColor, 1);
+        }
 
     }
 }
