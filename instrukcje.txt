@@ -1,0 +1,40 @@
+
+
+//start aplikacji//
+1.import bazy danych: 
+-klikając prawym przyciskiem w pole 'Databases' wybierz w sql management studio opcje import data-tier application 
+-importuj w ten sposób plik testDb7.bacpac
+-wybierając nazwę dla bazy użyj 'testDb7'
+
+2.uruchomcie aplikacje
+
+3.logowanie
+-utworzony został jeden użytkownik z uprawnieniami admina
+username: kamil
+hasło: Kamil1_
+od niego można zacząć pracę w aplikacji
+
+
+//stylowanie widgetu//
+
+-do url należy edytować ten tekst swoją paletą kolorów w hex:
+{
+  "colors": [
+    "#D4E4BC",
+    "#96ACB7",
+    "#36558F",
+    "#40376E",
+    "#48233C"
+  ]
+}
+-następnie użyć online base64 encoder tj. https://www.base64encode.org aby zakodować 
+wyżej tekst
+
+-dodać go url jako parametr:
+?styleSheet='base64Tekst'
+
+//stylowanie pojedynczym kolorem//
+-dodać jako parametr:
+?primaryColor='48233C'   <== hex musi być bez '#'
+
+
