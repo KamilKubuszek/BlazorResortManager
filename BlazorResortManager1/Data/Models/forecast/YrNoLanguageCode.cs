@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorResortManager1.Data.Models.forecast
 {
-    [Table("yrNoLanguageCode")]
+    //[Table("yrNoLanguageCode")]
     public class YrNoLanguageCode
     {
         [Key]

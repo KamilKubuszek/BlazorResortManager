@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace BlazorResortManager1.Data.Models.forecast
 {
-    [Table("yrNoCityCode")]
+    //[Table("yrNoCityCode")]
     public class YrNoCityCode
     {
         [Key]
