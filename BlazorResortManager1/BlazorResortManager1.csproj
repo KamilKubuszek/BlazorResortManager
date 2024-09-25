@@ -30,10 +30,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.8" />
     <PackageReference Include="MimeKit" Version="4.7.1" />
-    <PackageReference Include="Radzen.Blazor" Version="5.0.2" />
+    <PackageReference Include="Radzen.Blazor" Version="5.2.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\Resources\WeatherIcons\" />
   </ItemGroup>
 

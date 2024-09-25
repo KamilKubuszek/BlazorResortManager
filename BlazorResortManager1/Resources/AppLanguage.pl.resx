@@ -159,10 +159,10 @@
   <data name="Opened" xml:space="preserve">
     <value>Otwarty</value>
   </data>
-  <data name="Opening time" xml:space="preserve">
+  <data name="Opening Time" xml:space="preserve">
     <value>Godzina otwarcia</value>
   </data>
-  <data name="Closing time" xml:space="preserve">
+  <data name="Closing Time" xml:space="preserve">
     <value>Godzina zamknięcia</value>
   </data>
   <data name="Snow cover" xml:space="preserve">
@@ -443,5 +443,32 @@
   </data>
   <data name="Send request to create resort" xml:space="preserve">
     <value>Wyślij prośbę o utworzenie ośrodka</value>
+  </data>
+  <data name="Easy" xml:space="preserve">
+    <value>Łatwa</value>
+  </data>
+  <data name="Hard" xml:space="preserve">
+    <value>Trudna</value>
+  </data>
+  <data name="Intermidiate" xml:space="preserve">
+    <value>Średnia</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>Długość</value>
+  </data>
+  <data name="Select cameras" xml:space="preserve">
+    <value>Wybierz kamery</value>
+  </data>
+  <data name="Chairlift" xml:space="preserve">
+    <value>Kolejka krzesełkowa</value>
+  </data>
+  <data name="Gondola" xml:space="preserve">
+    <value>Gondola</value>
+  </data>
+  <data name="T-bar" xml:space="preserve">
+    <value>Orczyk</value>
+  </data>
+  <data name="Tape" xml:space="preserve">
+    <value>Taśma</value>
   </data>
 </root>

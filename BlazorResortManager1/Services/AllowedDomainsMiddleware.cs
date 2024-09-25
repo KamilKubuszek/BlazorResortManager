@@ -34,7 +34,7 @@ namespace BlazorResortManager1.Services
                 var normalizedOrigin = origin.Trim().ToLowerInvariant();
 
                 bool isAllowed = false;
-                Console.WriteLine(normalizedOrigin + " ---- " + normalizedReferer);
+                //Console.WriteLine(normalizedOrigin + " ---- " + normalizedReferer);
                 if (!string.IsNullOrEmpty(normalizedOrigin) || !string.IsNullOrEmpty(normalizedOrigin))
                 {
                     isAllowed = allowedDomains.Any(domain =>
