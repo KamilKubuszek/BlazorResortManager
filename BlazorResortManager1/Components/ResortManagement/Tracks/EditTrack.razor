@@ -45,8 +45,10 @@
                                         <RadzenLabel Text="@local["Difficulty"]" Component="difficulty" />
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
-                                        <RadzenDropDown Data="difficulties" @bind-Value="trackDto.trackDifficultyId" TValue="int" TextProperty="name" ValueProperty="id">
-
+                                        <RadzenDropDown Data="difficulties" Multiple="false" @bind-Value="selectedDifficulty" TValue="int" TextProperty="name" ValueProperty="id">
+                                            <Template Context="Track">
+                                                @local[Track.name]
+                                            </Template>
                                         </RadzenDropDown>
                                     </RadzenColumn>
                                 </RadzenRow>
@@ -103,6 +105,7 @@
     private IEnumerable<Guid> selectedCamerasIds { get; set; }
 
     private TrackDifficulty[] difficulties = [];
+    private int selectedDifficulty = 4;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
@@ -131,6 +134,8 @@
                 new Dictionary<string, object> { { "displayMessage", "Editing data..." } },
                 new DialogOptions { CloseDialogOnEsc = false, ShowClose = false }
             );
+            trackDto.trackDifficulty = difficulties.FirstOrDefault(e => e.id == selectedDifficulty);
+
 
             using (var database = contextFactory.CreateDbContext())
             {

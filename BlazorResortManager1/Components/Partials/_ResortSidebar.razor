@@ -14,8 +14,8 @@
         <hr />
         <RadzenPanelMenu Style="width: 100%;" Multiple="false">
             <RadzenPanelMenuItem Text="@local["Approve resorts"]" Path="resort/unapproved" Style="text-align: center" />
+            <RadzenPanelMenuItem Text="@local["Websites allowed to use widget"]" Path="resort/whitelist" Style="text-align: center" />
             <RadzenPanelMenuItem Text="@local["Register users"]" Click="@(() => NavigationManager.NavigateTo("account/register", true))" Style="text-align: center" />
-            <RadzenPanelMenuItem Text="@local["Websites allowed to use widget"]" Click="@(() => NavigationManager.NavigateTo("resort/whitelist/", true))" Style="text-align: center" />
         </RadzenPanelMenu>
     </Authorized>
 </AuthorizeView>

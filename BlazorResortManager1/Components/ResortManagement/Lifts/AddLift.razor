@@ -37,7 +37,9 @@
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenDropDown Data="liftTypes" @bind-Value="liftDto.liftTypeId" TValue="Guid" TextProperty="name" ValueProperty="id">
-
+                                            <Template Context="Lift">
+                                                @local[Lift.name]
+                                            </Template>
                                         </RadzenDropDown>
                                     </RadzenColumn>
                                 </RadzenRow>
@@ -53,7 +55,7 @@
 
                                 <RadzenRow AlignItems="AlignItems.Center">
                                     <RadzenColumn Size="12" SizeMD="4">
-                                        <RadzenLabel Component="capacity" Text="@local["Capacity per unit"]" />
+                                        <RadzenLabel Component="capacity" Text="@local["Capacity per seat"]" />
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenNumeric Name="capacity" @bind-Value="liftDto.capacityPerSeat" Style="width: 100%;" />
@@ -71,7 +73,7 @@
 
                                 <RadzenRow AlignItems="AlignItems.Center">
                                     <RadzenColumn Size="12" SizeMD="4">
-                                        <RadzenLabel Component="duration" Text="@local["Average Duration Time"]" />
+                                        <RadzenLabel Component="duration" Text="@local["Estimated duration time minutes"]" />
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenNumeric Name="duration" @bind-Value="liftDto.estimatedDurationTimeMinutes" Style="width: 100%;" />
@@ -158,6 +160,7 @@
                 opened = true,
                 openingTime = TimeOnly.Parse("9:00"),
                 closingTime = TimeOnly.Parse("18:00")
+
             };
         updateData();
         resortChangeManager.ResortChange += updateData;
@@ -263,6 +266,7 @@
                 selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
 
                 liftTypes = await database.liftTypes.OrderByDescending(e => e.name).ToArrayAsync();
+                liftDto.liftTypeId = liftTypes[0].id;
             }
             StateHasChanged();
         }

@@ -37,9 +37,8 @@
                                     </RadzenColumn>
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenDropDown Data="liftTypes" @bind-Value="liftDto.liftTypeId" TValue="Guid" TextProperty="name" ValueProperty="id" Style="width: 100%;">
-                                            <Template Context="liftType">
-                                                @(liftType.name)
-                                                @* add icon *@
+                                            <Template Context="Lift">
+                                                @local[Lift.name]
                                             </Template>
                                         </RadzenDropDown>
                                     </RadzenColumn>
@@ -90,7 +89,7 @@
                 <RadzenStack>
                     <RadzenCard>
                         <RadzenFieldset Text="@local["Bind cameras"]">
-                            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select Cameras"]" Style="width: 100%;" />
+                            <RadzenDropDown Data="cameras" @bind-Value="selectedCamerasIds" Multiple="true" TextProperty="name" ValueProperty="id" Placeholder="@local["Select cameras"]" Style="width: 100%;" />
                         </RadzenFieldset>
                     </RadzenCard>
                 </RadzenStack>
@@ -115,6 +114,7 @@
     private IEnumerable<Guid> selectedCamerasIds { get; set; }
 
     private LiftType[] liftTypes = [];
+    private Guid selectedType;
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,6 +142,9 @@
                 dialogService.Open<_LoadingTaskDialog>(
                    "", new Dictionary<string, object>() { { "displayMessage", "Editing data..." } },
                        new DialogOptions() { CloseDialogOnEsc = false, ShowClose = false });
+
+                liftDto.liftType = liftTypes.FirstOrDefault(e => e.id == selectedLiftId);
+                liftDto.liftTypeId = selectedType;
 
                 var cameraBindings = database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking();
                 var bindingsToRemove = new List<CameraLiftBinding>();
@@ -181,7 +184,6 @@
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
                     dialogService.Close();
-                    navigationManager.NavigateTo("/resort");
                 }
                 catch
                 {
@@ -214,6 +216,8 @@
                 };
         }
         notificationService.Notify(notifMessage);
+        navigationManager.NavigateTo("/resort/lift");
+
     }
 
     private async Task validateLiftOwnership()
@@ -267,6 +271,7 @@
             cameras = await database.cameras.Where(e => e.resortId == liftDto.resortId).AsNoTracking().ToArrayAsync();
             selectedCamerasIds = await database.cameraLiftBindings.Where(e => e.liftId == liftDto.id).AsNoTracking().Select(e => e.cameraId).ToArrayAsync();
             liftTypes = await database.liftTypes.OrderByDescending(e => e.name).ToArrayAsync();
+            selectedLiftId = liftDto.liftTypeId;
         }
         StateHasChanged();
     }

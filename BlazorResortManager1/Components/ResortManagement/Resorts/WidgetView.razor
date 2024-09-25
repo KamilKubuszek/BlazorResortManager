@@ -1,11 +1,16 @@
 ﻿@page "/resort/widget"
 @attribute [Authorize]
+@inject IStringLocalizer<AppLanguage> local
 
 @if(selectedResort is not null)
 {
     <RadzenStack Style="width:100%" JustifyContent="JustifyContent.Center">
         <iframe width="800px" height="400px" src=@($"https://localhost:7103/widget/{selectedResort.id}")></iframe>
     </RadzenStack>
+}
+else
+{
+    <p>@local["Select resort first"]</p>
 }
 
 

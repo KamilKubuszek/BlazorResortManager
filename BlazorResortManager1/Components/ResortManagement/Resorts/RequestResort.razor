@@ -9,12 +9,12 @@
 @inject DialogService dialogService
 
 <h3 class="text-3xl font-bold">@local["Send request to create resort"]</h3>
-
+<hr />
+<p>@local["After your request is sent, it is added to queue. You will receive a message via email about the status of your request."]</p>
 <br />
 
 <RadzenTemplateForm Data="resortDto" TItem="Resort" Submit="addResort">
     <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
-        <!-- Left Column -->
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack>
                 <RadzenCard>
@@ -55,7 +55,6 @@
             </RadzenStack>
         </RadzenColumn>
 
-        <!-- Right Column -->
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack>
                 <RadzenCard>
@@ -102,7 +101,8 @@
                             <RadzenRow>
                                 <RadzenColumn Size="12" SizeMD="6">
                                     <RadzenLabel Component="cordX" Text="@local["X Axis"]" />
-                                    <RadzenMask Mask="**° **'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" Style="width: 100%;" />
+                                    <RadzenMask Mask="**° **\'" Placeholder="12° 33'" Name="cordX" @bind-Value="resortDto.coordinatesX" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="cordX" />
                                     <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedX">
                                         <Items>
                                             <RadzenSelectBarItem Value="1" Text="@local["East"]" />
@@ -113,7 +113,8 @@
 
                                 <RadzenColumn Size="12" SizeMD="6">
                                     <RadzenLabel Component="cordY" Text="@local["Y Axis"]" />
-                                    <RadzenMask Mask="**° **'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 100%;" />
+                                    <RadzenMask Mask="**° **\'" Placeholder="32° 87'" Name="cordY" @bind-Value="resortDto.coordinatesY" Style="width: 100%;" />
+                                    <RadzenDataAnnotationValidator Component="cordY" />
                                     <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="SelectedY">
                                         <Items>
                                             <RadzenSelectBarItem Value="1" Text="@local["North"]" />
@@ -133,14 +134,13 @@
         <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Text="@local["Submit"]" />
     </RadzenStack>
 
-    <hr />
-    <p>@local["After your request is sent, it is added to queue. You will receive a message via email about the status of your request."]</p>
+   
 </RadzenTemplateForm>
 
 
 @code {
-    private int SelectedX { get; set; }
-    private int SelectedY { get; set; }
+    private int SelectedX { get; set; } = 1;
+    private int SelectedY { get; set; } = 1;
 
     private Resort? resortDto = new Resort() { id = Guid.NewGuid(), approved = false };
 

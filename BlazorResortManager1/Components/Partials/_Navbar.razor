@@ -1,23 +1,36 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IStringLocalizer<AppLanguage> local
 
-<RadzenMenu>
-    <RadzenMenuItem Path="home" Text="@local["Home"]" />
-    <RadzenMenuItem Path="resort" Text="@local["Resort"]" />
-    <RadzenMenuItem Path="resort/widget" Text="@local["Widget"]" />
-    <RadzenMenuItem Path="resort/tutorial" Text="@local["Tutorial"]" />
-    <RadzenMenuItem Path="resort/status/update" Text="@local["Update status"]" />
-    <RadzenMenuItem Click="@(() => NavigationManager.NavigateTo("account/login", true))" Text="@local["Logout"]" />
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Style="width: 100%">
+    <RadzenMenu>
+        <RadzenMenuItem Path="home" Text="@local["Home"]" />
+        <RadzenMenuItem Path="resort" Text="@local["Resort"]" />
+        <RadzenMenuItem Path="resort/widget" Text="@local["Widget"]" />
+        <RadzenMenuItem Path="resort/tutorial" Text="@local["Tutorial"]" />
+        <RadzenMenuItem Path="resort/status/add" Text="@local["Update status"]" />
+@*         <RadzenMenuItem>
+            <Template>
+                asasasa
+            </Template>
+        </RadzenMenuItem> *@
 
-    <RadzenProfileMenu Style="float: right">
+        @*     <RadzenProfileMenu Style="float: right">
         <Template>
-            <RadzenGravatar Email="user@example.com" />
+        @local["Account"]
         </Template>
         <ChildContent>
+        <RadzenProfileMenuItem  Click="@(() => Console.WriteLine("ASSSSSASASASASASAS"))" Text="CALL ASAS">
+
+        </RadzenProfileMenuItem>
         </ChildContent>
-    </RadzenProfileMenu>
-    <RadzenAppearanceToggle />
-</RadzenMenu>
+        </RadzenProfileMenu> *@
+    </RadzenMenu>
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenAppearanceToggle />
+        <RadzenButton Text="@local["Logout"]" Click="@(() => NavigationManager.NavigateTo("Account/Login", true))" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" />
+    </RadzenStack>
+</RadzenStack>
+
 
 @* <form Model="model" action="Account/Logout" method="post">
     <AntiforgeryToken />

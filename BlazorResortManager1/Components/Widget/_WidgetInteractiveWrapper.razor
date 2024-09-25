@@ -153,28 +153,36 @@
                     </RadzenColumn>
                     <RadzenColumn>
                         <p>
-                            @local["On the camera you can see objects: "]
-                            @foreach (var bind in cameras[currentCameraIndex].trackBindings)
+                            @if(!string.IsNullOrEmpty(cameras[currentCameraIndex].description))
                             {
-                                @bind.track.name
-                                if (cameras[currentCameraIndex].trackBindings.Last() != bind)
+                                @cameras[currentCameraIndex].description
+                            }
+                            else
+                            {
+                                @local["On the camera you can see objects: "]
+                                @foreach (var bind in cameras[currentCameraIndex].trackBindings)
                                 {
-                                    @(", ")
+                                    @bind.track.name
+                                    if (cameras[currentCameraIndex].trackBindings.Last() != bind)
+                                    {
+                                        @(", ")
+                                    }
+
                                 }
 
-                            }
+                                @(cameras[currentCameraIndex].liftBindings.Any()
+                                    && cameras[currentCameraIndex].trackBindings.Any() ? ", " : "")
 
-                            @(cameras[currentCameraIndex].liftBindings.Any()
-                                && cameras[currentCameraIndex].trackBindings.Any() ? ", " : "")
-
-                            @foreach (var bind in cameras[currentCameraIndex].liftBindings)
-                            {
-                                @bind.lift.name
-                                if (cameras[currentCameraIndex].liftBindings.Last() != bind)
+                                @foreach (var bind in cameras[currentCameraIndex].liftBindings)
                                 {
-                                    @(", ")
+                                    @bind.lift.name
+                                    if (cameras[currentCameraIndex].liftBindings.Last() != bind)
+                                    {
+                                        @(", ")
+                                    }
                                 }
                             }
+                            
                         </p>
 
                     </RadzenColumn>

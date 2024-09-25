@@ -50,5 +50,6 @@
         {
             userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         }
+        NavManager.NavigateTo("/resort", true);
     }
 }

@@ -88,13 +88,13 @@
                                     </Template>
                                 </RadzenDataGridColumn>
 
-                                <RadzenDataGridColumn Title="@local["Opening time"]">
+                                <RadzenDataGridColumn Title="@local["Opening Time"]">
                                     <Template Context="lstatus">
                                         <RadzenDatePicker @bind-Value=@lstatus.openingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
                                     </Template>
                                 </RadzenDataGridColumn>
 
-                                <RadzenDataGridColumn Title="@local["Closing time"]">
+                                <RadzenDataGridColumn Title="@local["Closing Time"]">
                                     <Template Context="lstatus">
                                         <RadzenDatePicker @bind-Value=@lstatus.closingTime ShowTime="true" TimeOnly="true" DateFormat="HH:mm" Style="min-width: 115px" />
                                     </Template>
@@ -172,7 +172,7 @@ else
                         };
                     rstatus.id = Guid.NewGuid();
                     rstatus.parentResort = null;
-                    
+
 
                     var tstatuses = new List<TrackStatus>();
                     var lstatuses = new List<LiftStatus>();
@@ -218,6 +218,7 @@ else
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
                     dialogService.Close();
+                    navigationManager.NavigateTo("/resort/status");
 
                 }
                 catch (Exception ex)

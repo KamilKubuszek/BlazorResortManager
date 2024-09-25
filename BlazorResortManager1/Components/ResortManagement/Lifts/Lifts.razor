@@ -27,9 +27,9 @@
                         <RadzenDataGridColumn TItem="Lift" Property="name" Title="@local["Name"]" Frozen="true">
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Lift" Property="type" Title="@local["Type"]">
+                        <RadzenDataGridColumn TItem="Lift" Title="@local["Type"]">
                             <Template Context="Lift">
-                                @Lift.liftType.name
+                                @local[Lift?.liftType?.name ?? "undefined"]
                             </Template>
                         </RadzenDataGridColumn>
 
@@ -63,7 +63,6 @@
 @inject NavigationManager navigationManager
 @inject ResortChangeManager resortChangeManager
 @inject IStringLocalizer<AppLanguage> local
-@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 @code {

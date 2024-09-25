@@ -22,9 +22,8 @@
             <RadzenColumn>
                 <RadzenCard id="toResize">
                     <RadzenDataGrid Style="height: 100%" TItem="Track" Data=@resortData.tracks @bind-Value=selectedTracks SelectionMode="DataGridSelectionMode.Single" PageSize="7"
-                                    AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true">@* @(resortData.tracks.Count > 7) *@
+                                    AllowAlternatingRows="false" AllowFiltering="false" AllowPaging="false" AllowSorting="true">
                         <Columns>
-                            @* <RadzenDataGridColumn TItem="Track" Property="id" Title="@local["ID"]" Width="100px" Frozen="true" /> *@
 
                             <RadzenDataGridColumn TItem="Track" Property="name" Title="@local["Name"]" Width="100px" Frozen="true" />
 
@@ -32,7 +31,7 @@
 
                             <RadzenDataGridColumn TItem="Track" Title="@local["Difficulty"]" Width="100px">
                                 <Template Context="Track">
-                                    @Track.trackDifficulty.name
+                                    @local[Track?.trackDifficulty?.name ?? "undefined"]
                                 </Template>
                             </RadzenDataGridColumn>
 
@@ -73,7 +72,7 @@ else
     [CascadingParameter]
     public Resort? selectedResort { get; set; }
 
-    private Resort resortData { get; set; }
+    private Resort? resortData;
 
     private IList<Track> selectedTracks { get; set; } = new List<Track>();
 
@@ -87,7 +86,7 @@ else
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
+           // await JSRuntime.InvokeVoidAsync("sizeHeightToBottom", "toResize");
         }
     }
 
@@ -163,7 +162,8 @@ else
             using (var database = contextFactory.CreateDbContext())
             {
                 resortData = selectedResort;
-                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id).Include(e => e.trackDifficulty)
+                resortData.tracks = await database.tracks.Where(e => e.resortId == selectedResort.id)
+                    .Include(e => e.trackDifficulty)
                     .OrderByDescending(e => e.name).ToListAsync();
             }
             StateHasChanged();

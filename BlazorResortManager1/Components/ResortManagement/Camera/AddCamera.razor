@@ -7,6 +7,7 @@
 @inject ResortChangeManager resortChangeManager
 @inject NotificationService notificationService
 @inject DialogService dialogService
+@inject NavigationManager navigationManager
 @inject IDbContextFactory<ApplicationDbContext> contextFactory
 
 <h3 class="text-3xl font-bold">@local["Add Camera"] @(selectedResort is not null ? local["For"] + " " + selectedResort.name : "")</h3>
@@ -27,6 +28,15 @@
                                     <RadzenColumn Size="12" SizeMD="8">
                                         <RadzenTextBox Name="name" @bind-Value="cameraDto.name" Style="width: 100%;" />
                                         <RadzenDataAnnotationValidator Component="name" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Component="description" Text="@local["Description"]" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextArea Name="description" @bind-Value="cameraDto.description" Style="width: 100%;" />
+                                        <RadzenDataAnnotationValidator Component="description" />
                                     </RadzenColumn>
                                 </RadzenRow>
                                 <RadzenRow AlignItems="AlignItems.Center">
@@ -86,7 +96,7 @@
                 {
                     await database.SaveChangesAsync();
                     await Task.Delay(2000);
-                    
+
                 }
                 catch
                 {
@@ -108,6 +118,10 @@
             };
 
         notificationService.Notify(notifMessage);
+        if (!error)
+        {
+            navigationManager.NavigateTo("/resort/camera");
+        }
     }
 
     private async void updateData(ResortChangeEventArgs? eventArgs = null)

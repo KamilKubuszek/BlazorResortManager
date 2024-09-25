@@ -47,7 +47,9 @@
                                     @* <RadzenTextBox Name="difficulty" @bind-Value="trackDto.difficulty" Style="width: 100%;" />
                                     <RadzenDataAnnotationValidator Component="difficulty" /> *@
                                     <RadzenDropDown Data="difficulties" @bind-Value="trackDto.trackDifficultyId" TValue="int" TextProperty="name" ValueProperty="id">
-
+                                        <Template Context="Track">
+                                            @local[Track.name]
+                                        </Template>
                                     </RadzenDropDown>
                                 </RadzenColumn>
                             </RadzenRow>
@@ -190,7 +192,7 @@
     protected override async Task OnInitializedAsync()
     {
         trackDto.id = Guid.NewGuid();
-        trackDto.trackDifficultyId = 0;
+        trackDto.trackDifficultyId = 4;
         statusDto = new TrackStatus
             {
                 id = Guid.NewGuid(),
@@ -220,7 +222,6 @@
 
             using (var database = contextFactory.CreateDbContext())
             {
-
 
                 var cameraEntries = selectedCamerasIds.Select(cameraId => new CameraTrackBinding
                     {
