@@ -22,9 +22,9 @@
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn>
-
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+
             <RadzenStack JustifyContent="JustifyContent.Center" Style="width: 100%">
                 <DataAnnotationsValidator />
                 @* <ValidationSummary class="text-danger" role="alert" /> *@
@@ -115,8 +115,17 @@
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-            await SignInManager.SignOutAsync();
+
         }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            NavigationManager.NavigateTo("Account/Login", true);
+        }
+
     }
 
     private async Task LoginUser()

@@ -1,0 +1,17 @@
+﻿@page "/LogoutAndRedirect"
+@layout MainLayout
+@attribute [Authorize]
+
+<h3>Logout and redirect</h3>
+
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SignInManager.SignOutAsync();
+        NavigationManager.NavigateTo("Account/Login", true);
+    }
+}
