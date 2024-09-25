@@ -24,6 +24,15 @@
 								</RadzenRow>
 								<RadzenRow AlignItems="AlignItems.Center">
 									<RadzenColumn Size="12" SizeMD="4">
+										<RadzenLabel Component="description" Text="@local["Description"]" />
+									</RadzenColumn>
+									<RadzenColumn Size="12" SizeMD="8">
+										<RadzenTextArea Name="description" @bind-Value="cameraDto.description" Style="width: 100%;" />
+										<RadzenDataAnnotationValidator Component="description" />
+									</RadzenColumn>
+								</RadzenRow>
+								<RadzenRow AlignItems="AlignItems.Center">
+									<RadzenColumn Size="12" SizeMD="4">
 										<RadzenLabel Component="link" Text="@local["Url"]" />
 									</RadzenColumn>
 									<RadzenColumn Size="12" SizeMD="8">
